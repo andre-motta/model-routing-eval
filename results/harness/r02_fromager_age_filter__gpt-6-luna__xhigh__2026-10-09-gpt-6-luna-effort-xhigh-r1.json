@@ -1,0 +1,23 @@
+{
+ "task": "r02_fromager_age_filter",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 1,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh-r1",
+ "wall_s": 134.9,
+ "tokens": {
+  "input": 37900,
+  "cached": 423168,
+  "cache_write": 0,
+  "output": 6483,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.007473,
+ "error": null
+}

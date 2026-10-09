@@ -39,6 +39,9 @@ def main():
         sm = run / "summary.yaml"
         if not rr.exists():
             continue
+        # pilot smoke runs duplicate grid cases on a handful of tasks; keep only the ticket-only pilots (extra judged runs)
+        if run.name.startswith("smoke") and "tickets" not in run.name:
+            continue
         R = json.loads(rr.read_text())
         S = yaml.safe_load(sm.read_text()) if sm.exists() else {}
         per_judge = S.get("per_case", {})

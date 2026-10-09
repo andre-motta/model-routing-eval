@@ -1,6 +1,6 @@
 # Results
 
-382 runs, 24 tasks, 11 configs
+404 runs, 24 tasks, 12 configs
 
 ## Pass rate and mean cost per config, by tier
 
@@ -84,26 +84,27 @@
 |---|---|---|---|---|
 | glm-5-3@medium | 88% | $0.000 | 484 | 8 |
 | gpt-6-luna@low | 81% | $0.010 | 128 | 16 |
-| gpt-6-luna@xhigh | 88% | $0.025 | 418 | 8 |
+| gpt-6-luna@xhigh | 79% | $0.021 | 346 | 14 |
 | gpt-6.1-sol@low | 94% | $0.059 | 96 | 16 |
-| haiku-5-5@low | 88% | $0.097 | 86 | 16 |
+| haiku-5-5@low | 84% | $0.092 | 89 | 19 |
 | haiku-5-5@medium | 88% | $0.143 | 117 | 16 |
+| gpt-6.1-sol@xhigh | 100% | $0.181 | 277 | 7 |
 | gpt-5.6-terra@medium | 75% | $0.243 | 241 | 8 |
 | sonnet-5-5@low | 94% | $0.416 | 54 | 16 |
-| sonnet-5-5@medium | 94% | $0.422 | 54 | 16 |
+| sonnet-5-5@medium | 95% | $0.419 | 54 | 19 |
 | gpt-6-astra@medium | 100% | $0.615 | 123 | 8 |
-| opus-5-5@medium | 100% | $1.181 | 103 | 8 |
+| opus-5-5@medium | 100% | $1.141 | 99 | 11 |
 
 ## Cheapest config that passed every repetition, per task
 
 | task | tier | cheapest passing config | cost | most expensive passing | cost | saving |
 |---|---|---|---|---|---|---|
 | r01_fromager_distinfo | 6 | gpt-6-luna@low | $0.007 | opus-5-5@medium | $1.048 | 99% |
-| r01t_fromager_distinfo_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.880 | 100% |
+| r01t_fromager_distinfo_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.879 | 100% |
 | r02_fromager_age_filter | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.526 | 100% |
-| r02t_fromager_age_filter_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.769 | 100% |
+| r02t_fromager_age_filter_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.719 | 100% |
 | r03_fromager_dep_chain | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.031 | 100% |
-| r03t_fromager_dep_chain_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.645 | 100% |
+| r03t_fromager_dep_chain_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.600 | 100% |
 | r04_fromager_age_fallback | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.504 | 100% |
 | r05_fromager_version_prebuilt | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $2.050 | 100% |
 | t01_rename_symbol | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.214 | 100% |
@@ -125,5 +126,5 @@
 
 ## Routing scenario
 
-Everything on `opus-5-5@medium`: $16.95 for 100% pass rate (24 runs).
+Everything on `opus-5-5@medium`: $20.05 for 100% pass rate (27 runs).
 Routed per tier to the cheapest fully-passing config: $0.00 for 23 passing tasks.

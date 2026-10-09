@@ -1,0 +1,23 @@
+{
+ "task": "r02_fromager_age_filter",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-xhigh",
+ "wall_s": 209.0,
+ "tokens": {
+  "input": 59609,
+  "cached": 630272,
+  "cache_write": 0,
+  "output": 6766,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.130687,
+ "error": null
+}

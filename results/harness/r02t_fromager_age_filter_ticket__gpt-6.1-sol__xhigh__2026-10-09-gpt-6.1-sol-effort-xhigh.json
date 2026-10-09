@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-xhigh",
+ "wall_s": 196.1,
+ "tokens": {
+  "input": 66262,
+  "cached": 737536,
+  "cache_write": 0,
+  "output": 6459,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.138344,
+ "error": null
+}

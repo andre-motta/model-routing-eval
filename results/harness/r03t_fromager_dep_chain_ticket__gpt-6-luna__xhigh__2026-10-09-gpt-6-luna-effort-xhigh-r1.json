@@ -1,0 +1,23 @@
+{
+ "task": "r03t_fromager_dep_chain_ticket",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 1,
+ "passed": false,
+ "quality": 2,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh-r1",
+ "wall_s": 318.3,
+ "tokens": {
+  "input": 93850,
+  "cached": 1380864,
+  "cache_write": 0,
+  "output": 15346,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.021482,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "r01t_fromager_distinfo_ticket",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-xhigh",
+ "wall_s": 146.9,
+ "tokens": {
+  "input": 67318,
+  "cached": 313856,
+  "cache_write": 0,
+  "output": 4924,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.080626,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "r01t_fromager_distinfo_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 4,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "smoke-sonnet-medium-tickets",
+ "wall_s": 29.2,
+ "tokens": {
+  "input": 8,
+  "cached": 110121,
+  "cache_write": 39513,
+  "output": 3339,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.21348219999999998,
+ "error": null
+}
