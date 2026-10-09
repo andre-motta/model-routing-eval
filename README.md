@@ -5,7 +5,7 @@ Small, reproducible experiment behind the Red Hat AI Enablement session
 
 > What is the cheapest (model, reasoning effort) pair that still gets this task right?
 
-Nineteen coding tasks in six difficulty tiers, run headlessly through a real
+Twenty-one coding tasks in six difficulty tiers, run headlessly through a real
 coding agent (OpenAI Codex CLI or Claude Code), verified by hidden tests,
 with tokens, cost and wall time recorded per run.
 
@@ -31,7 +31,7 @@ results/                 raw records (committed for the talk)
 | 3 | Debugging | mutable default, timezone, thread safety, unicode dedupe |
 | 4 | Architecture | plugin registry refactor, sync to async migration, backtracking dependency resolver, JSON Patch |
 | 5 | Long context | one-cent rounding bug and a quadratic regression, each hidden in a 40-module package |
-| 6 | Real repository | three fromager bug fixes (#1146, age filter bypass, #1214), hidden tests are the real PR's tests |
+| 6 | Real repository | five fromager changes: #1146, age filter bypass, #1214, the full PR #1289, and an 8-commit version-specific pre_built series; hidden tests are the real PR tests |
 
 ## Run
 

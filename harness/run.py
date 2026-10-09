@@ -55,7 +55,8 @@ def materialize_source(task, work):
     """task.yaml `source: {repo: <url>, commit: <sha>}` checks out that commit into work (no history)."""
     src = task["source"]
     CACHE.mkdir(parents=True, exist_ok=True)
-    name = src["repo"].rstrip("/").split("/")[-1].removesuffix(".git")
+    parts = src["repo"].rstrip("/").replace(":", "/").split("/")
+    name = "__".join(parts[-2:]).removesuffix(".git")  # owner__repo, so forks do not collide
     cache = CACHE / name
     if not cache.exists():
         subprocess.run(["git", "clone", "-q", "--bare", src["repo"], str(cache)], check=True)

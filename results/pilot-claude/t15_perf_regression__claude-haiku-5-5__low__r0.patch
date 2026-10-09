@@ -1,0 +1,52 @@
+diff --git a/reporting/__pycache__/dedupe.cpython-314.pyc b/reporting/__pycache__/dedupe.cpython-314.pyc
+index 7fbdce5..deb541e 100644
+Binary files a/reporting/__pycache__/dedupe.cpython-314.pyc and b/reporting/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/reporting/dedupe.py b/reporting/dedupe.py
+index b6d0f31..349197f 100644
+--- a/reporting/dedupe.py
++++ b/reporting/dedupe.py
+@@ -5,11 +5,11 @@ Refactored to keep insertion order of first occurrence, which the old set-based
+ 
+ 
+ def dedupe_rows(rows):
+-    seen_ids = []
++    seen_ids = set()
+     out = []
+     for r in rows:
+         if r.event_id in seen_ids:
+             continue
+-        seen_ids.append(r.event_id)
++        seen_ids.add(r.event_id)
+         out.append(r)
+     return out
+diff --git a/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..a1370a8
+Binary files /dev/null and b/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_dedupe_perf.py b/tests/test_dedupe_perf.py
+new file mode 100644
+index 0000000..c96a5c9
+--- /dev/null
++++ b/tests/test_dedupe_perf.py
+@@ -0,0 +1,21 @@
++import time
++
++from reporting import parse_rows, build_report, dedupe_rows
++
++
++def test_dedupe_keeps_first_occurrence_order():
++    rows = parse_rows(["e1,a,s,1,1", "e2,a,s,1,1", "e1,a,s,9,9", "e3,a,s,1,1"])
++    out = dedupe_rows(rows)
++    assert [r.event_id for r in out] == ["e1", "e2", "e3"]
++    assert out[0].cpu_seconds == 1.0
++
++
++def test_report_on_30k_rows_is_fast():
++    # Quadratic dedupe (list membership) takes several seconds on this size; linear takes well under one.
++    lines = [f"e{i},t{i % 50},s{i % 9},1.0,10" for i in range(30000)]
++    rows = parse_rows(lines)
++    start = time.perf_counter()
++    rep = build_report(rows)
++    elapsed = time.perf_counter() - start
++    assert rep[-1]["events"] == 30000
++    assert elapsed < 2.0, f"build_report took {elapsed:.2f}s on 30k rows"

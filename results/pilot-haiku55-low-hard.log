@@ -1,0 +1,5 @@
+run  r01_fromager_distinfo__claude-haiku-5-5__low__r0 ... PASS  $0.015  41s  turns=10
+run  r02_fromager_age_filter__claude-haiku-5-5__low__r0 ... PASS  $0.012  28s  turns=8
+run  r03_fromager_dep_chain__claude-haiku-5-5__low__r0 ... PASS  $0.019  64s  turns=17
+run  t15_perf_regression__claude-haiku-5-5__low__r0 ... PASS  $0.010  37s  turns=10
+run  t16_json_patch__claude-haiku-5-5__low__r0 ... PASS  $0.011  35s  turns=5
