@@ -1,0 +1,15 @@
+tier: 6
+title: 'ticket only: fromager: resolution errors blame the wrong package, include the dependency chain (#1214)'
+timeout: 1800
+source:
+  repo: https://github.com/python-wheel-build/fromager.git
+  commit: fdf55b30af2150d9b5e127b4a83269e96511f6c9
+setup:
+- uv venv -q .venv && VIRTUAL_ENV=.venv SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 uv pip install -q -e ".[test]"
+hidden_dest: tests
+verify: .venv/bin/python -m pytest -q -x -p no:cacheprovider -o addopts="" tests/test_bootstrapper_iterative.py --deselect "tests/test_bootstrapper_iterative.py::TestPhasePrepareSource::test_constraint_logged_when_present"
+oracle:
+  repo_dir: ~/git/fromager
+  range: fdf55b30af2150d9b5e127b4a83269e96511f6c9..844deb0
+ticket_only: true
+variant_of: r03_fromager_dep_chain

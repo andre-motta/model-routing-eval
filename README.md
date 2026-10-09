@@ -33,7 +33,33 @@ results/                 raw records (committed for the talk)
 | 5 | Long context | one-cent rounding bug and a quadratic regression, each hidden in a 40-module package |
 | 6 | Real repository | five fromager changes: #1146, age filter bypass, #1214, the full PR #1289, and an 8-commit version-specific pre_built series; hidden tests are the real PR tests |
 
-## Run
+## Run with agent-eval-harness (recommended)
+
+The tasks are an [agent-eval-harness](https://github.com/opendatahub-io/agent-eval-harness)
+dataset. `eval.yaml` stages each task into the case workspace with a `before_each` hook,
+runs the agent (Claude Code or, via `eval-codex.yaml`, Codex CLI), then an `after_each`
+hook copies the hidden tests in and writes `output/tests.json`. Judges: `tests_pass`
+(objective gate) and, for real-repository tasks, `solution_quality` (LLM judge against
+the merged PR diff in `annotations.yaml`).
+
+```bash
+uv venv && uv pip install -e . -e "../opendatahub-io/agent-eval-harness[mlflow,anova]"
+python harness/export_cases.py                       # tasks/ -> eval/cases/
+./run_eval.sh claude-haiku-5-5 low                   # one configuration, all cases
+./run_eval.sh gpt-6-luna xhigh eval-codex.yaml t04_lru_cache   # Codex, one case
+# full model x effort matrix with ANOVA and a comparison report
+python ../opendatahub-io/agent-eval-harness/skills/eval-anova/scripts/orchestrate.py --config eval.yaml --dry-run
+```
+
+Inside Claude Code with the plugin installed, the same thing is `/eval-run --model
+claude-haiku-5-5 --effort low`, `/eval-anova`, and `/eval-compare eval/runs/model-routing-eval`.
+Reports land under `eval/runs/model-routing-eval/<run-id>/report.html`.
+
+Ticket-only variants (`r01t_*`, `r02t_*`, `r03t_*`) give the agent only the original issue
+text. Their hidden tests reference names the agent cannot know, so they are scored by the
+LLM judge alone (`tests_pass` is skipped via `annotations.ticket_only`).
+
+## Run with the standalone runner
 
 ```bash
 uv venv && uv pip install -e .

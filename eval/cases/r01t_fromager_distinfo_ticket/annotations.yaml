@@ -1,0 +1,7 @@
+tier: 6
+title: 'ticket only: fromager: get_metadata_for_wheel() can return a vendored package''s
+  metadata (#1146)'
+category: tier6
+ticket_only: true
+variant_of: r01_fromager_distinfo
+oracle: oracle.diff

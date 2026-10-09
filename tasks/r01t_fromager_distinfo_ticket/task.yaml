@@ -1,0 +1,15 @@
+tier: 6
+title: 'ticket only: fromager: get_metadata_for_wheel() can return a vendored package''s metadata (#1146)'
+timeout: 1800
+source:
+  repo: https://github.com/python-wheel-build/fromager.git
+  commit: cc322cd1b6aeab4df12e00d411e7960b20f79734
+setup:
+- uv venv -q .venv && VIRTUAL_ENV=.venv SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 uv pip install -q -e ".[test]"
+hidden_dest: tests
+verify: .venv/bin/python -m pytest -q -x -p no:cacheprovider -o addopts="" tests/test_pep658_support.py
+oracle:
+  repo_dir: ~/git/fromager
+  range: cc322cd1b6aeab4df12e00d411e7960b20f79734..3914e3e
+ticket_only: true
+variant_of: r01_fromager_distinfo

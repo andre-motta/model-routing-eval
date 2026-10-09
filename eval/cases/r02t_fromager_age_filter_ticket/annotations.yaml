@@ -1,0 +1,6 @@
+tier: 6
+title: 'ticket only: fromager: constrained packages must bypass max-release-age filtering'
+category: tier6
+ticket_only: true
+variant_of: r02_fromager_age_filter
+oracle: oracle.diff

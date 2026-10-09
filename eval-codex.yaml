@@ -1,0 +1,16 @@
+# Codex profile: same tasks, hooks and judges, Codex CLI as the agent.
+# Run: /eval-run --config eval-codex.yaml --model gpt-6-luna --effort xhigh
+extends: ./eval.yaml
+runner:
+  type: codex
+  effort: medium
+models:
+  skill: gpt-6-luna
+matrix:
+  factors:
+    model: !replace
+      - gpt-6-luna
+      - gpt-6.1-sol
+    effort: !replace
+      - low
+      - xhigh

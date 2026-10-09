@@ -1,0 +1,5 @@
+tier: 6
+title: 'fromager: get_metadata_for_wheel() can return a vendored package''s metadata
+  (#1146)'
+category: tier6
+oracle: oracle.diff

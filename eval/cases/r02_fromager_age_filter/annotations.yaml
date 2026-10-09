@@ -1,0 +1,4 @@
+tier: 6
+title: 'fromager: constrained packages must bypass max-release-age filtering'
+category: tier6
+oracle: oracle.diff

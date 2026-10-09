@@ -1,0 +1,5 @@
+tier: 6
+title: 'fromager: version-specific pre_built and wheel_server_url overrides must re-resolve
+  the download URL (8-commit series)'
+category: tier6
+oracle: oracle.diff

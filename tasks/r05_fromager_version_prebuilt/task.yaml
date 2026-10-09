@@ -6,3 +6,4 @@ setup:
   - "uv venv -q .venv && VIRTUAL_ENV=.venv SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 uv pip install -q -e \".[test]\""
 hidden_dest: tests
 verify: .venv/bin/python -m pytest -q -x -p no:cacheprovider -o addopts="" tests/test_packagesettings.py tests/test_bootstrapper_iterative.py --deselect "tests/test_bootstrapper_iterative.py::TestPhasePrepareSource::test_constraint_logged_when_present"
+oracle: {repo_dir: ~/git/fromager, range: f1d8bc3c8237fa658f9426426a50fb18ab42377d..6d482bf}

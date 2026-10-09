@@ -1,0 +1,3 @@
+tier: 4
+title: Refactor if-chain exporters into a plugin registry
+category: tier4

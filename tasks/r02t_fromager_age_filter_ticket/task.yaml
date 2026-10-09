@@ -1,0 +1,15 @@
+tier: 6
+title: 'ticket only: fromager: constrained packages must bypass max-release-age filtering'
+timeout: 1800
+source:
+  repo: https://github.com/python-wheel-build/fromager.git
+  commit: 925a19e084ae4392202d25fd9d5966f993e15a5d
+setup:
+- uv venv -q .venv && VIRTUAL_ENV=.venv SETUPTOOLS_SCM_PRETEND_VERSION=0.0.0 uv pip install -q -e ".[test]"
+hidden_dest: tests
+verify: .venv/bin/python -m pytest -q -x -p no:cacheprovider -o addopts="" tests/test_cooldown.py
+oracle:
+  repo_dir: ~/git/fromager
+  range: 925a19e084ae4392202d25fd9d5966f993e15a5d..d5ca37e
+ticket_only: true
+variant_of: r02_fromager_age_filter

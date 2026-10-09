@@ -1,0 +1,133 @@
+# agent-eval-harness config: cheapest (model, effort) that still passes, per coding-task tier.
+# Run:  /eval-run --model claude-haiku-5-5 --effort low        (inside Claude Code with the plugin)
+#   or: ./run_eval.sh claude-haiku-5-5 low                       (headless, same pipeline scripts)
+# Matrix with statistics:  /eval-anova   (uses the matrix block below)
+name: model-routing-eval
+description: >
+  21 coding tasks in six tiers run headlessly through a real coding agent. A before_each hook
+  stages the task's fixture repo (or a real repo at a base commit) into the case workspace;
+  an after_each hook copies the hidden tests in and writes output/tests.json. Judges: the
+  hidden tests (objective gate) and, for real-repo tasks, an LLM comparison against the
+  merged PR.
+
+execution:
+  mode: case
+  prompt: "{{ input.prompt }}"
+  timeout: 2400
+  max_budget_usd: 5.0
+
+runner:
+  type: claude-code            # see eval-codex.yaml for Codex
+  effort: low
+  permission_mode: acceptEdits
+  env:
+    # The runner forwards only an allowlist of variables to the agent. Forward the Claude Code
+    # config dir so the agent authenticates like the caller (resolved from the caller's env).
+    CLAUDE_CONFIG_DIR: $CLAUDE_CONFIG_DIR
+
+models:
+  skill: claude-haiku-5-5
+  judge: runner:/claude-sonnet-5-5   # judge through the Claude Code CLI, same auth as the agent
+
+permissions:
+  allow:
+    - "Bash"
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "MultiEdit"
+    - "Glob"
+    - "Grep"
+  deny:
+    - "mcp__*"
+    - "WebFetch"
+    - "WebSearch"
+    - { path: "hidden/", tools: ["Read", "Bash", "Glob", "Grep"] }
+
+dataset:
+  path: eval/cases
+  schema: |
+    Each case directory has input.yaml with a 'task' id and the 'prompt' the agent receives,
+    and annotations.yaml with 'tier', 'title' and, for real-repository tasks, 'oracle'
+    (the merged PR diff) for the LLM judge. The task fixture itself is staged by the
+    before_each hook from tasks/<task>/.
+  workspace:
+    files:
+      - input.yaml
+
+hooks:
+  before_each:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_prepare.py"
+      description: "Stage the task fixture or repo checkout and run its setup"
+      timeout: 1200
+  after_each:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_verify.py"
+      description: "Copy hidden tests in, run the verifier, write output/tests.json and solution.diff"
+      timeout: 1200
+      on_failure: continue
+
+outputs:
+  - path: output
+    schema: |
+      tests.json ({"passed": bool, "task": id, "tier": n}), solution.diff (the agent's
+      changes), verify.log (pytest output of the hidden tests).
+
+traces:
+  stdout: true
+  stderr: true
+  events: false
+  metrics: true
+
+judges:
+  - name: tests_pass
+    description: Hidden tests pass on the agent's change (objective gate). Skipped for ticket-only variants.
+    if: "not annotations.get('ticket_only')"
+    check: |
+      import json
+      for path, content in outputs.get("files", {}).items():
+          if path.endswith("tests.json") and isinstance(content, str):
+              try:
+                  d = json.loads(content)
+              except json.JSONDecodeError as exc:
+                  return False, f"malformed tests.json: {exc}"
+              return bool(d.get("passed")), ("hidden tests passed" if d.get("passed") else "hidden tests failed")
+      return False, "no tests.json in outputs (verifier did not run)"
+
+  - name: solution_quality
+    description: LLM judge, real-repository tasks only (including ticket-only variants). Does the diff solve the task like the merged PR?
+    if: "annotations.get('oracle')"
+    feedback_type: int
+    score_range: [1, 5]
+    prompt: |
+      You are scoring a coding agent's change to the fromager repository.
+
+      ## Task given to the agent
+      {{ inputs }}
+
+      ## Agent's change (output/solution.diff)
+      {{ outputs.files["output/solution.diff"] }}
+
+      ## Hidden-test verifier log (empty for ticket-only variants)
+      {{ outputs.files["output/verify.log"] }}
+
+      ## Reference: the merged PR diff
+      {{ outputs.annotation_oracle_content }}
+
+      Assess: (1) does it address the core problem, (2) are the changes sound and minimal,
+      (3) would they plausibly pass the PR's tests. Score 1-5 (1 = no meaningful attempt,
+      3 = addresses it with gaps, 5 = comparable to the merged PR).
+      Respond with JSON: {"score": <int 1-5>, "rationale": "<one sentence>"}
+
+thresholds:
+  tests_pass:
+    min_pass_rate: 0.8
+
+matrix:
+  factors:
+    model:
+      - claude-haiku-5-5
+      - claude-sonnet-5-5
+    effort:
+      - low
+      - medium
+  replications: 1

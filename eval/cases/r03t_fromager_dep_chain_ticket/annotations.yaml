@@ -1,0 +1,7 @@
+tier: 6
+title: 'ticket only: fromager: resolution errors blame the wrong package, include
+  the dependency chain (#1214)'
+category: tier6
+ticket_only: true
+variant_of: r03_fromager_dep_chain
+oracle: oracle.diff

@@ -4,3 +4,5 @@ __pycache__/
 results/**/work/
 .pytest_cache/
 .cache/
+eval/runs/
+tmp/

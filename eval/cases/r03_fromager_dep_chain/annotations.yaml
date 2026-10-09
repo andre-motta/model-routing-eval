@@ -1,0 +1,5 @@
+tier: 6
+title: 'fromager: resolution errors blame the wrong package, include the dependency
+  chain (#1214)'
+category: tier6
+oracle: oracle.diff

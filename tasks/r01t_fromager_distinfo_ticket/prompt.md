@@ -1,0 +1,15 @@
+This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Fix the issue below. Add a regression test and run the relevant test file.
+
+Issue #1146: get_metadata_for_wheel() may return wrong metadata
+
+`get_metadata_for_wheel` returns the first match for `name.endswith(".dist-info/METADATA")`.
+This is a bad assumption. A wheel can contain multiple `.dist-info` directories. It's
+common to include dist-info directories of vendored packages.
+
+`get_metadata_for_wheel` should only look at `dist-info` directories in the root of the
+wheel. Or better: parse the URL, split the name, and use
+`{dist_name}-{dist_version}.dist-info/METADATA`.

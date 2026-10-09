@@ -1,0 +1,318 @@
+diff --git a/docs/concepts/hooks-and-overrides.rst b/docs/concepts/hooks-and-overrides.rst
+index 43d5f28..7a0b399 100644
+--- a/docs/concepts/hooks-and-overrides.rst
++++ b/docs/concepts/hooks-and-overrides.rst
+@@ -48,7 +48,8 @@ name.  If the module defines the requested method, it is called instead
+ of the default; otherwise the default runs.
+ 
+ Override hooks cover resolution, source acquisition, building,
+-dependency extraction, and build environment customization.  Third-party
++dependency extraction, build environment customization, and prebuilt
++wheel selection (``is_pre_built``, added in version 0.95.0).  Third-party
+ packages register overrides via the ``fromager.project_overrides``
+ entry-point group in their ``pyproject.toml``, mapping a package name to
+ a Python module.
+diff --git a/docs/concepts/package-settings.rst b/docs/concepts/package-settings.rst
+index 2f0a0d7..d3a2a8d 100644
+--- a/docs/concepts/package-settings.rst
++++ b/docs/concepts/package-settings.rst
+@@ -78,6 +78,9 @@ layers override earlier ones:
+    │  4. Variant overrides (within package YAML)      │
+    │     (env vars, pre_built, wheel_server_url)      │
+    │                                                  │
++   │  4a. Version-specific variant overrides          │
++   │     (per-version pre_built, wheel_server_url)    │
++   │                                                  │
+    │  5. Version-specific patches and changelog       │
+    │     (patches/<pkg>-<version>/, changelog entries)│
+    │                                                  │
+diff --git a/src/fromager/bootstrap_requirement_resolver.py b/src/fromager/bootstrap_requirement_resolver.py
+index edec5b5..ce60789 100644
+--- a/src/fromager/bootstrap_requirement_resolver.py
++++ b/src/fromager/bootstrap_requirement_resolver.py
+@@ -12,8 +12,7 @@ import typing
+ 
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+-from packaging.version import InvalidVersion
+-from packaging.version import Version
++from packaging.version import InvalidVersion, Version
+ 
+ from . import finders, resolver, sources, wheels
+ from .dependency_graph import DependencyGraph
+diff --git a/src/fromager/bootstrapper/_start.py b/src/fromager/bootstrapper/_start.py
+index 96c7d55..febd960 100644
+--- a/src/fromager/bootstrapper/_start.py
++++ b/src/fromager/bootstrapper/_start.py
+@@ -3,17 +3,67 @@ from __future__ import annotations
+ import logging
+ import typing
+ 
++from packaging.requirements import Requirement
++from packaging.version import Version
++
++from .. import resolver, sources, wheels
+ from ..requirements_file import RequirementType
+ from ._phase import Phase
+ from ._prepare_source import PrepareSource
+ from ._types import BootstrapPhase
+ 
+ if typing.TYPE_CHECKING:
++    from .. import context
+     from ._bootstrapper import Bootstrapper
+ 
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _re_resolve_url(
++    ctx: context.WorkContext,
++    req: Requirement,
++    req_type: RequirementType,
++    resolved_version: Version,
++    pre_built: bool,
++    cache_wheel_server_url: str | None,
++) -> str | None:
++    """Re-resolve the download URL when version-specific pre_built differs.
++
++    Returns the new URL or ``None`` if re-resolution fails.
++    """
++    pinned_req = Requirement(f"{req.name}=={resolved_version}")
++    if pre_built:
++        wheel_server_urls = wheels.get_wheel_server_urls(
++            ctx,
++            req,
++            cache_wheel_server_url=cache_wheel_server_url,
++            version=resolved_version,
++        )
++        try:
++            url, _ = wheels.resolve_prebuilt_wheel(
++                ctx=ctx,
++                req=pinned_req,
++                wheel_server_urls=wheel_server_urls,
++                req_type=req_type,
++            )
++        except ExceptionGroup:
++            return None
++        return str(url)
++    else:
++        pbi = ctx.package_build_info(req)
++        sdist_server = pbi.resolver_sdist_server_url(resolver.PYPI_SERVER_URL)
++        provider = sources.get_source_provider(
++            ctx=ctx,
++            req=pinned_req,
++            sdist_server_url=sdist_server,
++            req_type=req_type,
++        )
++        results = resolver.find_all_matching_from_provider(provider, pinned_req)
++        if results:
++            return str(results[0][0])
++        return None
++
++
+ class Start(Phase):
+     """Record a resolved requirement in the dependency graph and deduplicate.
+ 
+@@ -44,7 +94,46 @@ class Start(Phase):
+         assert wi.resolved_version is not None
+         assert wi.source_url is not None
+ 
+-        # Add to graph (skip TOP_LEVEL, already added in _resolve_and_add_top_level)
++        wi.build_sdist_only = bt.sdist_only and not wi.is_build_requirement_context()
++
++        # Must set pbi_pre_built before constructing PrepareSource so that
++        # PrepareSource.background_work() immediately sees the correct value.
++        pbi = bt.ctx.package_build_info(wi.req)
++        wi.pbi_pre_built = pbi.is_pre_built(wi.resolved_version)
++        wi.exclusive_build = pbi.exclusive_build
++
++        # Re-resolve URL before graph insertion so the graph stores the
++        # final URL, and before the seen-check so duplicate parents still
++        # get their edge recorded with the correct URL.
++        version_url = pbi.get_wheel_server_url(wi.resolved_version)
++        variant_url = pbi.wheel_server_url
++        needs_re_resolve = wi.pbi_pre_built != pbi.pre_built or (
++            wi.pbi_pre_built and version_url != variant_url
++        )
++        if needs_re_resolve:
++            logger.info(
++                f"{wi.req} {wi.resolved_version}: version-specific override "
++                f"(pre_built={wi.pbi_pre_built}, url={version_url}) differs "
++                f"from variant default, re-resolving URL"
++            )
++            new_url = _re_resolve_url(
++                bt.ctx,
++                wi.req,
++                wi.req_type,
++                wi.resolved_version,
++                wi.pbi_pre_built,
++                bt.cache_wheel_server_url,
++            )
++            if new_url is not None:
++                wi.source_url = new_url
++            else:
++                logger.warning(
++                    f"{wi.req} {wi.resolved_version}: could not re-resolve URL "
++                    f"for pre_built={wi.pbi_pre_built}, using original"
++                )
++
++        # Add to graph after URL finalization but before the seen-check
++        # so every parent-to-dep edge is recorded with the correct URL.
+         if wi.req_type != RequirementType.TOP_LEVEL:
+             bt.add_to_graph(
+                 wi.req,
+@@ -54,8 +143,6 @@ class Start(Phase):
+                 wi.parent,
+             )
+ 
+-        wi.build_sdist_only = bt.sdist_only and not wi.is_build_requirement_context()
+-
+         if bt.has_been_seen(wi.req, wi.resolved_version, wi.build_sdist_only):
+             logger.debug(
+                 f"redundant {wi.req_type} dependency {wi.req} "
+@@ -69,9 +156,4 @@ class Start(Phase):
+             f"new {wi.req_type} dependency {wi.req} resolves to {wi.resolved_version}"
+         )
+ 
+-        # Must set pbi_pre_built before constructing PrepareSource so that
+-        # PrepareSource.background_work() immediately sees the correct value.
+-        pbi = bt.ctx.package_build_info(wi.req)
+-        wi.pbi_pre_built = pbi.is_pre_built(wi.resolved_version)
+-        wi.exclusive_build = pbi.exclusive_build
+         return [PrepareSource(wi)]
+diff --git a/src/fromager/packagesettings/_models.py b/src/fromager/packagesettings/_models.py
+index c9d3f24..8ee2bc0 100644
+--- a/src/fromager/packagesettings/_models.py
++++ b/src/fromager/packagesettings/_models.py
+@@ -458,7 +458,7 @@ class VersionSpecificSettings(pydantic.BaseModel):
+     specific package versions.  When a field is ``None``, the
+     variant-wide default is used.
+ 
+-    .. versionadded:: 0.90.0
++    .. versionadded:: 0.95.0
+ 
+     ::
+ 
+@@ -519,7 +519,7 @@ class VariantInfo(pydantic.BaseModel):
+     Version-specific settings take precedence over variant defaults
+     when present.
+ 
+-    .. versionadded:: 0.90.0
++    .. versionadded:: 0.95.0
+     """
+ 
+     # TODO
+diff --git a/src/fromager/packagesettings/_pbi.py b/src/fromager/packagesettings/_pbi.py
+index 36b06c3..8bf0c5f 100644
+--- a/src/fromager/packagesettings/_pbi.py
++++ b/src/fromager/packagesettings/_pbi.py
+@@ -31,6 +31,15 @@ if typing.TYPE_CHECKING:
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _default_is_pre_built(
++    *,
++    version: Version,
++    variant: str,
++) -> bool | None:
++    """Default ``is_pre_built`` hook returns ``None`` to defer to YAML config."""
++    return None
++
++
+ def get_available_memory_gib() -> float:
+     """available virtual memory in GiB"""
+     return psutil.virtual_memory().available / (1024**3)
+@@ -162,11 +171,11 @@ class PackageBuildInfo:
+ 
+     @property
+     def pre_built(self) -> bool:
+-        """Does the variant use pre-build wheels?"""
+-        vi = self._ps.variants.get(self.variant)
+-        if vi is not None:
+-            return vi.pre_built
+-        return False
++        """Does the variant use pre-build wheels?
++
++        Delegates to :meth:`is_pre_built` with no version.
++        """
++        return self.is_pre_built()
+ 
+     def is_pre_built(self, version: Version | None = None) -> bool:
+         """Version-aware pre-built check.
+@@ -177,20 +186,22 @@ class PackageBuildInfo:
+         2. Version-specific YAML setting
+         3. Variant-wide default
+ 
+-        .. versionadded:: 0.90.0
++        .. versionadded:: 0.95.0
+         """
+         vi = self._ps.variants.get(self.variant)
+         if vi is None:
+             return False
+         if version is not None:
+-            hook_fn = overrides.find_override_method(self.package, "is_pre_built")
+-            if hook_fn is not None:
+-                result = overrides.invoke(
+-                    hook_fn, version=version, variant=self.variant
+-                )
+-                if result is not None:
+-                    return bool(result)
+-            pv = typing.cast(PackageVersion, version)
++            result = overrides.find_and_invoke(
++                self.package,
++                "is_pre_built",
++                _default_is_pre_built,
++                version=version,
++                variant=self.variant,
++            )
++            if result is not None:
++                return bool(result)
++            pv = typing.cast(PackageVersion, Version(version.public))
+             vs = vi.versions.get(pv)
+             if vs is not None and vs.pre_built is not None:
+                 return vs.pre_built
+@@ -198,11 +209,11 @@ class PackageBuildInfo:
+ 
+     @property
+     def wheel_server_url(self) -> str | None:
+-        """Alternative package index for pre-build wheel"""
+-        vi = self._ps.variants.get(self.variant)
+-        if vi is not None and vi.wheel_server_url is not None:
+-            return str(vi.wheel_server_url)
+-        return None
++        """Alternative package index for pre-build wheel.
++
++        Delegates to :meth:`get_wheel_server_url` with no version.
++        """
++        return self.get_wheel_server_url()
+ 
+     def get_wheel_server_url(self, version: Version | None = None) -> str | None:
+         """Version-aware wheel server URL.
+@@ -210,13 +221,13 @@ class PackageBuildInfo:
+         Returns the version-specific URL if defined, otherwise
+         falls back to the variant-wide default.
+ 
+-        .. versionadded:: 0.90.0
++        .. versionadded:: 0.95.0
+         """
+         vi = self._ps.variants.get(self.variant)
+         if vi is None:
+             return None
+         if version is not None:
+-            pv = typing.cast(PackageVersion, version)
++            pv = typing.cast(PackageVersion, Version(version.public))
+             vs = vi.versions.get(pv)
+             if vs is not None and vs.wheel_server_url is not None:
+                 return str(vs.wheel_server_url)
+diff --git a/src/fromager/wheels.py b/src/fromager/wheels.py
+index 24d7a07..477e5f0 100644
+--- a/src/fromager/wheels.py
++++ b/src/fromager/wheels.py
+@@ -470,7 +470,7 @@ def get_wheel_server_urls(
+     When *version* is given, version-specific ``wheel_server_url``
+     overrides are checked first.
+ 
+-    .. versionchanged:: 0.90.0
++    .. versionchanged:: 0.95.0
+        Added *version* parameter for version-specific URL lookup.
+     """
+     pbi = ctx.package_build_info(req)
