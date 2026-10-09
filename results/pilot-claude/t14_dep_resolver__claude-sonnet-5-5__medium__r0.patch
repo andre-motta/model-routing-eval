@@ -1,0 +1,380 @@
+diff --git a/resolver/__pycache__/__init__.cpython-314.pyc b/resolver/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..5513dff
+Binary files /dev/null and b/resolver/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/resolver/__pycache__/solve.cpython-314.pyc b/resolver/__pycache__/solve.cpython-314.pyc
+new file mode 100644
+index 0000000..2593efe
+Binary files /dev/null and b/resolver/__pycache__/solve.cpython-314.pyc differ
+diff --git a/resolver/solve.py b/resolver/solve.py
+index 5bcec2a..203f53b 100644
+--- a/resolver/solve.py
++++ b/resolver/solve.py
+@@ -1,20 +1,213 @@
++import functools
++import operator
++import re
++
++
+ class ResolutionError(Exception):
+     pass
+ 
+ 
++@functools.total_ordering
+ class Version:
+     def __init__(self, s):
+-        raise NotImplementedError
++        self._s = str(s).strip()
++        try:
++            parts = tuple(int(p) for p in self._s.split("."))
++        except ValueError:
++            raise ValueError(f"invalid version: {s!r}") from None
++        while parts and parts[-1] == 0:
++            parts = parts[:-1]
++        self._key = parts
++
++    def __eq__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key == other._key
++
++    def __lt__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key < other._key
++
++    def __hash__(self):
++        return hash(self._key)
++
++    def __str__(self):
++        return self._s
++
++    def __repr__(self):
++        return f"Version({self._s!r})"
++
++
++_OPS = {
++    "==": operator.eq,
++    "!=": operator.ne,
++    "<": operator.lt,
++    "<=": operator.le,
++    ">": operator.gt,
++    ">=": operator.ge,
++}
++_CLAUSE = re.compile(r"^(==|!=|<=|>=|<|>)\s*(\S+)$")
+ 
+ 
+ class Constraint:
++    def __init__(self, name, clauses=()):
++        self.name = name
++        self.clauses = tuple(clauses)
++
+     @classmethod
+     def parse(cls, requirement):
+-        raise NotImplementedError
++        requirement = requirement.strip()
++        m = re.search(r"[=!<>]", requirement)
++        if m is None:
++            name, rest = requirement, ""
++        else:
++            name, rest = requirement[: m.start()].strip(), requirement[m.start():]
++        if not name:
++            raise ValueError(f"invalid requirement: {requirement!r}")
++        clauses = []
++        for part in rest.split(","):
++            part = part.strip()
++            if not part:
++                if rest:
++                    raise ValueError(f"invalid requirement: {requirement!r}")
++                continue
++            cm = _CLAUSE.match(part)
++            if cm is None:
++                raise ValueError(f"invalid constraint {part!r} in {requirement!r}")
++            clauses.append((cm.group(1), Version(cm.group(2))))
++        return cls(name, clauses)
+ 
+     def allows(self, version):
+-        raise NotImplementedError
++        if not isinstance(version, Version):
++            version = Version(version)
++        return all(_OPS[op](version, v) for op, v in self.clauses)
++
++
++def _search(deps, domains, roots, force=()):
++    """Find any solution; domains: name -> tuple of Versions, descending.
++
++    Returns (solution dict name->Version, None) or (None, (depth, name)).
++    """
++    worst = [(-1, None)]
++    reach_cache = {}
++
++    def reach(n):
++        if n not in reach_cache:
++            out, stack = set(), [n]
++            while stack:
++                x = stack.pop()
++                for cs in deps.get(x, {}).values():
++                    for c in cs:
++                        if c.name not in out:
++                            out.add(c.name)
++                            stack.append(c.name)
++            reach_cache[n] = out
++        return reach_cache[n]
++
++    def note(depth, name):
++        if depth > worst[0][0]:
++            worst[0] = (depth, name)
++
++    def constrain(doms, cons, depth):
++        for c in cons:
++            cur = doms.get(c.name, ())
++            new = tuple(v for v in cur if c.allows(v))
++            if not new:
++                note(depth, c.name)
++                return False
++            doms[c.name] = new
++        return True
++
++    def rec(doms, assigned, required, depth):
++        pending = [n for n in required if n not in assigned]
++        if (
++            any(
++                m not in assigned
++                and not any(m == n or m in reach(n) for n in pending)
++                for m in force
++            )
++        ):
++            return None
++        if not pending:
++            if any(m not in assigned for m in force):
++                return None
++            return dict(assigned)
++        name = min(pending, key=lambda n: (len(doms[n]), n))
++        for v in doms[name]:
++            nd = dict(doms)
++            nd[name] = (v,)
++            cons = deps[name][v]
++            if not constrain(nd, cons, depth):
++                continue
++            na = dict(assigned)
++            na[name] = v
++            nr = required | {c.name for c in cons}
++            res = rec(nd, na, nr, depth + 1)
++            if res is not None:
++                return res
++        note(depth, name)
++        return None
++
++    doms = dict(domains)
++    if not constrain(doms, roots, 0):
++        return None, worst[0]
++    required = frozenset(c.name for c in roots)
++    return rec(doms, {}, required, 1), worst[0]
+ 
+ 
+ def resolve(roots, index):
+-    raise NotImplementedError
++    versions = {}
++    deps = {}
++    for name, vs in index.items():
++        parsed = {Version(s): s for s in vs}
++        versions[name] = tuple(sorted(parsed, reverse=True))
++        deps[name] = {
++            Version(s): [Constraint.parse(r) for r in reqs] for s, reqs in vs.items()
++        }
++    originals = {
++        name: {Version(s): s for s in vs} for name, vs in index.items()
++    }
++    root_cons = [Constraint.parse(r) for r in roots]
++
++    # Static closure of names reachable via any version.
++    seen = set()
++    stack = [c.name for c in root_cons]
++    while stack:
++        n = stack.pop()
++        if n in seen:
++            continue
++        seen.add(n)
++        for cs in deps.get(n, {}).values():
++            stack.extend(c.name for c in cs)
++
++    domains = {n: versions.get(n, ()) for n in seen}
++    sol, (_, bad) = _search(deps, domains, root_cons)
++    if sol is None:
++        raise ResolutionError(
++            f"cannot satisfy constraints for package {bad!r}"
++        )
++
++    # Lexicographic improvement: fix names alphabetically.
++    present = set()
++    for n in sorted(seen):
++        cur = sol.get(n)
++        fixed = None
++        for v in versions.get(n, ()):
++            if cur is not None and v <= cur:
++                break
++            d = dict(domains)
++            d[n] = (v,)
++            s, _ = _search(deps, d, root_cons, force=present | {n})
++            if s is not None:
++                sol, fixed = s, v
++                break
++        if fixed is None:
++            fixed = cur
++        if fixed is not None:
++            domains[n] = (fixed,)
++            present.add(n)
++        else:
++            domains[n] = ()
++
++    return {n: originals[n][v] for n, v in sol.items()}
+diff --git a/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..cd42d3d
+Binary files /dev/null and b/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/__pycache__/test_solve.cpython-314.pyc b/tests/__pycache__/test_solve.cpython-314.pyc
+new file mode 100644
+index 0000000..c5c9414
+Binary files /dev/null and b/tests/__pycache__/test_solve.cpython-314.pyc differ
+diff --git a/tests/test_solve.py b/tests/test_solve.py
+new file mode 100644
+index 0000000..af0cafc
+--- /dev/null
++++ b/tests/test_solve.py
+@@ -0,0 +1,136 @@
++import itertools
++import random
++import time
++
++import pytest
++
++from resolver.solve import Constraint, ResolutionError, Version, resolve
++
++INDEX = {
++    "app": {"1.0": ["web>=2", "db"]},
++    "web": {"1.0": [], "2.0": ["json<3"], "2.1": ["json>=3"]},
++    "json": {"2.0": [], "3.0": []},
++    "db": {"1.0": ["json<3"]},
++}
++
++
++def test_version():
++    assert Version("1.0") == Version("1")
++    assert hash(Version("1.0")) == hash(Version("1"))
++    assert Version("1.10") > Version("1.9")
++    assert str(Version("1.0")) == "1.0"
++
++
++def test_constraint():
++    c = Constraint.parse("json>=2,<3")
++    assert c.name == "json"
++    assert c.allows(Version("2.5"))
++    assert not c.allows(Version("3"))
++    assert not c.allows(Version("1.9"))
++    assert Constraint.parse("db").allows(Version("0.1"))
++    assert Constraint.parse("db!=1.0").allows(Version("1.1"))
++    assert not Constraint.parse("db==1").allows(Version("1.1"))
++
++
++def test_example():
++    assert resolve(["app"], INDEX) == {
++        "app": "1.0", "web": "2.0", "json": "2.0", "db": "1.0"}
++
++
++def test_unreachable_excluded():
++    assert set(resolve(["db"], INDEX)) == {"db", "json"}
++
++
++def test_cycle():
++    idx = {"a": {"1": ["b"]}, "b": {"1": ["a"], "2": ["a<1"]}}
++    assert resolve(["a"], idx) == {"a": "1", "b": "1"}
++
++
++def test_error_names_leaf():
++    idx = {"a": {"1": ["b<1"]}, "b": {"1": [], "2": []}}
++    with pytest.raises(ResolutionError, match="b"):
++        resolve(["a"], idx)
++
++
++def test_missing_package():
++    with pytest.raises(ResolutionError, match="zzz"):
++        resolve(["a"], {"a": {"1": ["zzz"]}})
++
++
++def test_earlier_name_priority():
++    # a prefers highest; b=2 requires a<2 so b must be 1.
++    idx = {"a": {"1": [], "2": []}, "b": {"1": [], "2": ["a<2"]}}
++    assert resolve(["a", "b"], idx) == {"a": "2", "b": "1"}
++
++
++def test_late_discovered_earlier_name():
++    # c=2 pulls in a (a<c alphabetically); lower c allows higher a.
++    idx = {
++        "c": {"1": ["a>=2"], "2": ["a==1"]},
++        "a": {"1": [], "2": []},
++    }
++    assert resolve(["c"], idx) == {"c": "1", "a": "2"}
++
++
++def brute(roots, index):
++    cons = [Constraint.parse(r) for r in roots]
++    names = sorted(index)
++    best = None
++    for combo in itertools.product(*[[None] + sorted(index[n], key=Version, reverse=True)
++                                     for n in names]):
++        ch = {n: v for n, v in zip(names, combo) if v is not None}
++        # closure must be exactly reachable set
++        need, stack = set(), list(cons)
++        ok = True
++        while stack and ok:
++            c = stack.pop()
++            if c.name not in ch or not c.allows(Version(ch[c.name])):
++                ok = False
++                break
++            if c.name not in need:
++                need.add(c.name)
++                stack.extend(Constraint.parse(r) for r in index[c.name][ch[c.name]])
++        if ok and need == set(ch):
++            key = [Version(ch[n]) if n in ch else None for n in names]
++            k2 = [(0,) if v is None else (1, v) for v in key]
++            if best is None or k2 > best[0]:
++                best = (k2, ch)
++    return None if best is None else best[1]
++
++
++def test_random_vs_brute():
++    rnd = random.Random(1)
++    names = list("abcde")
++    for _ in range(150):
++        idx = {}
++        for n in names:
++            idx[n] = {}
++            for v in range(1, rnd.randint(2, 3) + 1):
++                reqs = []
++                for m in rnd.sample(names, rnd.randint(0, 2)):
++                    op = rnd.choice(["", ">=1", "<2", "<3", "==2", "!=1"])
++                    reqs.append(m + op)
++                idx[n][str(v)] = reqs
++        roots = ["a"]
++        exp = brute(roots, idx)
++        if exp is None:
++            with pytest.raises(ResolutionError):
++                resolve(roots, idx)
++        else:
++            assert resolve(roots, idx) == exp, idx
++
++
++def test_large():
++    rnd = random.Random(5)
++    n = 40
++    idx = {}
++    for i in range(n):
++        idx[f"p{i:02d}"] = {}
++        for v in range(8):
++            reqs = []
++            for j in rnd.sample(range(i + 1, n), min(3, n - i - 1)):
++                reqs.append(f"p{j:02d}>={rnd.randint(0, 3)}")
++            idx[f"p{i:02d}"][str(v)] = reqs
++    t = time.time()
++    resolve(["p00"], idx)
++    assert time.time() - t < 20

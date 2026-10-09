@@ -1,0 +1,24 @@
+{
+ "task": "t15_perf_regression",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "...                                                                      [100%]\n3 passed in 0.21s\n",
+ "ts": "2026-10-09T09:44:56",
+ "wall_s": 24.380073308944702,
+ "tokens": {
+  "input": 10,
+  "cached": 133049,
+  "cache_write": 20189,
+  "output": 1253,
+  "reasoning": 43
+ },
+ "turns": 5,
+ "cost_usd": 0.11991580000000002,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

@@ -1,4 +1,6 @@
 run  r01_fromager_distinfo__claude-sonnet-5-5__medium__r0 ... PASS  $0.318  70s  turns=11
 run  r02_fromager_age_filter__claude-sonnet-5-5__medium__r0 ... PASS  $0.214  33s  turns=13
 run  r03_fromager_dep_chain__claude-sonnet-5-5__medium__r0 ... PASS  $0.230  47s  turns=11
-run  t14_dep_resolver__claude-sonnet-5-5__medium__r0 ...
+run  t14_dep_resolver__claude-sonnet-5-5__medium__r0 ... PASS  $0.309  319s  turns=14
+run  t15_perf_regression__claude-sonnet-5-5__medium__r0 ... PASS  $0.120  24s  turns=5
+run  t16_json_patch__claude-sonnet-5-5__medium__r0 ...
