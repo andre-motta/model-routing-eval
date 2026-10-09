@@ -24,7 +24,8 @@ def load(root: Path) -> pd.DataFrame:
         rows.append(dict(task=d["task"], tier=d["tier"], backend=d["backend"], model=d["model"], effort=d["effort"],
                          rep=d["rep"], passed=bool(d["passed"]), cost=d.get("cost_usd") or 0.0, wall=d.get("wall_s", 0),
                          turns=d.get("turns", 0), tok_in=tk.get("input", 0), tok_cached=tk.get("cached", 0),
-                         tok_out=tk.get("output", 0), tok_reason=tk.get("reasoning", 0), error=d.get("error")))
+                         tok_out=tk.get("output", 0), tok_reason=tk.get("reasoning", 0), error=d.get("error"),
+                         quality=d.get("quality")))
     if not rows:
         raise SystemExit(f"no records under {root}")
     df = pd.DataFrame(rows)
