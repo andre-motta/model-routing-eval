@@ -1,0 +1,24 @@
+{
+ "task": "t16_json_patch",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "........                                                                 [100%]\n8 passed in 0.04s\n",
+ "ts": "2026-10-09T09:45:49",
+ "wall_s": 52.70830821990967,
+ "tokens": {
+  "input": 8,
+  "cached": 102592,
+  "cache_write": 25334,
+  "output": 7190,
+  "reasoning": 638
+ },
+ "turns": 9,
+ "cost_usd": 0.1937704,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

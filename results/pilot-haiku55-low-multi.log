@@ -1,2 +1,2 @@
-run  r04_fromager_age_fallback__claude-haiku-5-5__low__r0 ... FAIL  $0.027  60s  turns=26
-run  r05_fromager_version_prebuilt__claude-haiku-5-5__low__r0 ... FAIL  $0.000  31s  turns=0  err=unparseable output:  
+run  r04_fromager_age_fallback__claude-haiku-5-5__low__r0 ... FAIL  $0.023  60s  turns=20
+run  r05_fromager_version_prebuilt__claude-haiku-5-5__low__r0 ...

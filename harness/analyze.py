@@ -15,9 +15,11 @@ TIER_NAMES = {1: "Mechanical", 2: "Bounded impl", 3: "Debugging", 4: "Architectu
 def load(root: Path) -> pd.DataFrame:
     rows = []
     for f in root.rglob("*.json"):
-        if "/work/" in str(f):
+        if "/work/" in str(f) or "/report/" in str(f):
             continue
         d = json.loads(f.read_text())
+        if "task" not in d:
+            continue
         tk = d.get("tokens") or {}
         rows.append(dict(task=d["task"], tier=d["tier"], backend=d["backend"], model=d["model"], effort=d["effort"],
                          rep=d["rep"], passed=bool(d["passed"]), cost=d.get("cost_usd") or 0.0, wall=d.get("wall_s", 0),
