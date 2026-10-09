@@ -27,7 +27,7 @@ runner:
 
 models:
   skill: claude-haiku-5-5
-  judge: runner:/claude-sonnet-5-5   # judge through the Claude Code CLI, same auth as the agent
+  judge: runner:/claude-opus-5-5     # judge through the Claude Code CLI (CLAUDE_CONFIG_DIR auth), Opus 5.5
 
 permissions:
   allow:
