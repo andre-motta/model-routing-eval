@@ -7,3 +7,4 @@ results/**/work/
 eval/runs/
 tmp/
 .deps/
+.work/

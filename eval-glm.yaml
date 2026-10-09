@@ -1,0 +1,24 @@
+# GLM 5.3 through the EnMaaS gateway (free, 252K context, no prompt cache), driven by Codex CLI.
+# Same as `codex --profile enmaas`, spelled out as -c overrides because the harness runner takes
+# settings, not a profile name. The gateway key is read from $ENMAAS_KEY in the caller's environment.
+# Run: ./run_eval.sh rits/zai-org/glm-5-3 medium eval-glm.yaml
+extends: ./eval.yaml
+runner:
+  type: codex
+  effort: medium
+  settings:
+    model_provider: enmaas
+    model_providers.enmaas.name: EnMaaS
+    model_providers.enmaas.base_url: https://api.enmaas.devshift.net/v1
+    model_providers.enmaas.env_key: ENMAAS_KEY
+    model_providers.enmaas.wire_api: responses
+  env:
+    ENMAAS_KEY: $ENMAAS_KEY
+models:
+  skill: rits/zai-org/glm-5-3
+matrix:
+  factors:
+    model: !replace
+      - rits/zai-org/glm-5-3
+    effort: !replace
+      - medium
