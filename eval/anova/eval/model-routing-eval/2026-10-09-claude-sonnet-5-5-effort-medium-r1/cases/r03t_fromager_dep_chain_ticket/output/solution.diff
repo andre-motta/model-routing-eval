@@ -1,0 +1,61 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..24ba401 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -1158,7 +1158,15 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
+-            raise
++            # The logging context may name an unrelated top-level package, so
++            # state the dependency chain explicitly.
++            chain = " -> ".join(
++                [f"{req.name}=={ver}" for _, req, ver in wi.why_snapshot]
++                + [str(wi.req)]
++            )
++            raise RuntimeError(
++                f"failed to resolve {wi.req} (dependency chain: {chain})"
++            ) from err
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+         if self.test_mode:
+diff --git a/tests/test_bootstrapper.py b/tests/test_bootstrapper.py
+index 797121f..cd1c291 100644
+--- a/tests/test_bootstrapper.py
++++ b/tests/test_bootstrapper.py
+@@ -856,6 +856,35 @@ def test_bootstrap_skips_failed_resolution(tmp_context: WorkContext) -> None:
+     mock_run.assert_not_called()
+ 
+ 
++def test_resolve_failure_reports_dependency_chain(tmp_context: WorkContext) -> None:
++    """A failed dependency resolution names the full chain, not just the top level."""
++    bt = bootstrapper.Bootstrapper(tmp_context)
++    req = Requirement("flashinfer-python==0.6.8.post1")
++    item = Resolve(
++        WorkItem(
++            req=req,
++            req_type=RequirementType.INSTALL,
++            why_snapshot=[
++                (RequirementType.TOP_LEVEL, Requirement("its-hub"), Version("1.0")),
++                (RequirementType.INSTALL, Requirement("reward-hub"), Version("2.0")),
++                (RequirementType.INSTALL, Requirement("vllm"), Version("3.0")),
++            ],
++            parent=(Requirement("vllm"), Version("3.0")),
++        )
++    )
++    err = ResolverException("no matching versions")
++
++    with pytest.raises(RuntimeError) as exc_info:
++        bt._handle_phase_error(item, err)
++
++    msg = str(exc_info.value)
++    assert (
++        "its-hub==1.0 -> reward-hub==2.0 -> vllm==3.0 -> "
++        "flashinfer-python==0.6.8.post1" in msg
++    )
++    assert exc_info.value.__cause__ is err
++
++
+ def test_bootstrap_two_requirements_both_processed(tmp_context: WorkContext) -> None:
+     """bootstrap() processes all requirements in the list."""
+     bt = bootstrapper.Bootstrapper(tmp_context)

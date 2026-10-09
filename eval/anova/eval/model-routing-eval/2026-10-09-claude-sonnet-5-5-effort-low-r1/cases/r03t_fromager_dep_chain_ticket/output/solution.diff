@@ -1,0 +1,70 @@
+diff --git a/src/fromager/bootstrap_requirement_resolver.py b/src/fromager/bootstrap_requirement_resolver.py
+index 1f12a8a..7f29ee9 100644
+--- a/src/fromager/bootstrap_requirement_resolver.py
++++ b/src/fromager/bootstrap_requirement_resolver.py
+@@ -13,6 +13,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from . import finders, resolver, sources, wheels
+ from .dependency_graph import DependencyGraph
+@@ -141,7 +142,15 @@ class BootstrapRequirementResolver:
+             if rule_key not in self._resolved_rules:
+                 # Rule not seen before — resolve from graph or network and
+                 # extend the package-level known-versions cache.
+-                self._resolve_and_extend(req, req_type, pre_built, parent_req)
++                try:
++                    self._resolve_and_extend(req, req_type, pre_built, parent_req)
++                except ResolverException as err:
++                    # The logging context may name an unrelated top-level
++                    # package, so name the failing requirement and its parent.
++                    via = f" (required by {parent_req})" if parent_req else ""
++                    raise ResolverException(
++                        f"{req.name}{via}: {err}"
++                    ) from err
+                 self._resolved_rules.add(rule_key)
+             else:
+                 logger.debug(f"rule already resolved: {req}")
+diff --git a/tests/test_bootstrap_requirement_resolver.py b/tests/test_bootstrap_requirement_resolver.py
+index 4c9148c..ad1a4c1 100644
+--- a/tests/test_bootstrap_requirement_resolver.py
++++ b/tests/test_bootstrap_requirement_resolver.py
+@@ -3,6 +3,7 @@
+ from unittest.mock import MagicMock, patch
+ 
+ import pytest
++from resolvelib.resolvers import ResolverException
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
+@@ -918,3 +919,28 @@ class TestResolveFromCacheServer:
+             )
+ 
+         mock_cache.assert_not_called()
++
++
++def test_resolve_error_names_failing_requirement_and_parent(
++    tmp_context: WorkContext,
++) -> None:
++    """Resolution errors name the failing package and its parent, not the context."""
++    req = Requirement("vllm==0.1")
++    parent_req = Requirement("reward-hub==1.0")
++    resolver = BootstrapRequirementResolver(tmp_context)
++
++    with patch.object(
++        resolver, "_resolve_and_extend", side_effect=ResolverException("no match")
++    ):
++        with pytest.raises(ResolverException) as excinfo:
++            resolver.resolve(
++                req=req,
++                req_type=RequirementType.INSTALL,
++                parent_req=parent_req,
++                pre_built=False,
++            )
++
++    msg = str(excinfo.value)
++    assert "vllm" in msg
++    assert "required by reward-hub==1.0" in msg
++    assert "no match" in msg

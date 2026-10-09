@@ -1,0 +1,98 @@
+{
+  "r01_fromager_distinfo": {
+    "output": 5,
+    "_modified": 7
+  },
+  "r01t_fromager_distinfo_ticket": {
+    "output": 5,
+    "_modified": 2
+  },
+  "r02_fromager_age_filter": {
+    "output": 5,
+    "_modified": 2
+  },
+  "r02t_fromager_age_filter_ticket": {
+    "output": 5,
+    "_modified": 2
+  },
+  "r03_fromager_dep_chain": {
+    "output": 5,
+    "_modified": 2
+  },
+  "r03t_fromager_dep_chain_ticket": {
+    "output": 5,
+    "_modified": 2
+  },
+  "r04_fromager_age_fallback": {
+    "output": 5,
+    "_modified": 4
+  },
+  "r05_fromager_version_prebuilt": {
+    "output": 5,
+    "_modified": 6
+  },
+  "t01_rename_symbol": {
+    "output": 5,
+    "_modified": 9
+  },
+  "t02_ini_to_toml": {
+    "output": 5,
+    "_modified": 5
+  },
+  "t03_add_type_hints": {
+    "output": 5,
+    "_modified": 4
+  },
+  "t04_lru_cache": {
+    "output": 5,
+    "_modified": 5
+  },
+  "t05_cli_json_flag": {
+    "output": 5,
+    "_modified": 6
+  },
+  "t06_log_parser": {
+    "output": 5,
+    "_modified": 5
+  },
+  "t07_mutable_default": {
+    "output": 5,
+    "_modified": 4
+  },
+  "t08_timezone_bug": {
+    "output": 5,
+    "_modified": 2
+  },
+  "t09_thread_safety": {
+    "output": 5,
+    "_modified": 4
+  },
+  "t10_plugin_registry": {
+    "output": 5,
+    "_modified": 15
+  },
+  "t11_async_migration": {
+    "output": 5,
+    "_modified": 9
+  },
+  "t12_needle_bug": {
+    "output": 5,
+    "_modified": 4
+  },
+  "t13_unicode_dedupe": {
+    "output": 5,
+    "_modified": 2
+  },
+  "t14_dep_resolver": {
+    "output": 5,
+    "_modified": 5
+  },
+  "t15_perf_regression": {
+    "output": 5,
+    "_modified": 4
+  },
+  "t16_json_patch": {
+    "output": 5,
+    "_modified": 5
+  }
+}

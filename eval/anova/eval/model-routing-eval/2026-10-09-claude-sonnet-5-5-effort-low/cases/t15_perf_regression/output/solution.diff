@@ -1,0 +1,48 @@
+diff --git a/reporting/__pycache__/dedupe.cpython-314.pyc b/reporting/__pycache__/dedupe.cpython-314.pyc
+index 7fbdce5..051f093 100644
+Binary files a/reporting/__pycache__/dedupe.cpython-314.pyc and b/reporting/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/reporting/dedupe.py b/reporting/dedupe.py
+index b6d0f31..349197f 100644
+--- a/reporting/dedupe.py
++++ b/reporting/dedupe.py
+@@ -5,11 +5,11 @@ Refactored to keep insertion order of first occurrence, which the old set-based
+ 
+ 
+ def dedupe_rows(rows):
+-    seen_ids = []
++    seen_ids = set()
+     out = []
+     for r in rows:
+         if r.event_id in seen_ids:
+             continue
+-        seen_ids.append(r.event_id)
++        seen_ids.add(r.event_id)
+         out.append(r)
+     return out
+diff --git a/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..5a56892
+Binary files /dev/null and b/tests/__pycache__/test_dedupe_perf.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_dedupe_perf.py b/tests/test_dedupe_perf.py
+new file mode 100644
+index 0000000..256ad88
+--- /dev/null
++++ b/tests/test_dedupe_perf.py
+@@ -0,0 +1,17 @@
++import time
++
++from reporting import UsageRow, dedupe_rows
++
++
++def test_dedupe_preserves_first_occurrence_order():
++    rows = [UsageRow(i, "t", "s", 1.0, 1) for i in ("b", "a", "b", "c", "a")]
++    assert [r.event_id for r in dedupe_rows(rows)] == ["b", "a", "c"]
++
++
++def test_dedupe_scales_linearly():
++    # Quadratic dedupe takes tens of seconds at this size; linear takes milliseconds.
++    rows = [UsageRow(f"e{i}", "t", "s", 1.0, 1) for i in range(200_000)]
++    start = time.perf_counter()
++    out = dedupe_rows(rows + rows[:1000])
++    assert len(out) == 200_000
++    assert time.perf_counter() - start < 2.0

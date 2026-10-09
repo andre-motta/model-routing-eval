@@ -1,0 +1,234 @@
+diff --git a/fetcher/aggregate.py b/fetcher/aggregate.py
+index e9f06fc..12eb792 100644
+--- a/fetcher/aggregate.py
++++ b/fetcher/aggregate.py
+@@ -1,8 +1,8 @@
+ from .client import FetchError
+ 
+ 
+-def summarize(client, urls):
+-    results = client.get_many(urls)
++async def summarize(client, urls):
++    results = await client.get_many(urls)
+     ok = [r for r in results if not isinstance(r, FetchError)]
+     failed = [r.url for r in results if isinstance(r, FetchError)]
+     return {"ok": len(ok), "failed": failed, "bytes": sum(len(r) for r in ok)}
+diff --git a/fetcher/client.py b/fetcher/client.py
+index f3f8d7e..cf52bd3 100644
+--- a/fetcher/client.py
++++ b/fetcher/client.py
+@@ -1,4 +1,4 @@
+-import time
++import asyncio
+ 
+ 
+ class FetchError(Exception):
+@@ -12,49 +12,56 @@ class TransientError(Exception):
+     pass
+ 
+ 
+-def default_transport(url):
+-    time.sleep(0.01)
++async def default_transport(url):
++    await asyncio.sleep(0.01)
+     if url.endswith("/404"):
+         raise KeyError("not found")
+     return f"payload for {url}".encode()
+ 
+ 
+ class Client:
+-    def __init__(self, transport=None, retries=3, backoff=0.01):
++    def __init__(self, transport=None, retries=3, backoff=0.01, max_concurrency=5):
++        if max_concurrency < 1:
++            raise ValueError("max_concurrency must be at least 1")
+         self.transport = transport or default_transport
+         self.retries = retries
+         self.backoff = backoff
++        self.max_concurrency = max_concurrency
+         self.closed = False
+         self.calls = 0
+ 
+-    def get(self, url):
++    async def get(self, url):
+         if self.closed:
+             raise RuntimeError("client closed")
+         delay = self.backoff
+         for attempt in range(1, self.retries + 1):
+             self.calls += 1
+             try:
+-                return self.transport(url)
++                return await self.transport(url)
+             except TransientError:
+                 if attempt == self.retries:
+                     raise
+-                time.sleep(delay)
++                await asyncio.sleep(delay)
+                 delay *= 2
+ 
+-    def get_many(self, urls):
+-        out = []
+-        for u in urls:
+-            try:
+-                out.append(self.get(u))
+-            except Exception as e:
+-                out.append(FetchError(u, e))
+-        return out
++    async def get_many(self, urls):
++        sem = asyncio.Semaphore(self.max_concurrency)
++
++        async def fetch_one(u):
++            async with sem:
++                try:
++                    return await self.get(u)
++                except Exception as e:
++                    return FetchError(u, e)
++
++        # gather returns results in the order of the awaitables, not completion order
++        return await asyncio.gather(*(fetch_one(u) for u in urls))
+ 
+-    def close(self):
++    async def close(self):
+         self.closed = True
+ 
+-    def __enter__(self):
++    async def __aenter__(self):
+         return self
+ 
+-    def __exit__(self, *exc):
+-        self.close()
++    async def __aexit__(self, *exc):
++        await self.close()
+diff --git a/fetcher/sync.py b/fetcher/sync.py
+new file mode 100644
+index 0000000..aa87ec4
+--- /dev/null
++++ b/fetcher/sync.py
+@@ -0,0 +1,16 @@
++import asyncio
++
++from .client import Client
++
++
++def fetch_all(urls, transport=None):
++    """Blocking wrapper around Client.get_many for non-async callers.
++
++    Must not be called from inside a running event loop (asyncio.run restriction).
++    """
++
++    async def run():
++        async with Client(transport) as c:
++            return await c.get_many(urls)
++
++    return asyncio.run(run())
+diff --git a/tests/test_client.py b/tests/test_client.py
+index 4275d34..1b0b787 100644
+--- a/tests/test_client.py
++++ b/tests/test_client.py
+@@ -1,27 +1,98 @@
++import asyncio
++
+ from fetcher import Client, FetchError, TransientError, aggregate
++from fetcher.sync import fetch_all
+ 
+ 
+ def test_get_and_many():
+-    with Client() as c:
+-        assert c.get("http://x/1") == b"payload for http://x/1"
+-        res = c.get_many(["http://x/1", "http://x/404"])
+-        assert res[0].startswith(b"payload") and isinstance(res[1], FetchError)
++    async def run():
++        async with Client() as c:
++            assert await c.get("http://x/1") == b"payload for http://x/1"
++            res = await c.get_many(["http://x/1", "http://x/404"])
++            assert res[0].startswith(b"payload") and isinstance(res[1], FetchError)
++
++    asyncio.run(run())
+ 
+ 
+ def test_retry_then_succeed():
+     attempts = {"n": 0}
+ 
+-    def flaky(url):
++    async def flaky(url):
+         attempts["n"] += 1
+         if attempts["n"] < 3:
+             raise TransientError("try again")
+         return b"ok"
+ 
+-    c = Client(transport=flaky, retries=3)
+-    assert c.get("u") == b"ok" and c.calls == 3
++    async def run():
++        c = Client(transport=flaky, retries=3)
++        assert await c.get("u") == b"ok" and c.calls == 3
++
++    asyncio.run(run())
++
++
++def test_non_transient_error_is_not_retried():
++    calls = {"n": 0}
++
++    async def broken(url):
++        calls["n"] += 1
++        raise ValueError("boom")
++
++    async def run():
++        c = Client(transport=broken, retries=3)
++        res = await c.get_many(["u"])
++        assert isinstance(res[0], FetchError) and isinstance(res[0].cause, ValueError)
++
++    asyncio.run(run())
++    assert calls["n"] == 1
++
++
++def test_get_many_keeps_input_order_when_completion_differs():
++    delays = {"slow": 0.05, "fast": 0.0}
++
++    async def transport(url):
++        await asyncio.sleep(delays[url])
++        return url.encode()
++
++    async def run():
++        return await Client(transport=transport).get_many(["slow", "fast"])
++
++    assert asyncio.run(run()) == [b"slow", b"fast"]
++
++
++def test_get_many_respects_max_concurrency():
++    state = {"in_flight": 0, "peak": 0}
++
++    async def transport(url):
++        state["in_flight"] += 1
++        state["peak"] = max(state["peak"], state["in_flight"])
++        await asyncio.sleep(0.01)
++        state["in_flight"] -= 1
++        return b"ok"
++
++    async def run():
++        urls = [f"u{i}" for i in range(20)]
++        return await Client(transport=transport, max_concurrency=3).get_many(urls)
++
++    res = asyncio.run(run())
++    assert len(res) == 20 and all(r == b"ok" for r in res)
++    assert state["peak"] == 3
+ 
+ 
+ def test_summarize():
+-    c = Client()
+-    assert aggregate.summarize(c, ["http://x/1", "http://x/404"]) == {
++    async def run():
++        return await aggregate.summarize(Client(), ["http://x/1", "http://x/404"])
++
++    assert asyncio.run(run()) == {
+         "ok": 1, "failed": ["http://x/404"], "bytes": len(b"payload for http://x/1")}
++
++
++def test_fetch_all_sync_wrapper():
++    res = fetch_all(["http://x/1", "http://x/404"])
++    assert res[0] == b"payload for http://x/1" and isinstance(res[1], FetchError)
++
++
++def test_fetch_all_with_injected_transport():
++    async def transport(url):
++        return url.encode()
++
++    assert fetch_all(["a", "b"], transport=transport) == [b"a", b"b"]

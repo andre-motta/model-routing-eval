@@ -1,0 +1,32 @@
+diff --git a/contacts/dedupe.py b/contacts/dedupe.py
+index f27e236..3f31c8a 100644
+--- a/contacts/dedupe.py
++++ b/contacts/dedupe.py
+@@ -1,4 +1,5 @@
+ import re
++import unicodedata
+ 
+ _WS = re.compile(r"\s+")
+ 
+@@ -8,12 +9,15 @@ def email_key(email):
+ 
+ 
+ def name_key(name):
+-    """Key for matching names: lower-case, single spaces, no accents."""
+-    s = _WS.sub(" ", name.strip()).lower()
+-    # strip common accents
+-    for a, b in (("é", "e"), ("è", "e"), ("á", "a"), ("ó", "o"), ("ü", "u"), ("ö", "o"), ("ä", "a"), ("ñ", "n")):
+-        s = s.replace(a, b)
+-    return s
++    """Key for matching names: case-folded, single spaces, no accents.
++
++    NFKD splits precomposed letters (macOS often stores "é" as "e" + U+0301,
++    Windows as one code point), so dropping combining marks removes accents
++    regardless of which form was typed. casefold() maps "ß" to "ss".
++    """
++    s = unicodedata.normalize("NFKD", name)
++    s = "".join(c for c in s if not unicodedata.combining(c))
++    return _WS.sub(" ", s.casefold()).strip()
+ 
+ 
+ def dedupe(records):

@@ -1,0 +1,27 @@
+diff --git a/sched/__pycache__/core.cpython-314.pyc b/sched/__pycache__/core.cpython-314.pyc
+index 97eb68c..0cc5976 100644
+Binary files a/sched/__pycache__/core.cpython-314.pyc and b/sched/__pycache__/core.cpython-314.pyc differ
+diff --git a/sched/core.py b/sched/core.py
+index f434c9e..cdf220a 100644
+--- a/sched/core.py
++++ b/sched/core.py
+@@ -7,9 +7,13 @@ def next_run(now: datetime, hour: int, minute: int, tz: str) -> datetime:
+     if now.tzinfo is None:
+         now = now.replace(tzinfo=timezone.utc)
+     zone = ZoneInfo(tz)
+-    today = now.date()
+-    candidate = datetime(today.year, today.month, today.day, hour, minute, tzinfo=zone)
+-    if candidate <= now:
+-        # advance one day; do the arithmetic in UTC to avoid tz surprises
+-        candidate = (candidate.astimezone(timezone.utc) + timedelta(days=1)).astimezone(zone)
+-    return candidate
++    # Work with the local calendar date in the target zone, not the UTC date.
++    day = now.astimezone(zone).date()
++    while True:
++        # Build the candidate from wall-clock fields so DST is applied per day;
++        # round-trip through UTC to normalize times that fall in a DST gap.
++        candidate = datetime(day.year, day.month, day.day, hour, minute, tzinfo=zone)
++        candidate = candidate.astimezone(timezone.utc).astimezone(zone)
++        if candidate > now:
++            return candidate
++        day += timedelta(days=1)

@@ -1,0 +1,253 @@
+diff --git a/src/fromager/candidate.py b/src/fromager/candidate.py
+index 36d5955..273499e 100644
+--- a/src/fromager/candidate.py
++++ b/src/fromager/candidate.py
+@@ -3,6 +3,7 @@ import datetime
+ import logging
+ import typing
+ from io import BytesIO
++from urllib.parse import unquote, urlparse
+ from zipfile import ZipFile
+ 
+ from packaging.metadata import Metadata
+@@ -10,6 +11,7 @@ from packaging.requirements import Requirement
+ from packaging.utils import BuildTag, canonicalize_name
+ from packaging.version import Version
+ 
++from .pkgmetadata import dist_info_name
+ from .request_session import session
+ 
+ logger = logging.getLogger(__name__)
+@@ -103,6 +105,12 @@ class Candidate:
+         return str(spec) if spec is not None else None
+ 
+ 
++def _wheel_metadata_path(url: str) -> str:
++    """Path of the METADATA member inside the wheel at ``url``."""
++    filename = unquote(urlparse(url).path.rsplit("/", 1)[-1])
++    return f"{dist_info_name(filename)}/METADATA"
++
++
+ def get_metadata_for_wheel(
+     url: str, metadata_url: str | None = None, *, validate: bool = True
+ ) -> Metadata:
+@@ -140,13 +148,12 @@ def get_metadata_for_wheel(
+     # Fallback to existing method: download wheel and extract metadata
+     logger.debug(f"Downloading full wheel to extract metadata: {url}")
+     data = session.get(url).content
++    metadata_path = _wheel_metadata_path(url)
+     with ZipFile(BytesIO(data)) as z:
+-        for n in z.namelist():
+-            if n.endswith(".dist-info/METADATA"):
+-                metadata_content = z.read(n)
+-                # Parse metadata directly using packaging.metadata.Metadata
+-                # (avoiding circular import with dependencies module)
+-                return Metadata.from_email(metadata_content, validate=validate)
+-
+-    # If we didn't find the metadata, raise an error
+-    raise ValueError(f"Could not find METADATA file in wheel: {url}")
++        try:
++            metadata_content = z.read(metadata_path)
++        except KeyError:
++            raise ValueError(f"Could not find METADATA file in wheel: {url}") from None
++    # Parse metadata directly using packaging.metadata.Metadata
++    # (avoiding circular import with dependencies module)
++    return Metadata.from_email(metadata_content, validate=validate)
+diff --git a/src/fromager/dependencies.py b/src/fromager/dependencies.py
+index e7964e4..9576116 100644
+--- a/src/fromager/dependencies.py
++++ b/src/fromager/dependencies.py
+@@ -22,6 +22,7 @@ from . import (
+     packagesettings,
+     requirements_file,
+ )
++from .pkgmetadata import verbatim_dist_name
+ 
+ if typing.TYPE_CHECKING:
+     from . import context
+@@ -478,7 +479,7 @@ def _get_metadata_from_wheel(
+     # Get dist-info path from wheel filename.
+     # Uses same pattern as wheels.extract_info_from_wheel_file:
+     _, dist_version, _, _ = parse_wheel_filename(wheel_filename.name)
+-    dist_name = wheel_filename.name.split("-", 1)[0]
++    dist_name = verbatim_dist_name(wheel_filename.name)
+     metadata_path = f"{dist_name}-{dist_version}.dist-info/METADATA"
+ 
+     with zipfile.ZipFile(wheel_filename) as whl:
+diff --git a/src/fromager/pkgmetadata/__init__.py b/src/fromager/pkgmetadata/__init__.py
+index 0b9707a..d3a7241 100644
+--- a/src/fromager/pkgmetadata/__init__.py
++++ b/src/fromager/pkgmetadata/__init__.py
+@@ -1,15 +1,19 @@
+ """Package metadata helpers
+ 
+ - PEP 639-based license detection
++- PEP 376 dist-info naming
+ - PEP 753 project URL normalization
+ """
+ 
+ from .pep639 import license_from_metadata, license_from_metadata_values
++from .pep376 import dist_info_name, verbatim_dist_name
+ from .pep753 import normalize_project_urls, project_urls_from_metadata
+ 
+ __all__ = (
++    "dist_info_name",
+     "license_from_metadata",
+     "license_from_metadata_values",
+     "normalize_project_urls",
+     "project_urls_from_metadata",
++    "verbatim_dist_name",
+ )
+diff --git a/src/fromager/pkgmetadata/pep376.py b/src/fromager/pkgmetadata/pep376.py
+new file mode 100644
+index 0000000..f8326da
+--- /dev/null
++++ b/src/fromager/pkgmetadata/pep376.py
+@@ -0,0 +1,28 @@
++"""PEP 376 dist-info naming helpers"""
++
++from packaging.utils import parse_wheel_filename
++
++
++def verbatim_dist_name(wheel_filename: str) -> str:
++    """Distribution name exactly as spelled in the wheel filename.
++
++    ``parse_wheel_filename`` normalizes the name, but the ``.dist-info``
++    directory uses the verbatim spelling (e.g. ``MarkupSafe``).
++
++    Raises `packaging.utils.InvalidWheelFilename` for invalid filenames.
++    """
++    parse_wheel_filename(wheel_filename)
++    return wheel_filename.split("-", 1)[0]
++
++
++def dist_info_name(wheel_filename: str) -> str:
++    """Name of the ``.dist-info`` directory for a wheel filename.
++
++    Returns ``{name}-{version}.dist-info`` with name and version taken
++    verbatim from the filename.
++
++    Raises `packaging.utils.InvalidWheelFilename` for invalid filenames.
++    """
++    parse_wheel_filename(wheel_filename)
++    name, version, _ = wheel_filename.split("-", 2)
++    return f"{name}-{version}.dist-info"
+diff --git a/src/fromager/wheels.py b/src/fromager/wheels.py
+index 0998a9d..21c732f 100644
+--- a/src/fromager/wheels.py
++++ b/src/fromager/wheels.py
+@@ -33,6 +33,7 @@ from . import (
+     sbom,
+     sources,
+ )
++from .pkgmetadata import verbatim_dist_name
+ 
+ if typing.TYPE_CHECKING:
+     from . import build_environment, context
+@@ -152,7 +153,7 @@ def extract_info_from_wheel_file(
+     dist_name_normalized, dist_version, build_tag, wheel_tags = parse_wheel_filename(
+         wheel_file.name
+     )
+-    dist_name = wheel_file.name.split("-", 1)[0]
++    dist_name = verbatim_dist_name(wheel_file.name)
+     if dist_name_normalized != canonicalize_name(dist_name):
+         # sanity check, should never fail
+         raise ValueError(f"{dist_name_normalized} does not match {dist_name}")
+diff --git a/tests/test_pep658_support.py b/tests/test_pep658_support.py
+index 3af992c..ac18895 100644
+--- a/tests/test_pep658_support.py
++++ b/tests/test_pep658_support.py
+@@ -1,11 +1,18 @@
+ """Tests for PEP 658 metadata support."""
+ 
++import io
+ import typing
++import zipfile
+ from unittest.mock import Mock, patch
+ 
++import pytest
+ from packaging.version import Version
+ 
+-from fromager.candidate import Candidate, get_metadata_for_wheel
++from fromager.candidate import (
++    Candidate,
++    _wheel_metadata_path,
++    get_metadata_for_wheel,
++)
+ 
+ 
+ class TestPEP658Support:
+@@ -191,3 +198,43 @@ Requires-Dist: requests >= 2.0.0
+         assert candidate_with_metadata.name == candidate_without_metadata.name
+         assert candidate_with_metadata.version == candidate_without_metadata.version
+         assert candidate_with_metadata.url == candidate_without_metadata.url
++
++
++def _wheel_bytes(members: dict[str, str]) -> bytes:
++    buf = io.BytesIO()
++    with zipfile.ZipFile(buf, "w") as zf:
++        for name, content in members.items():
++            zf.writestr(name, content)
++    return buf.getvalue()
++
++
++def _metadata(name: str) -> str:
++    return f"Metadata-Version: 2.1\nName: {name}\nVersion: 1.0\n"
++
++
++def test_wheel_metadata_path_ignores_query_and_fragment() -> None:
++    url = "https://pkg.test/files/MarkupSafe-3.0.2-py3-none-any.whl?x=1#sha256=abc"
++    assert _wheel_metadata_path(url) == "MarkupSafe-3.0.2.dist-info/METADATA"
++
++
++@patch("fromager.candidate.session")
++def test_get_metadata_for_wheel_ignores_vendored_dist_info(
++    mock_session: typing.Any,
++) -> None:
++    mock_session.get.return_value.content = _wheel_bytes(
++        {
++            "pkg/_vendor/other-9.0.dist-info/METADATA": _metadata("other"),
++            "pkg-1.0.dist-info/METADATA": _metadata("pkg"),
++        }
++    )
++    metadata = get_metadata_for_wheel("https://pkg.test/pkg-1.0-py3-none-any.whl")
++    assert metadata.name == "pkg"
++
++
++@patch("fromager.candidate.session")
++def test_get_metadata_for_wheel_missing_member(mock_session: typing.Any) -> None:
++    mock_session.get.return_value.content = _wheel_bytes(
++        {"other-9.0.dist-info/METADATA": _metadata("other")}
++    )
++    with pytest.raises(ValueError, match="Could not find METADATA"):
++        get_metadata_for_wheel("https://pkg.test/pkg-1.0-py3-none-any.whl")
+diff --git a/tests/test_pkgmetadata_pep376.py b/tests/test_pkgmetadata_pep376.py
+new file mode 100644
+index 0000000..72edaa7
+--- /dev/null
++++ b/tests/test_pkgmetadata_pep376.py
+@@ -0,0 +1,24 @@
++import pytest
++from packaging.utils import InvalidWheelFilename
++
++from fromager.pkgmetadata import dist_info_name, verbatim_dist_name
++
++
++def test_verbatim_dist_name_keeps_case() -> None:
++    assert verbatim_dist_name("MarkupSafe-3.0.2-cp312-cp312-linux_x86_64.whl") == (
++        "MarkupSafe"
++    )
++
++
++def test_dist_info_name_verbatim_version() -> None:
++    assert dist_info_name("MarkupSafe-3.0.2-1-py3-none-any.whl") == (
++        "MarkupSafe-3.0.2.dist-info"
++    )
++    assert dist_info_name("pkg-1.0+local-py3-none-any.whl") == "pkg-1.0+local.dist-info"
++
++
++@pytest.mark.parametrize("func", [verbatim_dist_name, dist_info_name])
++@pytest.mark.parametrize("filename", ["pkg-1.0.tar.gz", "pkg-1.0.whl", "pkg.whl"])
++def test_invalid_wheel_filename(func, filename: str) -> None:  # type: ignore[no-untyped-def]
++    with pytest.raises(InvalidWheelFilename):
++        func(filename)

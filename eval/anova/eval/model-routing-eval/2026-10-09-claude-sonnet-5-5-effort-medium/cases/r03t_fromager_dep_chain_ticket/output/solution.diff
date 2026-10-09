@@ -1,0 +1,72 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..ebe35ce 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -1158,6 +1158,11 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
++            # The error surfaces later under the top-level requirement's
++            # logging context. Name the real chain here and on the exception.
++            chain = self.explain or "top-level requirement"
++            logger.error("unable to resolve %s, required as %s", wi.req, chain)
++            err.add_note(f"while resolving {wi.req} as {chain}")
+             raise
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+diff --git a/tests/test_bootstrap_test_mode.py b/tests/test_bootstrap_test_mode.py
+index ee8e874..a9ce462 100644
+--- a/tests/test_bootstrap_test_mode.py
++++ b/tests/test_bootstrap_test_mode.py
+@@ -9,13 +9,18 @@ Tests the test mode functionality:
+ """
+ 
+ import json
++import logging
+ import pathlib
+ from unittest import mock
+ 
+ import pytest
+ from packaging.requirements import Requirement
++from packaging.version import Version
+ 
+ from fromager import bootstrapper, context
++from fromager.bootstrapper._resolve import Resolve
++from fromager.bootstrapper._work_item import WorkItem
++from fromager.requirements_file import RequirementType
+ 
+ 
+ class TestBootstrapperInitialization:
+@@ -295,3 +300,32 @@ class TestBootstrapExceptionHandling:
+         ):
+             with pytest.raises(RuntimeError, match="Version resolution failed"):
+                 bt.bootstrap([req])
++
++    def test_resolution_failure_names_dependency_chain(
++        self,
++        tmp_context: context.WorkContext,
++        caplog: pytest.LogCaptureFixture,
++    ) -> None:
++        """Test that a failing indirect dependency is reported with its chain."""
++        bt = bootstrapper.Bootstrapper(ctx=tmp_context, test_mode=False)
++        parent = Requirement("vllm")
++        child = Requirement("flashinfer-python==0.6.8.post1")
++        bt.why = [(RequirementType.TOP_LEVEL, parent, Version("0.1"))]
++        item = Resolve(
++            WorkItem(
++                req=child,
++                req_type=RequirementType.INSTALL,
++                why_snapshot=list(bt.why),
++            )
++        )
++
++        with caplog.at_level(logging.ERROR):
++            with pytest.raises(RuntimeError, match="Unable to resolve") as exc_info:
++                try:
++                    raise RuntimeError("Unable to resolve requirement specifier")
++                except RuntimeError as err:
++                    bt._handle_phase_error(item, err)
++
++        assert "flashinfer-python==0.6.8.post1" in caplog.text
++        assert "vllm (0.1)" in caplog.text
++        assert any("vllm (0.1)" in n for n in exc_info.value.__notes__)

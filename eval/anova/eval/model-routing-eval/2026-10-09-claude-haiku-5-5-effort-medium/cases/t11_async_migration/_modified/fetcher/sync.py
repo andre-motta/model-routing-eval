@@ -1,0 +1,13 @@
+import asyncio
+
+from .client import Client
+
+
+async def _fetch_all(urls, transport):
+    async with Client(transport) as client:
+        return await client.get_many(urls)
+
+
+def fetch_all(urls, transport=None):
+    """Blocking entry point for callers that are not running an event loop."""
+    return asyncio.run(_fetch_all(urls, transport))

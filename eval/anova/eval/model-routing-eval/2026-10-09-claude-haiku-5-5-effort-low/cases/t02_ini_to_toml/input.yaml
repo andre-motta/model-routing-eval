@@ -1,0 +1,12 @@
+task: t02_ini_to_toml
+prompt: 'The app reads `config.ini` with configparser. Migrate it to `config.toml` read with
+
+  the standard library `tomllib`. Keep the same sections and keys, keep numeric values
+
+  numeric (ints and floats, not strings), keep booleans as booleans, and keep the
+
+  public function `load_config(path)` returning the same nested dict shape it does
+
+  today, but with proper types. Delete `config.ini` when done. Run the tests.
+
+  '

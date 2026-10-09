@@ -1,0 +1,34 @@
+diff --git a/contacts/__pycache__/dedupe.cpython-314.pyc b/contacts/__pycache__/dedupe.cpython-314.pyc
+index 61e290a..91349cb 100644
+Binary files a/contacts/__pycache__/dedupe.cpython-314.pyc and b/contacts/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/contacts/dedupe.py b/contacts/dedupe.py
+index f27e236..be5a29c 100644
+--- a/contacts/dedupe.py
++++ b/contacts/dedupe.py
+@@ -1,19 +1,19 @@
+ import re
++import unicodedata
+ 
+ _WS = re.compile(r"\s+")
+ 
+ 
+ def email_key(email):
+-    return email.strip().lower()
++    return email.strip().casefold()
+ 
+ 
+ def name_key(name):
+-    """Key for matching names: lower-case, single spaces, no accents."""
+-    s = _WS.sub(" ", name.strip()).lower()
+-    # strip common accents
+-    for a, b in (("é", "e"), ("è", "e"), ("á", "a"), ("ó", "o"), ("ü", "u"), ("ö", "o"), ("ä", "a"), ("ñ", "n")):
+-        s = s.replace(a, b)
+-    return s
++    """Key for matching names: case-folded, single spaces, no accents."""
++    s = unicodedata.normalize("NFKD", name.casefold())
++    s = "".join(c for c in s if not unicodedata.combining(c))
++    # casefold again: NFKD can expose new foldable characters
++    return _WS.sub(" ", s.casefold()).strip()
+ 
+ 
+ def dedupe(records):

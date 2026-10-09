@@ -1,0 +1,209 @@
+diff --git a/logstats/__pycache__/__init__.cpython-314.pyc b/logstats/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..fa36b84
+Binary files /dev/null and b/logstats/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/logstats/__pycache__/parse.cpython-314.pyc b/logstats/__pycache__/parse.cpython-314.pyc
+new file mode 100644
+index 0000000..eabc764
+Binary files /dev/null and b/logstats/__pycache__/parse.cpython-314.pyc differ
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..b71b831 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,114 @@
+-"""Implement parse_line and summarize here. See FORMAT.md."""
++"""Parse access log lines and summarize them. See FORMAT.md."""
++
++import math
++import re
++from collections import Counter
++from dataclasses import dataclass, field
++from datetime import datetime, timezone
++
++_METHOD_RE = re.compile(r"[A-Z]+")
++_STATUS_RE = re.compile(r"\d{3}")
++_LATENCY_RE = re.compile(r"\d+(\.\d+)?")
++_BYTES_RE = re.compile(r"\d+")
++_TS_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})")
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int = 0
++    malformed: int = 0
++    by_status: dict[int, int] = field(default_factory=dict)
++    by_method: dict[str, int] = field(default_factory=dict)
++    p50_latency_ms: float = 0.0
++    p95_latency_ms: float = 0.0
++    bytes_total: int = 0
++    error_rate: float = 0.0
++    top_paths: list[tuple[str, int]] = field(default_factory=list)
++
++
++def _parse_timestamp(token: str) -> datetime | None:
++    if not _TS_RE.fullmatch(token):
++        return None
++    try:
++        ts = datetime.fromisoformat(token.replace("Z", "+00:00"))
++    except ValueError:
++        return None
++    return ts.astimezone(timezone.utc)
++
++
++def parse_line(line: str) -> Record | None:
++    """Return a Record for a well-formed line, or None if it is malformed."""
++    parts = line.split()
++    if len(parts) not in (5, 6):
++        return None
++
++    ts_tok, method, path, status_tok, latency_tok = parts[:5]
++    bytes_tok = parts[5] if len(parts) == 6 else "0"
++
++    ts = _parse_timestamp(ts_tok)
++    if ts is None or not _METHOD_RE.fullmatch(method):
++        return None
++    if not _STATUS_RE.fullmatch(status_tok) or not _LATENCY_RE.fullmatch(latency_tok):
++        return None
++    if not _BYTES_RE.fullmatch(bytes_tok):
++        return None
++
++    latency = float(latency_tok)
++    if not math.isfinite(latency):
++        return None
++
++    return Record(
++        ts=ts,
++        method=method,
++        path=path,
++        status=int(status_tok),
++        latency_ms=latency,
++        bytes=int(bytes_tok),
++    )
++
++
++def _nearest_rank(sorted_values: list[float], pct: float) -> float:
++    if not sorted_values:
++        return 0.0
++    rank = math.ceil(pct / 100 * len(sorted_values))
++    return sorted_values[max(rank, 1) - 1]
++
++
++def summarize(lines) -> Summary:
++    """Parse an iterable of lines into a Summary, counting malformed ones."""
++    records: list[Record] = []
++    malformed = 0
++    for line in lines:
++        record = parse_line(line)
++        if record is None:
++            malformed += 1
++        else:
++            records.append(record)
++
++    by_status = Counter(r.status for r in records)
++    by_method = Counter(r.method for r in records)
++    path_counts = Counter(r.path for r in records)
++    latencies = sorted(r.latency_ms for r in records)
++    errors = sum(1 for r in records if r.status >= 500)
++
++    return Summary(
++        total=len(records),
++        malformed=malformed,
++        by_status=dict(by_status),
++        by_method=dict(by_method),
++        p50_latency_ms=_nearest_rank(latencies, 50),
++        p95_latency_ms=_nearest_rank(latencies, 95),
++        bytes_total=sum(r.bytes for r in records),
++        error_rate=errors / len(records) if records else 0.0,
++        top_paths=sorted(path_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:5],
++    )
+diff --git a/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..774d7e7
+Binary files /dev/null and b/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+new file mode 100644
+index 0000000..678a9ba
+--- /dev/null
++++ b/tests/test_parse.py
+@@ -0,0 +1,71 @@
++from datetime import datetime, timezone
++from pathlib import Path
++
++from logstats.parse import parse_line, summarize
++
++SAMPLE = Path(__file__).resolve().parent.parent / "sample.log"
++
++
++def test_parse_line_full():
++    rec = parse_line("2026-10-01T12:00:00Z GET /api/users 200 12.5 843")
++    assert rec is not None
++    assert rec.ts == datetime(2026, 10, 1, 12, 0, 0, tzinfo=timezone.utc)
++    assert (rec.method, rec.path, rec.status, rec.latency_ms, rec.bytes) == (
++        "GET", "/api/users", 200, 12.5, 843)
++
++
++def test_parse_line_missing_bytes_is_zero():
++    rec = parse_line("2026-10-01T12:00:02Z GET /api/users/7 404 3.1")
++    assert rec is not None and rec.bytes == 0 and rec.status == 404
++
++
++def test_parse_line_converts_offset_to_utc():
++    rec = parse_line("2026-10-01T14:00:00+02:00 GET / 200 1")
++    assert rec is not None
++    assert rec.ts.utcoffset().total_seconds() == 0
++    assert rec.ts.hour == 12
++
++
++def test_parse_line_malformed():
++    bad = [
++        "garbage line here",
++        "",
++        "2026-10-01T12:00:00Z GET /x abc 1.0",
++        "2026-10-01T12:00:00Z get /x 200 1.0",
++        "2026-10-01T12:00:00Z GET /x 200 nan",
++        "2026-10-01T12:00:00Z GET /x 200 -1",
++        "2026-10-01T12:00:00 GET /x 200 1.0",
++        "2026-13-01T12:00:00Z GET /x 200 1.0",
++        "2026-10-01T12:00:00Z GET /x 200 1.0 1 2",
++    ]
++    for line in bad:
++        assert parse_line(line) is None, line
++
++
++def test_summarize_sample():
++    with SAMPLE.open() as fh:
++        s = summarize(fh)
++    assert s.total == 5
++    assert s.malformed == 1
++    assert s.by_status == {200: 2, 201: 1, 404: 1, 500: 1}
++    assert s.by_method == {"GET": 4, "POST": 1}
++    assert s.bytes_total == 843 + 120 + 0 + 0 + 0
++    assert s.error_rate == 1 / 5
++    assert s.top_paths == [("/api/users", 3), ("/api/users/7", 1), ("/health", 1)]
++    # sorted latencies: 0.4, 3.1, 12.5, 40, 120.0
++    assert s.p50_latency_ms == 12.5
++    assert s.p95_latency_ms == 120.0
++
++
++def test_summarize_empty():
++    s = summarize([])
++    assert s.total == 0 and s.malformed == 0
++    assert s.p50_latency_ms == 0.0 and s.p95_latency_ms == 0.0
++    assert s.error_rate == 0.0 and s.top_paths == []
++
++
++def test_top_paths_limit_and_tiebreak():
++    lines = [f"2026-10-01T12:00:00Z GET /p{i} 200 1" for i in range(7)]
++    s = summarize(lines)
++    assert len(s.top_paths) == 5
++    assert [p for p, _ in s.top_paths] == ["/p0", "/p1", "/p2", "/p3", "/p4"]

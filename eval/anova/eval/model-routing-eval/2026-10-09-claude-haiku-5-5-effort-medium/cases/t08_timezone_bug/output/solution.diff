@@ -1,0 +1,40 @@
+diff --git a/sched/core.py b/sched/core.py
+index f434c9e..3ccbb68 100644
+--- a/sched/core.py
++++ b/sched/core.py
+@@ -7,9 +7,12 @@ def next_run(now: datetime, hour: int, minute: int, tz: str) -> datetime:
+     if now.tzinfo is None:
+         now = now.replace(tzinfo=timezone.utc)
+     zone = ZoneInfo(tz)
+-    today = now.date()
++    # The calendar date must be taken in the target zone; the UTC date is a day behind
++    # for Berlin between 00:00 and 02:00 local time.
++    today = now.astimezone(zone).date()
+     candidate = datetime(today.year, today.month, today.day, hour, minute, tzinfo=zone)
+     if candidate <= now:
+-        # advance one day; do the arithmetic in UTC to avoid tz surprises
+-        candidate = (candidate.astimezone(timezone.utc) + timedelta(days=1)).astimezone(zone)
++        # Step the calendar date rather than adding 24h: a day is 23 or 25 hours across DST changes.
++        tomorrow = today + timedelta(days=1)
++        candidate = datetime(tomorrow.year, tomorrow.month, tomorrow.day, hour, minute, tzinfo=zone)
+     return candidate
+diff --git a/tests/test_sched.py b/tests/test_sched.py
+index c665ef4..ecbb673 100644
+--- a/tests/test_sched.py
++++ b/tests/test_sched.py
+@@ -1,4 +1,5 @@
+ from datetime import datetime, timezone
++from zoneinfo import ZoneInfo
+ 
+ from sched import next_run
+ 
+@@ -8,3 +9,9 @@ def test_result_is_after_now_late_evening_utc():
+     nxt = next_run(now, 1, 0, "Europe/Berlin")
+     assert nxt > now
+     assert (nxt.year, nxt.month, nxt.day, nxt.hour) == (2026, 6, 3, 1)
++
++
++def test_next_day_keeps_wall_clock_across_dst_change():
++    now = datetime(2026, 3, 28, 12, 0, tzinfo=timezone.utc)   # 13:00 CET on March 28
++    nxt = next_run(now, 9, 0, "Europe/Berlin")                 # DST starts March 29
++    assert nxt == datetime(2026, 3, 29, 9, 0, tzinfo=ZoneInfo("Europe/Berlin"))

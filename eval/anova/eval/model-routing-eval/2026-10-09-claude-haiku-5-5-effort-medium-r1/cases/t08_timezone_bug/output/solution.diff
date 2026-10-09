@@ -1,0 +1,53 @@
+diff --git a/sched/__pycache__/core.cpython-314.pyc b/sched/__pycache__/core.cpython-314.pyc
+index 97eb68c..f71b38f 100644
+Binary files a/sched/__pycache__/core.cpython-314.pyc and b/sched/__pycache__/core.cpython-314.pyc differ
+diff --git a/sched/core.py b/sched/core.py
+index f434c9e..5d960bb 100644
+--- a/sched/core.py
++++ b/sched/core.py
+@@ -6,10 +6,14 @@ def next_run(now: datetime, hour: int, minute: int, tz: str) -> datetime:
+     """Next hour:minute in tz strictly after now. `now` may be naive (treated as UTC) or aware."""
+     if now.tzinfo is None:
+         now = now.replace(tzinfo=timezone.utc)
++    # Normalize to UTC so the comparison below is between instants, not wall-clock fields
++    now = now.astimezone(timezone.utc)
+     zone = ZoneInfo(tz)
+-    today = now.date()
+-    candidate = datetime(today.year, today.month, today.day, hour, minute, tzinfo=zone)
+-    if candidate <= now:
+-        # advance one day; do the arithmetic in UTC to avoid tz surprises
+-        candidate = (candidate.astimezone(timezone.utc) + timedelta(days=1)).astimezone(zone)
+-    return candidate
++    # "Today" is the calendar date in the target zone, not in UTC
++    local_today = now.astimezone(zone).date()
++    # Step through local calendar days (not 24h blocks) so DST changes keep the wall-clock time
++    candidate = datetime(local_today.year, local_today.month, local_today.day, hour, minute, tzinfo=zone)
++    if candidate > now:
++        return candidate
++    tomorrow = local_today + timedelta(days=1)
++    return datetime(tomorrow.year, tomorrow.month, tomorrow.day, hour, minute, tzinfo=zone)
+diff --git a/tests/__pycache__/test_sched.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_sched.cpython-314-pytest-9.1.1.pyc
+index 069cbd1..6a0d20f 100644
+Binary files a/tests/__pycache__/test_sched.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_sched.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_sched.py b/tests/test_sched.py
+index c665ef4..0137e74 100644
+--- a/tests/test_sched.py
++++ b/tests/test_sched.py
+@@ -1,4 +1,5 @@
+ from datetime import datetime, timezone
++from zoneinfo import ZoneInfo
+ 
+ from sched import next_run
+ 
+@@ -8,3 +9,11 @@ def test_result_is_after_now_late_evening_utc():
+     nxt = next_run(now, 1, 0, "Europe/Berlin")
+     assert nxt > now
+     assert (nxt.year, nxt.month, nxt.day, nxt.hour) == (2026, 6, 3, 1)
++
++
++def test_keeps_wall_clock_time_across_dst_change():
++    # Berlin switches to CEST on 2026-03-29; 08:00 local stays 08:00 local
++    now = datetime(2026, 3, 28, 10, 0, tzinfo=timezone.utc)   # 11:00 CET on March 28
++    nxt = next_run(now, 8, 0, "Europe/Berlin")
++    assert nxt == datetime(2026, 3, 29, 6, 0, tzinfo=timezone.utc)   # 08:00 CEST
++    assert nxt.astimezone(ZoneInfo("Europe/Berlin")).hour == 8

@@ -1,0 +1,102 @@
+diff --git a/src/fromager/bootstrap_requirement_resolver.py b/src/fromager/bootstrap_requirement_resolver.py
+index 9e2bcfb..d7f178b 100644
+--- a/src/fromager/bootstrap_requirement_resolver.py
++++ b/src/fromager/bootstrap_requirement_resolver.py
+@@ -198,7 +198,12 @@ class BootstrapRequirementResolver:
+                 sdist_server_url=resolver.PYPI_SERVER_URL,
+                 req_type=req_type,
+             )
+-            max_age_cutoff = resolver._compute_max_age_cutoff(self.ctx)
++            # A constraint is explicit user intent, so the age heuristic must not
++            # drop its candidates. The provider still enforces the constraint.
++            if self.ctx.constraints.get_constraint(req.name) is not None:
++                max_age_cutoff = None
++            else:
++                max_age_cutoff = resolver._compute_max_age_cutoff(self.ctx)
+             results = resolver.find_all_matching_from_provider(
+                 provider,
+                 req,
+diff --git a/tests/test_bootstrap_requirement_resolver_multiple.py b/tests/test_bootstrap_requirement_resolver_multiple.py
+index ce9482d..32ad341 100644
+--- a/tests/test_bootstrap_requirement_resolver_multiple.py
++++ b/tests/test_bootstrap_requirement_resolver_multiple.py
+@@ -1,5 +1,6 @@
+ """Tests for multiple versions feature in bootstrap_requirement_resolver."""
+ 
++import datetime
+ from pathlib import Path
+ from unittest.mock import MagicMock, patch
+ 
+@@ -96,6 +97,72 @@ def test_resolve_return_all_versions_false_default(tmp_context: WorkContext) ->
+         assert results[0] == _MOCK_VERSIONS[0]
+ 
+ 
++def test_resolve_constrained_package_skips_max_release_age(
++    tmp_context: WorkContext,
++) -> None:
++    """A constrained package is resolved without the max-release-age cutoff."""
++    tmp_context.constraints.get_constraint.return_value = Requirement(
++        "testpkg==1.0"
++    )
++    brr = BootstrapRequirementResolver(tmp_context)
++
++    with (
++        patch.object(brr, "_resolve_from_graph", return_value=None),
++        patch(
++            "fromager.bootstrap_requirement_resolver.sources.get_source_provider",
++        ),
++        patch(
++            "fromager.bootstrap_requirement_resolver.resolver"
++            ".find_all_matching_from_provider",
++            return_value=[("https://pypi.org/testpkg-1.0.tar.gz", Version("1.0"))],
++        ) as mock_find,
++        patch(
++            "fromager.bootstrap_requirement_resolver.resolver._compute_max_age_cutoff",
++            return_value=datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC),
++        ),
++    ):
++        brr.resolve(
++            req=Requirement("testpkg==1.0"),
++            req_type=RequirementType.INSTALL,
++            parent_req=None,
++            return_all_versions=True,
++        )
++
++    assert mock_find.call_args.kwargs["max_age_cutoff"] is None
++
++
++def test_resolve_unconstrained_package_applies_max_release_age(
++    tmp_context: WorkContext,
++) -> None:
++    """An unconstrained package still gets the max-release-age cutoff."""
++    cutoff = datetime.datetime(2026, 1, 1, tzinfo=datetime.UTC)
++    brr = BootstrapRequirementResolver(tmp_context)
++
++    with (
++        patch.object(brr, "_resolve_from_graph", return_value=None),
++        patch(
++            "fromager.bootstrap_requirement_resolver.sources.get_source_provider",
++        ),
++        patch(
++            "fromager.bootstrap_requirement_resolver.resolver"
++            ".find_all_matching_from_provider",
++            return_value=list(_MOCK_VERSIONS),
++        ) as mock_find,
++        patch(
++            "fromager.bootstrap_requirement_resolver.resolver._compute_max_age_cutoff",
++            return_value=cutoff,
++        ),
++    ):
++        brr.resolve(
++            req=Requirement("testpkg>=1.0"),
++            req_type=RequirementType.INSTALL,
++            parent_req=None,
++            return_all_versions=True,
++        )
++
++    assert mock_find.call_args.kwargs["max_age_cutoff"] == cutoff
++
++
+ def test_resolve_return_all_versions_uses_cache(tmp_context: WorkContext) -> None:
+     """resolve() with return_all_versions=True uses cache correctly."""
+     brr = BootstrapRequirementResolver(tmp_context)

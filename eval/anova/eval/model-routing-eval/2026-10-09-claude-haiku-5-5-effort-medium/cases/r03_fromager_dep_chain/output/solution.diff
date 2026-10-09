@@ -1,0 +1,193 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..6b3e077 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -14,6 +14,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from .. import (
+     bootstrap_requirement_resolver,
+@@ -1127,6 +1128,34 @@ class Bootstrapper:
+             unsatisfied.add(dep)
+         return unsatisfied
+ 
++    def _dependency_chain_suffix(self, wi: WorkItem) -> str:
++        """Describe the dependency chain that led to ``wi``.
++
++        Returns a suffix such as ``" (dependency chain: a==1 -> b==2 -> c>=3)"``
++        built from ``wi.why_snapshot``.
++        """
++        chain = " -> ".join(
++            f"{req.name}=={version}" for _, req, version in wi.why_snapshot
++        )
++        return f" (dependency chain: {chain} -> {wi.req})"
++
++    def _enrich_resolution_error(self, item: Phase, err: Exception) -> Exception:
++        """Add the dependency chain to a RESOLVE phase error.
++
++        Returns a new exception of the same shape with the chain appended to
++        its message. Non-RESOLVE phases and top-level requirements return
++        ``err`` unchanged.
++        """
++        wi = item.work_item
++        if not isinstance(item, Resolve) or not wi.why_snapshot:
++            return err
++        suffix = self._dependency_chain_suffix(wi)
++        if isinstance(err, ResolverException):
++            return ResolverException(f"{err}{suffix}")
++        if isinstance(err, RuntimeError):
++            return RuntimeError(f"{err}{suffix}")
++        return RuntimeError(f"{type(err).__name__}: {err}{suffix}")
++
+     def _handle_phase_error(
+         self,
+         item: Phase,
+@@ -1140,6 +1169,8 @@ class Bootstrapper:
+         wi = item.work_item
+         # Resolution failures: recoverable in test mode and multiple versions mode
+         if isinstance(item, Resolve):
++            # Enrich before recording so the failure report names the chain
++            err = self._enrich_resolution_error(item, err)
+             if self.test_mode:
+                 self.record_test_mode_failure(wi.req, None, err, "resolution")
+                 if self.multiple_versions:
+@@ -1158,7 +1189,9 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
+-            raise
++            # Raise the enriched error without ``from`` so the original stays
++            # reachable via ``__context__`` and ``__cause__`` stays unset.
++            raise err
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+         if self.test_mode:
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 6761bcf..9d7d717 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -27,6 +27,7 @@ import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from fromager import bootstrapper, build_environment
+ from fromager.bootstrapper._build import Build
+@@ -867,6 +868,113 @@ class TestHandlePhaseError:
+                 bt._handle_phase_error(item, err)
+ 
+ 
++_CHAIN = [
++    (RequirementType.INSTALL, Requirement("its-hub"), Version("1.0")),
++    (RequirementType.INSTALL, Requirement("reward-hub"), Version("2.0")),
++]
++_CHAIN_SUFFIX = " (dependency chain: its-hub==1.0 -> reward-hub==2.0 -> vllm>=0.6)"
++
++
++class TestDependencyChainSuffix:
++    def test_suffix_lists_chain_and_requirement(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        wi = _make_work_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++
++        assert bt._dependency_chain_suffix(wi) == _CHAIN_SUFFIX
++
++
++class TestEnrichResolutionError:
++    def test_resolver_exception_keeps_type(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++        err = ResolverException("no candidates")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert type(result) is ResolverException
++        assert str(result) == f"no candidates{_CHAIN_SUFFIX}"
++
++    def test_runtime_error_keeps_type(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++
++        result = bt._enrich_resolution_error(item, RuntimeError("broken"))
++
++        assert type(result) is RuntimeError
++        assert str(result) == f"broken{_CHAIN_SUFFIX}"
++
++    def test_other_exception_becomes_runtime_error(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++
++        result = bt._enrich_resolution_error(item, ValueError("bad spec"))
++
++        assert type(result) is RuntimeError
++        assert str(result) == f"ValueError: bad spec{_CHAIN_SUFFIX}"
++
++    def test_top_level_requirement_returns_same_object(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=[])
++        err = RuntimeError("broken")
++
++        assert bt._enrich_resolution_error(item, err) is err
++
++    def test_non_resolve_phase_returns_same_object(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_build_item(phase=BootstrapPhase.BUILD)
++        item.work_item.why_snapshot = list(_CHAIN)
++        err = RuntimeError("build failed")
++
++        assert bt._enrich_resolution_error(item, err) is err
++
++
++class TestHandlePhaseErrorEnrichment:
++    def test_normal_mode_raises_enriched_error(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++        err = ResolverException("no candidates")
++
++        with pytest.raises(ResolverException) as exc_info:
++            try:
++                raise err
++            except ResolverException:
++                bt._handle_phase_error(item, err)
++
++        raised = exc_info.value
++        assert str(raised) == f"no candidates{_CHAIN_SUFFIX}"
++        assert raised.__context__ is err
++        assert raised.__cause__ is None
++
++    def test_test_mode_records_enriched_message(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, test_mode=True)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++
++        bt._handle_phase_error(item, RuntimeError("broken"))
++
++        assert len(bt.failed_packages) == 1
++        assert bt.failed_packages[0]["exception_message"] == (f"broken{_CHAIN_SUFFIX}")
++
++    def test_multiple_versions_mode_records_enriched_error(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, multiple_versions=True)
++        item = _make_resolve_item(req="vllm>=0.6", why_snapshot=list(_CHAIN))
++
++        result = bt._handle_phase_error(item, RuntimeError("broken"))
++
++        assert result == []
++        key = (canonicalize_name("vllm"), "unresolved")
++        recorded = bt._failed_versions[key]
++        assert str(recorded) == f"broken{_CHAIN_SUFFIX}"
++        assert type(recorded) is RuntimeError
++
++
+ class TestIterativeBootstrapLoop:
+     def test_full_lifecycle_source_package(self, tmp_context: WorkContext) -> None:
+         """Drive a package through RESOLVE -> START -> ... -> COMPLETE."""

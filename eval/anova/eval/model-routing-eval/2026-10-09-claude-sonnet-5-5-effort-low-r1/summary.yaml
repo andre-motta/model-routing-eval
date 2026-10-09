@@ -1,0 +1,367 @@
+judge_usage:
+  by_judge:
+    solution_quality:
+      completion_tokens: 1448
+      cost_usd: 1.442968
+      prompt_tokens: 283970
+      reasoning_tokens: null
+      requests: 8
+      requests_missing_cost: 0
+  by_model:
+    claude-opus-5-5:
+      completion_tokens: 1448
+      cost_usd: 1.442968
+      prompt_tokens: 283970
+      reasoning_tokens: null
+      requests: 8
+      requests_missing_cost: 0
+  completion_tokens: 1448
+  cost_sources:
+    runner-estimate: 8
+  judge_cost_usd: 1.442968
+  prompt_tokens: 283970
+  reasoning_tokens: null
+  requests: 8
+  requests_missing_cost: 0
+judges:
+  solution_quality:
+    errored_cases: 0
+    mean: 4.5
+    pass_rate: null
+    scored_cases: 8
+  tests_pass:
+    errored_cases: 0
+    mean: 1.0
+    pass_rate: 1.0
+    scored_cases: 21
+per_case:
+  r01_fromager_distinfo:
+    solution_quality:
+      judge_type: llm
+      rationale: 'The change matches the merged PR in substance: the pep376 helpers
+        are identical, the candidate.py fix reads the exact dist-info METADATA member
+        and raises ValueError when it is missing, verbatim_dist_name is reused in
+        wheels.py and dependencies.py, and tests cover the helpers and fallback path,
+        with all 18 hidden tests passing.'
+      usage:
+        completion_tokens: 130
+        cost_source: runner-estimate
+        cost_usd: 0.195045
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 37458
+        provider: runner
+        reasoning_tokens: null
+      value: 5
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  r01t_fromager_distinfo_ticket:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Fix limits matches to root-level dist-info and picks the directory
+        whose name and version match the wheel filename when there are several, with
+        regression tests for vendored and nested-only cases. It is looser than the
+        merged PR, which reads the exact `{name}-{version}.dist-info/METADATA` path:
+        when no directory matches it falls back to the first root-level one, and it
+        skips the shared helper refactor.'
+      usage:
+        completion_tokens: 257
+        cost_source: runner-estimate
+        cost_usd: 0.177369
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 34931
+        provider: runner
+        reasoning_tokens: null
+      value: 4
+    tests_pass:
+      judge_type: check
+      rationale: 'Skipped: condition ''not annotations.get(''ticket_only'')'' is false'
+      value: null
+  r02_fromager_age_filter:
+    solution_quality:
+      judge_type: llm
+      rationale: 'The fix matches the merged PR: constrained packages skip the age
+        filter and log the exact INFO message. The docstring is updated, tests cover
+        both the constrained and unconstrained cases, and the hidden tests pass. The
+        only minor nits are a truthiness check where the PR uses `is not None`, and
+        a slightly out-of-order import.'
+      usage:
+        completion_tokens: 191
+        cost_source: runner-estimate
+        cost_usd: 0.153617
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 32127
+        provider: runner
+        reasoning_tokens: null
+      value: 5
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  r02t_fromager_age_filter_ticket:
+    solution_quality:
+      judge_type: llm
+      rationale: 'The change matches the merged PR: it skips age filtering for packages
+        that have a constraint, with the same elif structure, adds a docstring note,
+        and includes regression tests for both fallback modes plus an unconstrained
+        control case.'
+      usage:
+        completion_tokens: 84
+        cost_source: runner-estimate
+        cost_usd: 0.14790899999999998
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 31681
+        provider: runner
+        reasoning_tokens: null
+      value: 5
+    tests_pass:
+      judge_type: check
+      rationale: 'Skipped: condition ''not annotations.get(''ticket_only'')'' is false'
+      value: null
+  r03_fromager_dep_chain:
+    solution_quality:
+      judge_type: llm
+      rationale: The change matches the merged PR. It adds both helpers with the same
+        semantics, enriches the error before the test-mode and multiple-versions recording,
+        and raises the new exception without `from`, so `__context__` is kept and
+        `__cause__` stays unset. It also adds thorough tests, and the hidden tests
+        pass.
+      usage:
+        completion_tokens: 114
+        cost_source: runner-estimate
+        cost_usd: 0.169997
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 34367
+        provider: runner
+        reasoning_tokens: null
+      value: 5
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  r03t_fromager_dep_chain_ticket:
+    solution_quality:
+      judge_type: llm
+      rationale: The change adds the failing requirement and its immediate parent
+        to resolution errors, which addresses the misattribution. It does not show
+        the full dependency chain the way the merged PR's why_snapshot approach does,
+        and it wraps errors in a different layer, so tests that check for the 'dependency
+        chain:' text would likely fail.
+      usage:
+        completion_tokens: 115
+        cost_source: runner-estimate
+        cost_usd: 0.152553
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 32184
+        provider: runner
+        reasoning_tokens: null
+      value: 3
+    tests_pass:
+      judge_type: check
+      rationale: 'Skipped: condition ''not annotations.get(''ticket_only'')'' is false'
+      value: null
+  r04_fromager_age_fallback:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Adds the AgeFallback enum with ALL, NEWEST and NONE, and uses NEWEST
+        in multi-version mode. It also skips age filtering for exact == pins, using
+        the exact required log messages and updated docstrings. Tests cover these
+        cases and all hidden tests pass, so the change matches the merged PR in substance.
+        Differences are minor: plain Enum instead of StrEnum, and an extra exclusion
+        of ==X.* wildcard pins.'
+      usage:
+        completion_tokens: 255
+        cost_source: runner-estimate
+        cost_usd: 0.196385
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 37313
+        provider: runner
+        reasoning_tokens: null
+      value: 5
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  r05_fromager_version_prebuilt:
+    solution_quality:
+      judge_type: llm
+      rationale: 'The change covers the core work: local-segment stripping, hook use
+        only when a version is given, property delegation, URL re-resolution before
+        graph insertion and the seen-check, plus docs and tests, and the hidden tests
+        pass. Two gaps keep it below the merged PR: the source path uses `resolver.PYPI_SERVER_URL`
+        instead of the package''s `resolver_sdist_server_url`, and the hook receives
+        the version with its local segment stripped, which differs from the reference.'
+      usage:
+        completion_tokens: 302
+        cost_source: runner-estimate
+        cost_usd: 0.250093
+        id: null
+        model: claude-opus-5-5
+        prompt_tokens: 43909
+        provider: runner
+        reasoning_tokens: null
+      value: 4
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t01_rename_symbol:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t02_ini_to_toml:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t03_add_type_hints:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t04_lru_cache:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t05_cli_json_flag:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t06_log_parser:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t07_mutable_default:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t08_timezone_bug:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t09_thread_safety:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t10_plugin_registry:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t11_async_migration:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t12_needle_bug:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t13_unicode_dedupe:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t14_dep_resolver:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t15_perf_regression:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+  t16_json_patch:
+    solution_quality:
+      judge_type: llm
+      rationale: 'Skipped: condition ''annotations.get(''oracle'')'' is false'
+      value: null
+    tests_pass:
+      judge_type: check
+      rationale: hidden tests passed
+      value: true
+run_id: 2026-10-09-claude-sonnet-5-5-effort-low-r1
+run_metrics:
+  cache_hit_rate: 0.832098
+  cost_per_mtok_usd: 0.9497
+  cost_per_turn_usd: 0.04378
+  output_tokens_per_turn: 561.7
+total_cost_source: complete
+total_cost_usd: 7.002968

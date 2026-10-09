@@ -1,0 +1,72 @@
+diff --git a/reporting/__pycache__/dedupe.cpython-314.pyc b/reporting/__pycache__/dedupe.cpython-314.pyc
+index 7fbdce5..d2bb05a 100644
+Binary files a/reporting/__pycache__/dedupe.cpython-314.pyc and b/reporting/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/reporting/dedupe.py b/reporting/dedupe.py
+index b6d0f31..a4fd5ec 100644
+--- a/reporting/dedupe.py
++++ b/reporting/dedupe.py
+@@ -1,15 +1,16 @@
+ """Drop duplicate events (the collector retries, so the same event_id can appear several times).
+ 
+-Refactored to keep insertion order of first occurrence, which the old set-based version did not guarantee.
++Keeps insertion order of first occurrence. Membership is checked against a set, so this is
++linear in the number of rows; a list here made it quadratic.
+ """
+ 
+ 
+ def dedupe_rows(rows):
+-    seen_ids = []
++    seen_ids = set()
+     out = []
+     for r in rows:
+         if r.event_id in seen_ids:
+             continue
+-        seen_ids.append(r.event_id)
++        seen_ids.add(r.event_id)
+         out.append(r)
+     return out
+diff --git a/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc
+index 6d24808..3614152 100644
+Binary files a/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_report.py b/tests/test_report.py
+index f68f5a7..9455182 100644
+--- a/tests/test_report.py
++++ b/tests/test_report.py
+@@ -1,4 +1,4 @@
+-from reporting import parse_rows, build_report
++from reporting import UsageRow, parse_rows, build_report, dedupe_rows
+ 
+ 
+ def test_small_report():
+@@ -6,3 +6,31 @@ def test_small_report():
+     rep = build_report(rows)
+     assert rep[0] == {"tenant": "acme", "service": "api", "cpu_seconds": 2.0, "bytes_out": 150, "events": 2}
+     assert rep[-1]["events"] == 3
++
++
++class CountingId(str):
++    """str that counts equality checks, to observe how many comparisons dedupe does."""
++
++    eq_calls = 0
++
++    def __eq__(self, other):
++        CountingId.eq_calls += 1
++        return str.__eq__(self, other)
++
++    __hash__ = str.__hash__
++
++
++def test_dedupe_is_linear_not_quadratic():
++    # A list-based membership check does ~n^2/2 comparisons here (about 4.5M for n=3000);
++    # a set-based one does none on unique ids. Counting comparisons avoids timing flakiness.
++    n = 3000
++    rows = [UsageRow(CountingId(f"e{i}"), "acme", "api", 0.1, 1) for i in range(n)]
++    CountingId.eq_calls = 0
++    out = dedupe_rows(rows)
++    assert len(out) == n
++    assert CountingId.eq_calls <= n
++
++
++def test_dedupe_keeps_first_occurrence_order():
++    rows = [UsageRow(e, "acme", "api", 1.0, 1) for e in ["b", "a", "b", "c", "a"]]
++    assert [r.event_id for r in dedupe_rows(rows)] == ["b", "a", "c"]

@@ -1,0 +1,52 @@
+diff --git a/contacts/__pycache__/dedupe.cpython-314.pyc b/contacts/__pycache__/dedupe.cpython-314.pyc
+index 61e290a..a0f318d 100644
+Binary files a/contacts/__pycache__/dedupe.cpython-314.pyc and b/contacts/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/contacts/dedupe.py b/contacts/dedupe.py
+index f27e236..2260923 100644
+--- a/contacts/dedupe.py
++++ b/contacts/dedupe.py
+@@ -1,19 +1,19 @@
+ import re
++import unicodedata
+ 
+ _WS = re.compile(r"\s+")
+ 
+ 
+ def email_key(email):
+-    return email.strip().lower()
++    return unicodedata.normalize("NFKC", email).strip().casefold()
+ 
+ 
+ def name_key(name):
+-    """Key for matching names: lower-case, single spaces, no accents."""
+-    s = _WS.sub(" ", name.strip()).lower()
+-    # strip common accents
+-    for a, b in (("é", "e"), ("è", "e"), ("á", "a"), ("ó", "o"), ("ü", "u"), ("ö", "o"), ("ä", "a"), ("ñ", "n")):
+-        s = s.replace(a, b)
+-    return s
++    """Key for matching names: case-folded, single spaces, no accents, NFC/NFD-insensitive."""
++    s = unicodedata.normalize("NFKD", name).casefold()
++    s = unicodedata.normalize("NFKD", s)
++    s = "".join(c for c in s if not unicodedata.combining(c))
++    return _WS.sub(" ", s).strip()
+ 
+ 
+ def dedupe(records):
+diff --git a/tests/__pycache__/test_dedupe.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_dedupe.cpython-314-pytest-9.1.1.pyc
+index 3a7bf0a..5950279 100644
+Binary files a/tests/__pycache__/test_dedupe.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_dedupe.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_dedupe.py b/tests/test_dedupe.py
+index 1ba2403..d2dbe25 100644
+--- a/tests/test_dedupe.py
++++ b/tests/test_dedupe.py
+@@ -6,3 +6,10 @@ def test_accent_variants_merge():
+             {"name": "Jose Nunez", "email": "b@x.com"},
+             {"name": "JOSÉ  NÚÑEZ", "email": "c@x.com"}]
+     assert dedupe(recs) == [recs[0]]
++
++
++def test_nfd_and_eszett_merge():
++    recs = [{"name": "José Strauß", "email": "a@x.com"},
++            {"name": "José Strauss", "email": "b@x.com"},
++            {"name": "JOSE STRAUSS", "email": "A@X.COM"}]
++    assert dedupe(recs) == [recs[0]]

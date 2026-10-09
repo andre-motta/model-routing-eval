@@ -1,0 +1,47 @@
+diff --git a/reporting/__pycache__/dedupe.cpython-314.pyc b/reporting/__pycache__/dedupe.cpython-314.pyc
+index 7fbdce5..6e27503 100644
+Binary files a/reporting/__pycache__/dedupe.cpython-314.pyc and b/reporting/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/reporting/dedupe.py b/reporting/dedupe.py
+index b6d0f31..349197f 100644
+--- a/reporting/dedupe.py
++++ b/reporting/dedupe.py
+@@ -5,11 +5,11 @@ Refactored to keep insertion order of first occurrence, which the old set-based
+ 
+ 
+ def dedupe_rows(rows):
+-    seen_ids = []
++    seen_ids = set()
+     out = []
+     for r in rows:
+         if r.event_id in seen_ids:
+             continue
+-        seen_ids.append(r.event_id)
++        seen_ids.add(r.event_id)
+         out.append(r)
+     return out
+diff --git a/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc
+index 6d24808..ef303df 100644
+Binary files a/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_report.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_report.py b/tests/test_report.py
+index f68f5a7..7a53f72 100644
+--- a/tests/test_report.py
++++ b/tests/test_report.py
+@@ -6,3 +6,18 @@ def test_small_report():
+     rep = build_report(rows)
+     assert rep[0] == {"tenant": "acme", "service": "api", "cpu_seconds": 2.0, "bytes_out": 150, "events": 2}
+     assert rep[-1]["events"] == 3
++
++
++def test_dedupe_scales_linearly():
++    import time
++    from reporting import dedupe_rows
++
++    n = 50_000
++    lines = [f"e{i},t{i % 10},s{i % 5},1.0,1" for i in range(n)]
++    rows = parse_rows(lines + lines[:n // 2])
++    start = time.perf_counter()
++    out = dedupe_rows(rows)
++    elapsed = time.perf_counter() - start
++    assert [r.event_id for r in out] == [f"e{i}" for i in range(n)]
++    # quadratic implementation takes tens of seconds here; linear takes milliseconds
++    assert elapsed < 2.0

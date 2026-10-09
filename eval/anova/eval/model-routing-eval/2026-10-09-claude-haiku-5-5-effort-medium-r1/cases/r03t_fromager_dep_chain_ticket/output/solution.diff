@@ -1,0 +1,64 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..7ed2baf 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -1158,7 +1158,17 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
+-            raise
++            # Name the broken arc: the parent that requires the failed
++            # requirement and the dependency chain that led to it.
++            chain = [f"{req.name}=={version}" for _, req, version in wi.why_snapshot]
++            chain.append(str(wi.req))
++            parent = "top level"
++            if wi.parent:
++                parent = f"{wi.parent[0].name}=={wi.parent[1]}"
++            raise RuntimeError(
++                f"cannot resolve {wi.req} required by {parent} "
++                f"(dependency chain: {' -> '.join(chain)})"
++            ) from err
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+         if self.test_mode:
+diff --git a/tests/test_bootstrapper.py b/tests/test_bootstrapper.py
+index 797121f..6df1cf5 100644
+--- a/tests/test_bootstrapper.py
++++ b/tests/test_bootstrapper.py
+@@ -882,6 +882,36 @@ def test_bootstrap_two_requirements_both_processed(tmp_context: WorkContext) ->
+     assert sorted(dispatch_calls) == ["pkg1", "pkg2"]
+ 
+ 
++def test_resolve_failure_names_broken_dependency_arc(tmp_context: WorkContext) -> None:
++    """A failed indirect resolution names the parent that requires it."""
++    # Arrange
++    bt = bootstrapper.Bootstrapper(tmp_context)
++    cause = ResolverException("no candidates match")
++    item = _make_resolve_item(
++        req="flashinfer-python==0.6.8.post1",
++        req_type=RequirementType.INSTALL,
++        why_snapshot=[
++            (RequirementType.TOP_LEVEL, Requirement("its-hub"), Version("1.0")),
++            (RequirementType.INSTALL, Requirement("reward-hub"), Version("2.0")),
++            (RequirementType.INSTALL, Requirement("vllm"), Version("0.9")),
++        ],
++        parent=(Requirement("vllm"), Version("0.9")),
++    )
++
++    # Act
++    with pytest.raises(RuntimeError) as exc_info:
++        bt._handle_phase_error(item, cause)
++
++    # Assert
++    msg = str(exc_info.value)
++    chain = (
++        "its-hub==1.0 -> reward-hub==2.0 -> vllm==0.9 -> flashinfer-python==0.6.8.post1"
++    )
++    assert "required by vllm==0.9" in msg
++    assert chain in msg
++    assert exc_info.value.__cause__ is cause
++
++
+ def test_bg_prepare_source_log_prefix_includes_version(
+     tmp_context: WorkContext,
+     caplog: pytest.LogCaptureFixture,

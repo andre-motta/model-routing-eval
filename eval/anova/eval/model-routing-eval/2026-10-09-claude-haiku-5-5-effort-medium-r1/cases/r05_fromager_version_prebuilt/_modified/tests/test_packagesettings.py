@@ -1,0 +1,1308 @@
+import pathlib
+import typing
+from unittest.mock import Mock, patch
+
+import pydantic
+import pytest
+from packaging.requirements import Requirement
+from packaging.utils import NormalizedName
+from packaging.version import Version
+
+from fromager import build_environment, context, wheels
+from fromager.packagesettings import (
+    Annotations,
+    BuildDirectory,
+    EnvVars,
+    ExternalCommands,
+    GitOptions,
+    Package,
+    PackageBuildInfo,
+    PackageSettings,
+    ResolverDist,
+    Settings,
+    SettingsFile,
+    Variant,
+    substitute_template,
+)
+from fromager.packagesettings._models import DeleteEnvPattern, KeepEnvPattern
+from fromager.packagesettings._typedefs import PurlType, UpstreamPurl
+
+TEST_PKG = "test-pkg"
+TEST_EMPTY_PKG = "test-empty-pkg"
+TEST_OTHER_PKG = "test-other-pkg"
+TEST_RELATED_PKG = "test-pkg-library"
+TEST_PREBUILT_PKG = "test-prebuilt-pkg"
+TEST_COOLDOWN_PKG = "test-cooldown-pkg"
+
+FULL_EXPECTED: dict[str, typing.Any] = {
+    "annotations": {
+        "fromager.test.value": "somevalue",
+        "fromager.test.override": "variant override",
+    },
+    "build_dir": pathlib.Path("python"),
+    "build_options": {
+        "build_ext_parallel": True,
+        "cpu_cores_per_job": 4,
+        "memory_per_job_gb": 4.0,
+        "exclusive_build": False,
+    },
+    "changelog": {
+        Version("1.0.1"): ["fixed bug"],
+        Version("1.0.2"): ["more bugs", "rebuild"],
+    },
+    "config_settings": {
+        "setup-args": [
+            "-Dsystem-freetype=true",
+            "-Dsystem-qhull=true",
+        ],
+        "cmake.define.BLA_VENDOR": "OpenBLAS",
+    },
+    "download_source": {
+        "destination_filename": "${canonicalized_name}-${version}.tar.gz",
+        "url": "https://egg.test/${canonicalized_name}/v${version}.tar.gz",
+    },
+    "env": {
+        "EGG": "spam",
+        "EGG_AGAIN": "$EGG",
+        "SPAM": "alot $EXTRA",
+        "QUOTES": "A\"BC'$$EGG",
+        "DEF": "${DEF:-default}",
+        "EXTRA_MAX_JOBS": "${MAX_JOBS}",
+        "MY_VERSION": "${__version__}",
+    },
+    "git_options": {
+        "submodules": False,
+        "submodule_paths": [],
+    },
+    "name": "test-pkg",
+    "has_config": True,
+    "purl": None,
+    "project_override": {
+        "remove_build_requires": ["cmake"],
+        "update_build_requires": ["setuptools>=68.0.0", "torch"],
+        "requires_external": ["openssl-libs"],
+    },
+    "resolver_dist": {
+        "include_sdists": True,
+        "include_wheels": True,
+        "sdist_server_url": "https://sdist.test/egg",
+        "ignore_platform": True,
+        "use_pypi_org_metadata": True,
+        "min_release_age": None,
+    },
+    "variants": {
+        "cpu": {
+            "annotations": {
+                "fromager.test.override": "cpu override",
+            },
+            "env": {"EGG": "spam ${EGG}", "EGG_AGAIN": "$EGG"},
+            "wheel_server_url": "https://wheel.test/simple",
+            "pre_built": False,
+            "versions": {
+                Version("2.9.0"): {
+                    "wheel_server_url": "https://mirror.test/simple",
+                    "pre_built": True,
+                },
+                Version("2.8.0"): {
+                    "wheel_server_url": None,
+                    "pre_built": False,
+                },
+            },
+        },
+        "rocm": {
+            "annotations": {
+                "fromager.test.override": "amd override",
+            },
+            "env": {"SPAM": ""},
+            "wheel_server_url": None,
+            "pre_built": True,
+            "versions": {
+                Version("1.0.0"): {
+                    "wheel_server_url": None,
+                    "pre_built": False,
+                },
+            },
+        },
+        "cuda": {
+            "annotations": None,
+            "env": {},
+            "wheel_server_url": None,
+            "pre_built": False,
+            "versions": {},
+        },
+    },
+}
+
+EMPTY_EXPECTED: dict[str, typing.Any] = {
+    "name": "test-empty-pkg",
+    "annotations": None,
+    "build_dir": None,
+    "build_options": {
+        "build_ext_parallel": False,
+        "cpu_cores_per_job": 1,
+        "memory_per_job_gb": 1.0,
+        "exclusive_build": False,
+    },
+    "changelog": {},
+    "config_settings": {},
+    "env": {},
+    "download_source": {
+        "url": None,
+        "destination_filename": None,
+    },
+    "git_options": {
+        "submodules": False,
+        "submodule_paths": [],
+    },
+    "has_config": True,
+    "purl": None,
+    "project_override": {
+        "remove_build_requires": [],
+        "update_build_requires": [],
+        "requires_external": [],
+    },
+    "resolver_dist": {
+        "sdist_server_url": None,
+        "include_sdists": True,
+        "include_wheels": False,
+        "ignore_platform": False,
+        "use_pypi_org_metadata": None,
+        "min_release_age": None,
+    },
+    "variants": {},
+}
+
+PREBUILT_PKG_EXPECTED: dict[str, typing.Any] = {
+    "name": "test-prebuilt-pkg",
+    "annotations": None,
+    "build_dir": None,
+    "build_options": {
+        "build_ext_parallel": False,
+        "cpu_cores_per_job": 1,
+        "memory_per_job_gb": 1.0,
+        "exclusive_build": False,
+    },
+    "changelog": {
+        Version("1.0.1"): ["onboard"],
+    },
+    "config_settings": {},
+    "env": {},
+    "download_source": {
+        "url": None,
+        "destination_filename": None,
+    },
+    "git_options": {
+        "submodules": False,
+        "submodule_paths": [],
+    },
+    "has_config": True,
+    "purl": None,
+    "project_override": {
+        "remove_build_requires": [],
+        "update_build_requires": [],
+        "requires_external": [],
+    },
+    "resolver_dist": {
+        "sdist_server_url": None,
+        "include_sdists": True,
+        "include_wheels": False,
+        "ignore_platform": False,
+        "use_pypi_org_metadata": None,
+        "min_release_age": None,
+    },
+    "variants": {
+        "cpu": {
+            "annotations": None,
+            "env": {},
+            "pre_built": True,
+            "wheel_server_url": None,
+            "versions": {},
+        },
+    },
+}
+
+
+def test_parse_full(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings/test_pkg.yaml"
+    p = PackageSettings.from_string(TEST_PKG, filename.read_text())
+    assert p.model_dump() == FULL_EXPECTED
+
+
+def test_parse_full_file(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings/test_pkg.yaml"
+    p = PackageSettings.from_file(filename)
+    assert p.model_dump() == FULL_EXPECTED
+
+
+def test_parse_minimal(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings/test_empty_pkg.yaml"
+    p = PackageSettings.from_string(TEST_EMPTY_PKG, filename.read_text())
+    assert p.model_dump() == EMPTY_EXPECTED
+
+
+def test_parse_minimal_file(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings/test_empty_pkg.yaml"
+    p = PackageSettings.from_file(filename)
+    assert p.model_dump() == EMPTY_EXPECTED
+
+
+def test_parse_prebuilt_file(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings/test_prebuilt_pkg.yaml"
+    p = PackageSettings.from_file(filename)
+    assert p.model_dump() == PREBUILT_PKG_EXPECTED
+
+
+def test_default_settings() -> None:
+    p = PackageSettings.from_default(TEST_EMPTY_PKG)
+    expected = EMPTY_EXPECTED.copy()
+    expected["has_config"] = False
+    assert p.model_dump() == expected
+
+
+def test_pbi_test_pkg_extra_environ(
+    tmp_path: pathlib.Path, testdata_context: context.WorkContext
+) -> None:
+    testdata_context.settings.max_jobs = 1
+    parallel = {
+        "CMAKE_BUILD_PARALLEL_LEVEL": "1",
+        "MAKEFLAGS": "-j1",
+        "MAX_JOBS": "1",
+        "EXTRA_MAX_JOBS": "1",
+    }
+
+    version = Version("1.0.0")
+    version_env = {
+        "MY_VERSION": "1.0.0",
+    }
+
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    result = pbi.get_extra_environ(template_env={"EXTRA": "extra"}, version=version)
+    assert (
+        result
+        == {
+            "EGG": "spam spam",
+            "EGG_AGAIN": "spam spam",
+            "QUOTES": "A\"BC'$EGG",  # $$EGG is transformed into $EGG
+            "SPAM": "alot extra",
+            "DEF": "default",
+        }
+        | version_env
+        | parallel
+    )
+    assert "__version__" not in result
+
+    result = pbi.get_extra_environ(
+        template_env={"EXTRA": "extra", "DEF": "nondefault"}, version=version
+    )
+    assert (
+        result
+        == {
+            "EGG": "spam spam",
+            "EGG_AGAIN": "spam spam",
+            "QUOTES": "A\"BC'$EGG",  # $$EGG is transformed into $EGG
+            "SPAM": "alot extra",
+            "DEF": "nondefault",
+        }
+        | version_env
+        | parallel
+    )
+    assert "__version__" not in result
+
+    testdata_context.settings.variant = Variant("rocm")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    result = pbi.get_extra_environ(template_env={"EXTRA": "extra"}, version=version)
+    assert (
+        result
+        == {
+            "EGG": "spam",
+            "EGG_AGAIN": "spam",
+            "QUOTES": "A\"BC'$EGG",
+            "SPAM": "",
+            "DEF": "default",
+        }
+        | version_env
+        | parallel
+    )
+    assert "__version__" not in result
+
+    testdata_context.settings.variant = Variant("cuda")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    result = pbi.get_extra_environ(template_env={"EXTRA": "spam"}, version=version)
+    assert (
+        result
+        == {
+            "EGG": "spam",
+            "EGG_AGAIN": "spam",
+            "QUOTES": "A\"BC'$EGG",
+            "SPAM": "alot spam",
+            "DEF": "default",
+        }
+        | version_env
+        | parallel
+    )
+    assert "__version__" not in result
+
+    sdist_root = tmp_path / "test-pkg-1.0.0"
+    sdist_root.mkdir()
+    build_env = build_environment.BuildEnvironment(
+        ctx=testdata_context,
+        req=Requirement("test-pkg"),
+        sdist_root_dir=sdist_root,
+    )
+    result = pbi.get_extra_environ(
+        template_env={"EXTRA": "spam", "PATH": "/sbin:/bin"},
+        build_env=build_env,
+        version=version,
+    )
+    assert (
+        result
+        == {
+            "EGG": "spam",
+            "EGG_AGAIN": "spam",
+            "QUOTES": "A\"BC'$EGG",
+            "SPAM": "alot spam",
+            "DEF": "default",
+            "PATH": f"{build_env.path / 'bin'}:/sbin:/bin",
+            "VIRTUAL_ENV": str(build_env.path),
+            "UV_CACHE_DIR": str(testdata_context.uv_cache),
+            "UV_NATIVE_TLS": "true",
+            "UV_NO_MANAGED_PYTHON": "true",
+            "UV_PYTHON": str(build_env.python),
+            "UV_PYTHON_DOWNLOADS": "never",
+        }
+        | version_env
+        | parallel
+    )
+    assert "__version__" not in result
+
+
+def test_pbi_test_pkg(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.package == NormalizedName(TEST_PKG)
+    assert pbi.variant == Variant(testdata_context.settings.variant)
+    assert pbi.pre_built is False
+    assert pbi.has_config is True
+    assert pbi.wheel_server_url == "https://wheel.test/simple"
+    assert pbi.override_module_name == "test_pkg"
+    assert (
+        pbi.download_source_url(Version("1.0.2"), resolve_template=False)
+        == "https://egg.test/${canonicalized_name}/v${version}.tar.gz"
+    )
+    assert (
+        pbi.download_source_url(Version("1.0.2"))
+        == "https://egg.test/test-pkg/v1.0.2.tar.gz"
+    )
+    assert (
+        pbi.download_source_destination_filename(
+            Version("1.0.2"), resolve_template=False
+        )
+        == "${canonicalized_name}-${version}.tar.gz"
+    )
+    assert (
+        pbi.download_source_destination_filename(Version("1.0.2"))
+        == "test-pkg-1.0.2.tar.gz"
+    )
+    assert pbi.resolver_include_sdists is True
+    assert pbi.resolver_include_wheels is True
+    assert pbi.resolver_ignore_platform is True
+    assert (
+        pbi.resolver_sdist_server_url("https://pypi.org/simple")
+        == "https://sdist.test/egg"
+    )
+    assert pbi.build_tag(Version("1.0.2")) == (2, "")
+    sdist_root_dir = pathlib.Path("/sdist-root")
+    assert pbi.build_dir(sdist_root_dir) == sdist_root_dir / "python"
+
+
+def test_pbi_test_pkg_patches(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    norm_test_pkg = TEST_PKG.replace("-", "_")
+    unversioned_patchdir = testdata_context.settings.patches_dir / norm_test_pkg
+    versioned_patchdir = (
+        testdata_context.settings.patches_dir / f"{norm_test_pkg}-1.0.2"
+    )
+
+    patch001 = versioned_patchdir / "001-somepatch.patch"
+    patch002 = versioned_patchdir / "002-otherpatch.patch"
+    patch004 = unversioned_patchdir / "cpu" / "004-cpu.patch"
+    patch005 = versioned_patchdir / "cpu" / "005-cpuver.patch"
+    patch010 = unversioned_patchdir / "010-unversioned.patch"
+
+    assert pbi.get_all_patches() == {
+        None: [patch004, patch010],
+        Version("1.0.2"): [patch001, patch002, patch005],
+    }
+    assert pbi.get_all_patches() is pbi.get_all_patches()
+
+    assert pbi.get_patches(Version("1.0.2")) == [
+        patch001,
+        patch002,
+        patch004,
+        patch005,
+        patch010,
+    ]
+    assert pbi.get_patches(Version("1.0.2+local")) == pbi.get_patches(Version("1.0.2"))
+    assert pbi.get_patches(Version("1.0.1")) == [
+        patch004,
+        patch010,
+    ]
+
+
+def test_pbi_other(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_OTHER_PKG)
+    assert pbi.package == NormalizedName(TEST_OTHER_PKG)
+    assert pbi.variant == Variant(testdata_context.settings.variant)
+    assert pbi.pre_built is False
+    assert pbi.has_config is False
+    assert pbi.wheel_server_url is None
+    assert pbi.override_module_name == "test_other_pkg"
+    assert pbi.download_source_url(Version("1.0.0")) is None
+    assert pbi.download_source_destination_filename(Version("1.0.0")) is None
+    assert pbi.download_source_destination_filename(Version("1.0.0")) is None
+    assert pbi.resolver_include_sdists is True
+    assert pbi.resolver_include_wheels is False
+    assert (
+        pbi.resolver_sdist_server_url("https://pypi.org/simple")
+        == "https://pypi.org/simple"
+    )
+    assert pbi.build_tag(Version("1.0.0")) == ()
+    sdist_root_dir = pathlib.Path("/sdist-root")
+    assert pbi.build_dir(sdist_root_dir) == sdist_root_dir
+
+    patchdir = (
+        testdata_context.settings.patches_dir
+        / f"{TEST_OTHER_PKG.replace('-', '_')}-1.0.0"
+    )
+    assert pbi.get_all_patches() == {
+        Version("1.0.0"): [
+            patchdir / "001-mypatch.patch",
+        ],
+    }
+    assert pbi.get_all_patches() is pbi.get_all_patches()
+
+
+def test_type_envvars() -> None:
+    ta = pydantic.TypeAdapter(EnvVars)
+    v = ta.validate_python(
+        {"int": 1, "float": 2.0, "true": True, "false": False, "str": "string"}
+    )
+    assert v == {
+        "int": "1",
+        "float": "2.0",
+        "true": "1",
+        "false": "0",
+        "str": "string",
+    }
+    with pytest.raises(ValueError):
+        ta.validate_python({"shell": "$(subshell)"})
+    with pytest.raises(TypeError):
+        ta.validate_python({"none": None})
+
+
+def test_type_package() -> None:
+    ta = pydantic.TypeAdapter(Package)
+    assert ta.validate_python("Some_Package") == "some-package"
+    assert ta.validate_python("some.package") == "some-package"
+    with pytest.raises(ValueError):
+        ta.validate_python("invalid/package")
+
+
+def test_type_builddirectory() -> None:
+    ta = pydantic.TypeAdapter(BuildDirectory)
+    assert ta.validate_python("python") == pathlib.Path("python")
+    assert ta.validate_python("../tmp/build") == pathlib.Path("../tmp/build")
+    with pytest.raises(ValueError):
+        ta.validate_python("/absolute/path")
+
+
+def test_type_purl_type() -> None:
+    """Verify PurlType normalizes and rejects empty strings."""
+    ta = pydantic.TypeAdapter(PurlType)
+    assert ta.validate_python("pypi") == "pypi"
+    assert ta.validate_python("  Generic  ") == "generic"
+    assert ta.validate_python("GITHUB") == "github"
+    with pytest.raises(ValueError):
+        ta.validate_python("")
+    with pytest.raises(ValueError):
+        ta.validate_python("   ")
+
+
+def test_type_upstream_purl() -> None:
+    """Verify UpstreamPurl accepts valid purls and rejects invalid strings."""
+    ta = pydantic.TypeAdapter(UpstreamPurl)
+    assert ta.validate_python("pkg:pypi/flask@2.0") == "pkg:pypi/flask@2.0"
+    assert (
+        ta.validate_python("pkg:github/vllm-project/bart-plugin@v0.2.0")
+        == "pkg:github/vllm-project/bart-plugin@v0.2.0"
+    )
+    with pytest.raises(ValueError):
+        ta.validate_python("invalid-not-purl")
+    with pytest.raises(ValueError):
+        ta.validate_python("")
+
+
+def test_global_settings(testdata_path: pathlib.Path) -> None:
+    filename = testdata_path / "context/overrides/settings.yaml"
+    gs = SettingsFile.from_file(filename)
+    assert gs.changelog == {
+        "rocm": [
+            "setuptools upgraded to 82.0.0",
+        ],
+    }
+
+
+def test_settings_overrides(testdata_context: context.WorkContext) -> None:
+    assert testdata_context.settings.list_overrides() == {
+        TEST_PKG,
+        TEST_EMPTY_PKG,
+        TEST_OTHER_PKG,
+        TEST_RELATED_PKG,
+        TEST_PREBUILT_PKG,
+        TEST_COOLDOWN_PKG,
+    }
+
+
+def test_global_changelog(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.package == TEST_PKG
+    assert not pbi.pre_built
+    assert pbi.variant == "cpu"
+    assert pbi.build_tag(Version("0.99")) == ()
+    assert pbi.build_tag(Version("1.0.1")) == (1, "")
+    assert pbi.build_tag(Version("1.0.2")) == (2, "")
+    assert pbi.build_tag(Version("1.0.2+local")) == pbi.build_tag(Version("1.0.2"))
+    assert pbi.build_tag(Version("2.0.0")) == ()
+
+    # CUDA variant has no global changelog
+    testdata_context.settings.variant = Variant("cuda")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.package == TEST_PKG
+    assert not pbi.pre_built
+    assert pbi.variant == "cuda"
+    assert pbi.build_tag(Version("0.99")) == ()
+    assert pbi.build_tag(Version("1.0.1")) == (1, "")
+    assert pbi.build_tag(Version("1.0.2")) == (2, "")
+    assert pbi.build_tag(Version("1.0.2+local")) == pbi.build_tag(Version("1.0.2"))
+    assert pbi.build_tag(Version("2.0.0")) == ()
+
+    # ROCm variant has pre-built flag
+    testdata_context.settings.variant = Variant("rocm")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.package == TEST_PKG
+    assert pbi.pre_built
+    assert pbi.variant == "rocm"
+    assert pbi.build_tag(Version("0.99")) == ()
+
+    testdata_context.settings.variant = Variant("cpu")
+    pbi = testdata_context.settings.package_build_info(TEST_PREBUILT_PKG)
+    assert pbi.package == TEST_PREBUILT_PKG
+    assert pbi.pre_built
+    assert pbi.variant == "cpu"
+    assert pbi.get_changelog(Version("1.0.1")) == ["onboard"]
+    assert pbi.build_tag(Version("1.0.1")) == ()
+
+
+def test_is_pre_built_version_specific(
+    testdata_context: context.WorkContext,
+) -> None:
+    """Version-specific pre_built overrides variant default."""
+    # cpu variant: pre_built=False by default, but 2.9.0 is pre_built=True
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.variant == "cpu"
+    assert pbi.pre_built is False
+    assert pbi.is_pre_built() is False
+    assert pbi.is_pre_built(Version("2.9.0")) is True
+    assert pbi.is_pre_built(Version("2.9.0+cpu")) is True
+    assert pbi.is_pre_built(Version("2.8.0")) is False
+    assert pbi.is_pre_built(Version("2.8.0+local")) is False
+    assert pbi.is_pre_built(Version("3.0.0")) is False
+
+    # rocm variant: pre_built=True by default, but 1.0.0 is pre_built=False
+    testdata_context.settings.variant = Variant("rocm")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.pre_built is True
+    assert pbi.is_pre_built() is True
+    assert pbi.is_pre_built(Version("1.0.0")) is False
+    assert pbi.is_pre_built(Version("2.0.0")) is True
+
+    # cuda variant: no version-specific settings
+    testdata_context.settings.variant = Variant("cuda")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.is_pre_built() is False
+    assert pbi.is_pre_built(Version("2.9.0")) is False
+
+
+def test_get_wheel_server_url_version_specific(
+    testdata_context: context.WorkContext,
+) -> None:
+    """Version-specific wheel_server_url overrides variant default."""
+    # cpu variant: default wheel_server_url, 2.9.0 has override
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.wheel_server_url == "https://wheel.test/simple"
+    assert pbi.get_wheel_server_url() == "https://wheel.test/simple"
+    assert pbi.get_wheel_server_url(Version("2.9.0")) == "https://mirror.test/simple"
+    assert (
+        pbi.get_wheel_server_url(Version("2.9.0+cpu")) == "https://mirror.test/simple"
+    )
+    assert pbi.get_wheel_server_url(Version("2.8.0")) == "https://wheel.test/simple"
+    assert pbi.get_wheel_server_url(Version("3.0.0")) == "https://wheel.test/simple"
+
+
+def test_build_tag_version_specific_prebuilt(
+    testdata_context: context.WorkContext,
+) -> None:
+    """Pre-built versions return empty build tag even when variant default is source."""
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.variant == "cpu"
+    # 2.9.0 is version-specific pre_built=True, so no build tag
+    assert pbi.build_tag(Version("2.9.0")) == ()
+
+
+def test_is_pre_built_hook_overrides_yaml(
+    testdata_context: context.WorkContext,
+) -> None:
+    """Plugin hook takes precedence over YAML version-specific settings."""
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.variant == "cpu"
+
+    # Hook returns True for 2.8.0 (YAML says False)
+    with patch(
+        "fromager.overrides.find_and_invoke",
+        return_value=True,
+    ):
+        assert pbi.is_pre_built(Version("2.8.0")) is True
+
+    # Hook returns False for 2.9.0 (YAML says True)
+    with patch(
+        "fromager.overrides.find_and_invoke",
+        return_value=False,
+    ):
+        assert pbi.is_pre_built(Version("2.9.0")) is False
+
+    # Hook returns None (defers to YAML)
+    with patch(
+        "fromager.overrides.find_and_invoke",
+        return_value=None,
+    ):
+        assert pbi.is_pre_built(Version("2.9.0")) is True
+        assert pbi.is_pre_built(Version("2.8.0")) is False
+
+    # Without version, hook is not consulted
+    with patch(
+        "fromager.overrides.find_and_invoke",
+    ) as mock_invoke:
+        pbi.is_pre_built()
+        mock_invoke.assert_not_called()
+
+
+def test_get_wheel_server_urls_version_specific(
+    testdata_context: context.WorkContext,
+) -> None:
+    """get_wheel_server_urls uses version-specific URL when version given."""
+    req = Requirement("test-pkg")
+    # cpu variant: default URL is https://wheel.test/simple,
+    # version 2.9.0 overrides to https://mirror.test/simple
+    urls_default = wheels.get_wheel_server_urls(
+        testdata_context, req, cache_wheel_server_url=None
+    )
+    assert urls_default == ["https://wheel.test/simple"]
+
+    urls_versioned = wheels.get_wheel_server_urls(
+        testdata_context, req, cache_wheel_server_url=None, version=Version("2.9.0")
+    )
+    assert urls_versioned == ["https://mirror.test/simple"]
+
+    urls_other = wheels.get_wheel_server_urls(
+        testdata_context, req, cache_wheel_server_url=None, version=Version("3.0.0")
+    )
+    assert urls_other == ["https://wheel.test/simple"]
+
+
+def test_variant_info_versions_none_yaml() -> None:
+    """Bare ``versions:`` key in YAML (parsed as None) produces empty dict."""
+    ps = PackageSettings.from_string(
+        "test-none-versions",
+        "variants:\n  cpu:\n    versions:\n",
+    )
+    vi = ps.variants[Variant("cpu")]
+    assert vi.versions == {}
+
+
+def test_variant_info_versions_omitted() -> None:
+    """Omitting ``versions`` entirely produces empty dict."""
+    ps = PackageSettings.from_string(
+        "test-no-versions",
+        "variants:\n  cpu:\n    pre_built: true\n",
+    )
+    vi = ps.variants[Variant("cpu")]
+    assert vi.versions == {}
+
+
+def test_settings_list(testdata_context: context.WorkContext) -> None:
+    assert testdata_context.settings.list_overrides() == {
+        TEST_COOLDOWN_PKG,
+        TEST_PKG,
+        TEST_EMPTY_PKG,
+        TEST_OTHER_PKG,
+        TEST_RELATED_PKG,
+        TEST_PREBUILT_PKG,
+    }
+    assert testdata_context.settings.list_pre_built() == {TEST_PREBUILT_PKG}
+    assert testdata_context.settings.variant_changelog() == []
+    testdata_context.settings.variant = Variant("rocm")
+    assert testdata_context.settings.list_pre_built() == {TEST_PKG}
+    assert testdata_context.settings.variant_changelog() == [
+        "setuptools upgraded to 82.0.0"
+    ]
+
+
+@patch("fromager.threading_utils.get_cpu_count", return_value=8)
+@patch("fromager.packagesettings._pbi.get_available_memory_gib", return_value=7.1)
+def test_parallel_jobs(
+    get_available_memory_gib: Mock,
+    get_cpu_count: Mock,
+    testdata_context: context.WorkContext,
+) -> None:
+    assert testdata_context.settings.max_jobs is None
+
+    pbi = testdata_context.settings.package_build_info(TEST_EMPTY_PKG)
+    assert pbi.parallel_jobs() == 7
+
+    get_cpu_count.return_value = 4
+    assert pbi.parallel_jobs() == 4
+
+    get_available_memory_gib.return_value = 2.1
+    assert pbi.parallel_jobs() == 2
+
+    get_available_memory_gib.return_value = 1.5
+    assert pbi.parallel_jobs() == 1
+
+    testdata_context.settings.max_jobs = 2
+    pbi = testdata_context.settings.package_build_info(TEST_EMPTY_PKG)
+    get_available_memory_gib.return_value = 23
+    assert pbi.parallel_jobs() == 2
+
+    # test-pkg needs more memory
+    testdata_context.settings.max_jobs = 200
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    get_cpu_count.return_value = 16
+    get_available_memory_gib.return_value = 20
+    assert pbi.parallel_jobs() == 4
+
+    get_cpu_count.return_value = 32
+    get_available_memory_gib.return_value = 25
+    assert pbi.parallel_jobs() == 6
+
+    testdata_context.settings.max_jobs = 4
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.parallel_jobs() == 4
+
+
+@pytest.mark.parametrize(
+    "value,template_env,expected",
+    [
+        ("", {}, ""),
+        ("${var}", {"var": "value"}, "value"),
+        ("$${var}", {"var": "value"}, "${var}"),
+        ("${var:-}", {}, ""),
+        ("${var:-default}", {}, "default"),
+        ("${var:-default}", {"var": "value"}, "value"),
+        ("$${var:-default}", {}, "${var:-default}"),
+    ],
+)
+def test_substitute_template(
+    value: str, template_env: dict[str, str], expected: str
+) -> None:
+    assert substitute_template(value, template_env) == expected
+
+
+def test_substitute_template_key_error() -> None:
+    # This test expects a ValueError to be raised by substitute_template
+    with pytest.raises(ValueError) as excinfo:
+        substitute_template("${DEFAULT:-default} ${UNKNOWN}", {})
+    # Verify that the error message matches the expected message
+    assert (
+        str(excinfo.value)
+        == "Undefined environment variable KeyError('UNKNOWN') referenced in expression '${DEFAULT} ${UNKNOWN}'"
+    )
+
+
+def test_git_options_default() -> None:
+    """Test that GitOptions has correct default values."""
+    git_opts = GitOptions()
+    assert git_opts.submodules is False
+    assert git_opts.submodule_paths == []
+
+
+def test_git_options_with_submodules_enabled() -> None:
+    """Test GitOptions with submodules enabled."""
+    git_opts = GitOptions(submodules=True)
+    assert git_opts.submodules is True
+    assert git_opts.submodule_paths == []
+
+
+def test_git_options_with_specific_paths() -> None:
+    """Test GitOptions with specific submodule paths."""
+    paths = ["vendor/lib1", "vendor/lib2"]
+    git_opts = GitOptions(submodule_paths=paths)
+    assert git_opts.submodules is False  # Default value
+    assert git_opts.submodule_paths == paths
+
+
+def test_git_options_with_both_settings() -> None:
+    """Test GitOptions with both submodules and paths configured."""
+    paths = ["vendor/lib1"]
+    git_opts = GitOptions(submodules=True, submodule_paths=paths)
+    assert git_opts.submodules is True
+    assert git_opts.submodule_paths == paths
+
+
+def test_package_settings_git_options_default() -> None:
+    """Test that PackageSettings includes GitOptions with defaults."""
+    settings = PackageSettings.from_default("test-pkg")
+    assert hasattr(settings, "git_options")
+    assert isinstance(settings.git_options, GitOptions)
+    assert settings.git_options.submodules is False
+    assert settings.git_options.submodule_paths == []
+
+
+def test_package_settings_git_options_from_dict() -> None:
+    """Test PackageSettings can parse git_options from dictionary."""
+    settings = PackageSettings.model_validate(
+        {
+            "name": "test-pkg",
+            "has_config": True,
+            "git_options": {
+                "submodules": True,
+            },
+        }
+    )
+    assert settings.git_options.submodules is True
+    assert settings.git_options.submodule_paths == []  # Default value
+
+
+def test_package_settings_git_options_from_dict_empty() -> None:
+    """Test PackageSettings can parse empty git_options from dictionary."""
+    settings = PackageSettings.model_validate(
+        {"name": "test-pkg", "has_config": True, "git_options": {}}
+    )
+    assert settings.git_options.submodules is False  # Default value
+    assert settings.git_options.submodule_paths == []  # Default value
+
+
+def test_package_settings_git_options_from_file() -> None:
+    """Test PackageSettings can parse git_options from a YAML file."""
+    data = """
+git_options:
+  submodules: true
+  submodule_paths:
+    - path/to/submodule
+"""
+    settings = PackageSettings.from_string("test-pkg", data)
+    assert settings.git_options.submodules is True
+    assert settings.git_options.submodule_paths == ["path/to/submodule"]
+
+
+def test_package_build_info_git_options(testdata_context: context.WorkContext) -> None:
+    """Test that PackageBuildInfo exposes git_options property."""
+    req = Requirement("test-pkg==1.0.0")
+    pbi = testdata_context.package_build_info(req)
+
+    # Check that git_options property exists and returns GitOptions
+    assert hasattr(pbi, "git_options")
+    git_opts = pbi.git_options
+    assert isinstance(git_opts, GitOptions)
+
+    # Test that default values are correct
+    assert git_opts.submodules is False
+    assert git_opts.submodule_paths == []
+
+    # Test creating a new package settings with custom git options
+    settings_yaml = """
+git_options:
+  submodules: true
+  submodule_paths:
+    - vendor/lib
+"""
+    custom_settings = PackageSettings.from_string("custom-pkg", settings_yaml)
+    assert custom_settings.git_options.submodules is True
+    assert custom_settings.git_options.submodule_paths == ["vendor/lib"]
+
+
+def test_package_build_info_exclusive_build(
+    testdata_context: context.WorkContext,
+) -> None:
+    """Test that PackageBuildInfo correctly exposes exclusive_build from build_options."""
+    # Test default package (should have exclusive_build=False by default)
+    req = Requirement("test-empty-pkg==1.0.0")
+    pbi = testdata_context.package_build_info(req)
+    assert pbi.exclusive_build is False
+
+    # Test creating a package settings with exclusive_build=True
+    settings_yaml = """
+build_options:
+  exclusive_build: true
+"""
+    custom_settings = PackageSettings.from_string("exclusive-pkg", settings_yaml)
+    assert custom_settings.build_options.exclusive_build is True
+
+    # Test PackageBuildInfo properly accesses it through build_options
+    import pathlib
+
+    from fromager.packagesettings import Settings, SettingsFile
+
+    # Create a temporary Settings object to test with
+    settings = Settings(
+        settings=SettingsFile(),
+        package_settings=[custom_settings],
+        variant="cpu",
+        patches_dir=pathlib.Path("/tmp"),
+        max_jobs=1,
+    )
+
+    custom_pbi = settings.package_build_info("exclusive-pkg")
+    assert custom_pbi.exclusive_build is True
+
+
+def test_resolver_dist_validator() -> None:
+    with pytest.raises(pydantic.ValidationError):
+        ResolverDist(include_wheels=False, ignore_platform=True)
+
+
+def test_annotation_type() -> None:
+    ann = Annotations(None, None)
+    assert not ann
+    assert len(ann) == 0
+    assert ann == {}
+    with pytest.raises(TypeError):
+        ann["key"] = "value"  # type: ignore
+
+    ann = Annotations({"ka": "va", "kb": "vb"}, {"kb": "otherb", "kc": "vc"})
+    assert ann
+    assert len(ann) == 3
+    assert ann == {"ka": "va", "kb": "otherb", "kc": "vc"}
+
+    ann = Annotations({"t": "yes", "f": "no", "invalid": "invalid"}, {})
+    assert ann.getbool("t") is True
+    assert ann.getbool("f") is False
+    with pytest.raises(ValueError):
+        ann.getbool("invalid")
+    with pytest.raises(KeyError):
+        ann.getbool("missing")
+
+
+def test_pbi_annotations(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.annotations == {
+        "fromager.test.value": "somevalue",
+        "fromager.test.override": "cpu override",
+    }
+
+    testdata_context.settings.variant = Variant("cuda")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.annotations == {
+        "fromager.test.value": "somevalue",
+        "fromager.test.override": "variant override",
+    }
+
+    testdata_context.settings.variant = Variant("rocm")
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.annotations == {
+        "fromager.test.value": "somevalue",
+        "fromager.test.override": "amd override",
+    }
+
+    pbi = testdata_context.settings.package_build_info(TEST_EMPTY_PKG)
+    assert pbi.annotations == {}
+
+
+def test_use_pypi_org_metadata(testdata_context: context.WorkContext) -> None:
+    pbi = testdata_context.settings.package_build_info(TEST_PKG)
+    assert pbi.use_pypi_org_metadata
+
+    pbi = testdata_context.settings.package_build_info(TEST_EMPTY_PKG)
+    assert not pbi.use_pypi_org_metadata
+
+    pbi = testdata_context.settings.package_build_info(
+        "somepackage_without_customization"
+    )
+    assert pbi.use_pypi_org_metadata
+
+
+def _make_pbi(env_yaml: str, tmp_path: pathlib.Path) -> PackageBuildInfo:
+    """Create a PackageBuildInfo from inline env YAML."""
+    ps = PackageSettings.from_string("version-test-pkg", env_yaml)
+    settings = Settings(
+        settings=SettingsFile(),
+        package_settings=[ps],
+        variant="cpu",
+        patches_dir=tmp_path,
+        max_jobs=1,
+    )
+    return settings.package_build_info("version-test-pkg")
+
+
+def test_version_env_var_raises_when_version_unknown(
+    tmp_path: pathlib.Path,
+) -> None:
+    """Using ${__version__} in env without a fallback raises when version is None."""
+    pbi = _make_pbi(
+        """
+env:
+    MY_VERSION: "${__version__}"
+""",
+        tmp_path,
+    )
+    with pytest.raises(ValueError, match="__version__"):
+        pbi.get_extra_environ(template_env={}, version=None)
+
+
+def test_version_env_var_with_default_when_version_unknown(
+    tmp_path: pathlib.Path,
+) -> None:
+    """${__version__:-fallback} substitutes the default when version is None."""
+    pbi = _make_pbi(
+        """
+env:
+    MY_VERSION: "${__version__:-unresolved}"
+""",
+        tmp_path,
+    )
+    result = pbi.get_extra_environ(template_env={}, version=None)
+    assert result["MY_VERSION"] == "unresolved"
+    assert "__version__" not in result
+
+
+def test_version_none_no_reference(
+    tmp_path: pathlib.Path,
+) -> None:
+    """version=None works when no env vars reference __version__."""
+    pbi = _make_pbi(
+        """
+env:
+    FOO: "bar"
+""",
+        tmp_path,
+    )
+    result = pbi.get_extra_environ(template_env={}, version=None)
+    assert result["FOO"] == "bar"
+    assert "__version__" not in result
+
+
+# --- ExternalCommands / env pattern tests ---
+
+
+@pytest.mark.parametrize("valid", ["HOME", "CARGO_*", "X", "_FOO", "_1A*"])
+def test_type_keep_env_pattern_valid(valid: str) -> None:
+    """Verify `KeepEnvPattern` accepts well-formed patterns."""
+    ta = pydantic.TypeAdapter(KeepEnvPattern)
+    assert ta.validate_python(valid) == valid
+
+
+@pytest.mark.parametrize(
+    "invalid", ["*", "A*B", "", "   ", " AWS_*", "AWS_* ", "1BAD", "foo-bar"]
+)
+def test_type_keep_env_pattern_invalid(invalid: str) -> None:
+    """Verify `KeepEnvPattern` rejects bare ``*``, mid-``*``, empty, whitespace, and bad chars."""
+    ta = pydantic.TypeAdapter(KeepEnvPattern)
+    with pytest.raises(pydantic.ValidationError):
+        ta.validate_python(invalid)
+
+
+@pytest.mark.parametrize("valid", ["CI_TOKEN", "AWS_*", "*", "_X"])
+def test_type_delete_env_pattern_valid(valid: str) -> None:
+    """Verify `DeleteEnvPattern` accepts valid patterns including bare ``*``."""
+    ta = pydantic.TypeAdapter(DeleteEnvPattern)
+    assert ta.validate_python(valid) == valid
+
+
+@pytest.mark.parametrize("invalid", ["A*B", "", " *", "1BAD", "foo-bar"])
+def test_type_delete_env_pattern_invalid(invalid: str) -> None:
+    """Verify `DeleteEnvPattern` rejects mid-``*``, empty, whitespace, and bad chars."""
+    ta = pydantic.TypeAdapter(DeleteEnvPattern)
+    with pytest.raises(pydantic.ValidationError):
+        ta.validate_python(invalid)
+
+
+def test_external_commands_valid() -> None:
+    """Valid configs, defaults, and frozen behavior."""
+    # both lists
+    ec = ExternalCommands(
+        keep_env=["CARGO_*", "HOME"],
+        delete_env=["CI_TOKEN", "AWS_*"],
+    )
+    assert ec.keep_env == ["CARGO_*", "HOME"]
+    assert ec.delete_env == ["CI_TOKEN", "AWS_*"]
+
+    # catch-all delete
+    ec = ExternalCommands(delete_env=["*"])
+    assert ec.keep_env == []
+    assert ec.delete_env == ["*"]
+
+    # defaults
+    ec = ExternalCommands()
+    assert ec.keep_env == []
+    assert ec.delete_env == []
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        pytest.param({"keep_env": ["*"]}, id="bare-star-keep"),
+        pytest.param({"keep_env": ["A*B"]}, id="mid-star"),
+        pytest.param({"delete_env": ["*", "AWS_*"]}, id="star-with-others"),
+        pytest.param({"delete_env": ["HOME"]}, id="delete-default-keep"),
+        pytest.param({"delete_env": ["LC_*"]}, id="delete-default-keep-prefix"),
+        pytest.param(
+            {"keep_env": ["CARGO_*"], "delete_env": ["CARGO_*"]},
+            id="delete-overlaps-keep",
+        ),
+        pytest.param({"unknown_key": "value"}, id="extra-forbid"),
+    ],
+)
+def test_external_commands_invalid(kwargs: dict[str, typing.Any]) -> None:
+    """Invalid ``ExternalCommands`` configurations must raise."""
+    with pytest.raises(pydantic.ValidationError):
+        ExternalCommands.model_validate(kwargs)
+
+
+def test_settings_file_external_commands(tmp_path: pathlib.Path) -> None:
+    """Parse ``external_commands`` from YAML and access via ``Settings``."""
+    # absent → empty default
+    assert not SettingsFile.from_string("").external_commands.delete_env
+
+    # present
+    sf = SettingsFile.from_string(
+        """
+external_commands:
+  keep_env:
+    - "CARGO_*"
+  delete_env:
+    - "CI_TOKEN"
+"""
+    )
+    assert sf.external_commands.delete_env
+    assert sf.external_commands.keep_env == ["CARGO_*"]
+    assert sf.external_commands.delete_env == ["CI_TOKEN"]
+
+    # Settings property proxies SettingsFile
+    settings = Settings(
+        settings=sf,
+        package_settings=[],
+        variant="cpu",
+        patches_dir=tmp_path,
+        max_jobs=1,
+    )
+    assert settings.external_commands is sf.external_commands
+
+    settings_no_filter = Settings(
+        settings=SettingsFile(),
+        package_settings=[],
+        variant="cpu",
+        patches_dir=tmp_path,
+        max_jobs=1,
+    )
+    assert not settings_no_filter.external_commands.delete_env
+
+
+# --- ExternalCommands.filter_env tests ---
+
+_ENV = {"HOME": "/h", "PATH": "/bin", "LC_ALL": "C", "SECRET": "s", "AWS_KEY": "k"}
+
+
+def test_filter_env_no_delete() -> None:
+    """No delete_env configured keeps all POSIX-compliant keys."""
+    ec = ExternalCommands()
+    assert ec.filter_env(_ENV) == _ENV
+
+
+def test_filter_env_no_delete_strips_non_posix() -> None:
+    """Non-POSIX keys are removed even without delete_env."""
+    ec = ExternalCommands()
+    env = {"HOME": "/h", "dot.key": "x", "BASH_FUNC_f%%": "y"}
+    assert ec.filter_env(env) == {"HOME": "/h"}
+
+
+@pytest.mark.parametrize(
+    "keep,delete,env,expected",
+    [
+        pytest.param(
+            [],
+            ["SECRET"],
+            _ENV,
+            {"HOME": "/h", "PATH": "/bin", "LC_ALL": "C", "AWS_KEY": "k"},
+            id="exact-delete",
+        ),
+        pytest.param(
+            [],
+            ["AWS_*"],
+            _ENV,
+            {"HOME": "/h", "PATH": "/bin", "LC_ALL": "C", "SECRET": "s"},
+            id="prefix-delete",
+        ),
+        pytest.param(
+            ["CI_SAFE"],
+            ["CI_*"],
+            {"CI_SAFE": "1", "CI_TOKEN": "x"},
+            {"CI_SAFE": "1"},
+            id="keep-protects-from-delete",
+        ),
+        pytest.param(
+            [],
+            ["*"],
+            _ENV,
+            {"HOME": "/h", "PATH": "/bin", "LC_ALL": "C"},
+            id="delete-all",
+        ),
+        pytest.param(
+            ["AWS_*"],
+            ["*"],
+            _ENV,
+            {"HOME": "/h", "PATH": "/bin", "LC_ALL": "C", "AWS_KEY": "k"},
+            id="delete-all-user-keep",
+        ),
+        pytest.param(
+            [],
+            ["CI_*"],
+            {"X": "1", "CI_T": "2"},
+            {"X": "1"},
+            id="unmatched-kept",
+        ),
+        pytest.param(
+            [],
+            ["secret"],
+            {"SECRET": "gone", "secret": "gone", "Other": "kept"},
+            {"Other": "kept"},
+            id="delete-case-insensitive",
+        ),
+        pytest.param(
+            ["my_var"],
+            ["*"],
+            {"my_var": "kept", "MY_VAR": "gone"},
+            {"my_var": "kept"},
+            id="keep-case-sensitive",
+        ),
+        pytest.param(
+            [],
+            ["SECRET"],
+            {"HOME": "/h", "SECRET": "s", "dot.key": "x", "BASH_FUNC_f%%": "y"},
+            {"HOME": "/h"},
+            id="non-posix-keys-removed",
+        ),
+        pytest.param(
+            ["KEEP_ME"],
+            ["*"],
+            {"KEEP_ME": "ok", "1BAD": "x", "k-v": "y"},
+            {"KEEP_ME": "ok"},
+            id="non-posix-keys-removed-delete-all",
+        ),
+    ],
+)
+def test_filter_env(
+    keep: list[str],
+    delete: list[str],
+    env: dict[str, str],
+    expected: dict[str, str],
+) -> None:
+    ec = ExternalCommands(keep_env=keep, delete_env=delete)
+    assert ec.filter_env(env) == expected

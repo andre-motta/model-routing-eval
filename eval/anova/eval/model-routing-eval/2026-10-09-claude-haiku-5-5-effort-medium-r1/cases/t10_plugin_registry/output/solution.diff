@@ -1,0 +1,285 @@
+diff --git a/export/__init__.py b/export/__init__.py
+index af41b91..c0f6be9 100644
+--- a/export/__init__.py
++++ b/export/__init__.py
+@@ -1,3 +1,14 @@
+-from .core import export_records, export_to_file, UnknownFormat
++from . import formats  # noqa: F401  (imports built-in formats so they register)
++from .base import Exporter
++from .core import export_records, export_to_file
++from .registry import UnknownFormat, get, names, register
+ 
+-__all__ = ["export_records", "export_to_file", "UnknownFormat"]
++__all__ = [
++    "Exporter",
++    "UnknownFormat",
++    "export_records",
++    "export_to_file",
++    "get",
++    "names",
++    "register",
++]
+diff --git a/export/base.py b/export/base.py
+new file mode 100644
+index 0000000..eb5f2ee
+--- /dev/null
++++ b/export/base.py
+@@ -0,0 +1,15 @@
++from abc import ABC, abstractmethod
++
++
++class Exporter(ABC):
++    """Serialises a list of record dicts (identical keys) to bytes.
++
++    Subclasses set ``name`` and ``extension`` and implement ``dump``.
++    """
++
++    name: str
++    extension: str
++
++    @abstractmethod
++    def dump(self, records):
++        """Return the serialised form of ``records`` as bytes."""
+diff --git a/export/core.py b/export/core.py
+index 1f64e19..bd789a3 100644
+--- a/export/core.py
++++ b/export/core.py
+@@ -1,52 +1,17 @@
+-import csv
+-import io
+-import json
+-from xml.sax.saxutils import escape
+-
+-
+-class UnknownFormat(ValueError):
+-    pass
+-
+-
+-def _extension(fmt):
+-    if fmt == "csv":
+-        return ".csv"
+-    elif fmt == "json":
+-        return ".json"
+-    elif fmt == "xml":
+-        return ".xml"
+-    raise UnknownFormat(fmt)
++from . import registry
++from .registry import UnknownFormat
+ 
+ 
+ def export_records(records, fmt):
+     """records: list of dicts with identical keys. Returns bytes."""
+-    if fmt == "csv":
+-        buf = io.StringIO()
+-        if records:
+-            w = csv.DictWriter(buf, fieldnames=list(records[0].keys()), lineterminator="\n")
+-            w.writeheader()
+-            w.writerows(records)
+-        return buf.getvalue().encode()
+-    elif fmt == "json":
+-        return json.dumps(records, indent=2, sort_keys=True).encode() + b"\n"
+-    elif fmt == "xml":
+-        parts = ["<records>"]
+-        for r in records:
+-            parts.append("  <record>")
+-            for k, v in r.items():
+-                parts.append(f"    <{k}>{escape(str(v))}</{k}>")
+-            parts.append("  </record>")
+-        parts.append("</records>")
+-        return ("\n".join(parts) + "\n").encode()
+-    raise UnknownFormat(fmt)
++    return registry.get(fmt).dump(records)
+ 
+ 
+ def export_to_file(records, fmt, path):
+-    if fmt not in ("csv", "json", "xml"):
+-        raise UnknownFormat(fmt)
++    exporter = registry.get(fmt)
+     path = str(path)
+-    if not path.endswith(_extension(fmt)):
+-        path += _extension(fmt)
++    if not path.endswith(exporter.extension):
++        path += exporter.extension
+     with open(path, "wb") as f:
+-        f.write(export_records(records, fmt))
++        f.write(exporter.dump(records))
+     return path
+diff --git a/export/formats/__init__.py b/export/formats/__init__.py
+new file mode 100644
+index 0000000..327900f
+--- /dev/null
++++ b/export/formats/__init__.py
+@@ -0,0 +1,11 @@
++"""Built-in export formats.
++
++Every module in this package is imported on load, so any Exporter decorated
++with ``@register`` is available without editing the registry or core.
++"""
++
++import importlib
++import pkgutil
++
++for _module in pkgutil.iter_modules(__path__):
++    importlib.import_module(f"{__name__}.{_module.name}")
+diff --git a/export/formats/csv_format.py b/export/formats/csv_format.py
+new file mode 100644
+index 0000000..e89c35a
+--- /dev/null
++++ b/export/formats/csv_format.py
+@@ -0,0 +1,19 @@
++import csv
++import io
++
++from ..base import Exporter
++from ..registry import register
++
++
++@register
++class CsvExporter(Exporter):
++    name = "csv"
++    extension = ".csv"
++
++    def dump(self, records):
++        buf = io.StringIO()
++        if records:
++            w = csv.DictWriter(buf, fieldnames=list(records[0].keys()), lineterminator="\n")
++            w.writeheader()
++            w.writerows(records)
++        return buf.getvalue().encode()
+diff --git a/export/formats/json_format.py b/export/formats/json_format.py
+new file mode 100644
+index 0000000..c3263ff
+--- /dev/null
++++ b/export/formats/json_format.py
+@@ -0,0 +1,13 @@
++import json
++
++from ..base import Exporter
++from ..registry import register
++
++
++@register
++class JsonExporter(Exporter):
++    name = "json"
++    extension = ".json"
++
++    def dump(self, records):
++        return json.dumps(records, indent=2, sort_keys=True).encode() + b"\n"
+diff --git a/export/formats/xml_format.py b/export/formats/xml_format.py
+new file mode 100644
+index 0000000..b27e646
+--- /dev/null
++++ b/export/formats/xml_format.py
+@@ -0,0 +1,20 @@
++from xml.sax.saxutils import escape
++
++from ..base import Exporter
++from ..registry import register
++
++
++@register
++class XmlExporter(Exporter):
++    name = "xml"
++    extension = ".xml"
++
++    def dump(self, records):
++        parts = ["<records>"]
++        for r in records:
++            parts.append("  <record>")
++            for k, v in r.items():
++                parts.append(f"    <{k}>{escape(str(v))}</{k}>")
++            parts.append("  </record>")
++        parts.append("</records>")
++        return ("\n".join(parts) + "\n").encode()
+diff --git a/export/registry.py b/export/registry.py
+new file mode 100644
+index 0000000..f96a211
+--- /dev/null
++++ b/export/registry.py
+@@ -0,0 +1,31 @@
++class UnknownFormat(ValueError):
++    pass
++
++
++_exporters = {}
++
++
++def register(exporter_cls):
++    """Class decorator that adds an Exporter subclass to the registry."""
++    name = getattr(exporter_cls, "name", None)
++    if not name:
++        raise ValueError(f"{exporter_cls.__name__} must define a non-empty 'name'")
++    if name in _exporters:
++        raise ValueError(f"export format {name!r} is already registered")
++    _exporters[name] = exporter_cls
++    return exporter_cls
++
++
++def names():
++    """Sorted list of registered format names."""
++    return sorted(_exporters)
++
++
++def get(name):
++    """Return a new exporter instance for ``name``; raise UnknownFormat if absent."""
++    try:
++        exporter_cls = _exporters[name]
++    except KeyError:
++        known = ", ".join(names())
++        raise UnknownFormat(f"unknown format {name!r}; known formats: {known}") from None
++    return exporter_cls()
+diff --git a/tests/test_registry.py b/tests/test_registry.py
+new file mode 100644
+index 0000000..b1b3324
+--- /dev/null
++++ b/tests/test_registry.py
+@@ -0,0 +1,49 @@
++import pytest
++
++import export
++from export import registry
++from export.base import Exporter
++
++R = [{"id": 1, "name": "a"}]
++
++
++def test_builtin_formats_registered():
++    assert export.names() == ["csv", "json", "xml"]
++
++
++def test_unknown_format_lists_known_names():
++    with pytest.raises(export.UnknownFormat) as info:
++        export.get("yaml")
++    assert "csv, json, xml" in str(info.value)
++
++
++def test_plugin_registered_without_touching_core(monkeypatch, tmp_path):
++    monkeypatch.setattr(registry, "_exporters", dict(registry._exporters))
++
++    @export.register
++    class TxtExporter(Exporter):
++        name = "txt"
++        extension = ".txt"
++
++        def dump(self, records):
++            return b"\n".join(str(r).encode() for r in records)
++
++    assert "txt" in export.names()
++    assert export.export_records(R, "txt") == b"{'id': 1, 'name': 'a'}"
++    p = export.export_to_file(R, "txt", tmp_path / "out")
++    assert p.endswith(".txt")
++    assert (tmp_path / "out.txt").read_bytes() == b"{'id': 1, 'name': 'a'}"
++
++
++def test_duplicate_registration_rejected(monkeypatch):
++    monkeypatch.setattr(registry, "_exporters", dict(registry._exporters))
++
++    with pytest.raises(ValueError):
++
++        @export.register
++        class Dup(Exporter):
++            name = "json"
++            extension = ".json"
++
++            def dump(self, records):
++                return b""

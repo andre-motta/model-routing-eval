@@ -1,0 +1,7 @@
+{
+  "condition_id": "90740b19102e",
+  "levels": {
+    "effort": "medium",
+    "model": "claude-sonnet-5-5"
+  }
+}

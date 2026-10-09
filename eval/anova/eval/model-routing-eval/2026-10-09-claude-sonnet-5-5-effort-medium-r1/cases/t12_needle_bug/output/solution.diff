@@ -1,0 +1,44 @@
+diff --git a/billing/__pycache__/totals.cpython-314.pyc b/billing/__pycache__/totals.cpython-314.pyc
+index 858e67e..248d9ae 100644
+Binary files a/billing/__pycache__/totals.cpython-314.pyc and b/billing/__pycache__/totals.cpython-314.pyc differ
+diff --git a/billing/totals.py b/billing/totals.py
+index 7865b14..dd2d64d 100644
+--- a/billing/totals.py
++++ b/billing/totals.py
+@@ -14,10 +14,5 @@ def line_totals(inv: Invoice) -> list[Decimal]:
+ 
+ def invoice_total(inv: Invoice) -> Decimal:
+     """Amount charged: sum of lines after discount, plus tax on that sum."""
+-    gross = sum((li.unit_price * li.qty for li in inv.lines), Decimal("0"))
+-    discount_amount = Decimal("0")
+-    for li in inv.lines:
+-        if li.discount is not None:
+-            discount_amount += li.unit_price * li.qty * li.discount.percent / Decimal(100)
+-    net = round_money(gross - discount_amount)
++    net = sum(line_totals(inv), Decimal("0"))
+     return round_money(net + tax_for(net, inv.tax_rule))
+diff --git a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc
+index 6f56133..622777d 100644
+Binary files a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_billing.py b/tests/test_billing.py
+index 0391358..808d874 100644
+--- a/tests/test_billing.py
++++ b/tests/test_billing.py
+@@ -17,3 +17,17 @@ def test_with_tax():
+ def test_discount_whole_numbers():
+     inv = build_invoice("A3", [("x", "100.00", 1, percent_off("TEN", "10"))])
+     assert invoice_total(inv) == Decimal("90.00")
++
++
++def test_total_matches_printed_lines_with_discounts():
++    # Each line is 0.05 * 7% off = 4.65 -> rounds per line; unrounded sum differs by a cent.
++    rows = [("a", "0.05", 1, percent_off("D", "7"))] * 10 + [("b", "1.35", 1, percent_off("D", "15"))] * 3
++    inv = build_invoice("A4", rows)
++    assert invoice_total(inv) == sum(line_totals(inv))
++
++
++def test_total_matches_lines_half_cent_discounts():
++    inv = build_invoice("A5", [("a", "0.10", 1, percent_off("D", "5"))] * 3)
++    # each line 0.095 -> 0.10 (half up); printed sum 0.30, unrounded 0.285 -> 0.29
++    assert sum(line_totals(inv)) == Decimal("0.30")
++    assert invoice_total(inv) == Decimal("0.30")

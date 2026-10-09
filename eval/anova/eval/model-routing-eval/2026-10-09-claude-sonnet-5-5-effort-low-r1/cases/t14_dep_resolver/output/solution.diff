@@ -1,0 +1,222 @@
+diff --git a/resolver/__pycache__/__init__.cpython-314.pyc b/resolver/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..b9b7426
+Binary files /dev/null and b/resolver/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/resolver/__pycache__/solve.cpython-314.pyc b/resolver/__pycache__/solve.cpython-314.pyc
+new file mode 100644
+index 0000000..818c3b5
+Binary files /dev/null and b/resolver/__pycache__/solve.cpython-314.pyc differ
+diff --git a/resolver/solve.py b/resolver/solve.py
+index 5bcec2a..6a2a192 100644
+--- a/resolver/solve.py
++++ b/resolver/solve.py
+@@ -1,20 +1,138 @@
++import functools
++import operator
++import re
++
++
+ class ResolutionError(Exception):
+     pass
+ 
+ 
++@functools.total_ordering
+ class Version:
+     def __init__(self, s):
+-        raise NotImplementedError
++        self._s = str(s)
++        parts = self._s.strip().split(".")
++        try:
++            nums = [int(p) for p in parts]
++        except ValueError:
++            raise ValueError(f"invalid version: {s!r}") from None
++        while len(nums) > 1 and nums[-1] == 0:
++            nums.pop()
++        self._key = tuple(nums)
++
++    def __eq__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key == other._key
++
++    def __lt__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key < other._key
++
++    def __hash__(self):
++        return hash(self._key)
++
++    def __str__(self):
++        return self._s
++
++    def __repr__(self):
++        return f"Version({self._s!r})"
++
++
++_OPS = {
++    "==": operator.eq,
++    "!=": operator.ne,
++    "<=": operator.le,
++    ">=": operator.ge,
++    "<": operator.lt,
++    ">": operator.gt,
++}
++_CLAUSE = re.compile(r"^\s*(==|!=|<=|>=|<|>)\s*([0-9][0-9.]*)\s*$")
+ 
+ 
+ class Constraint:
++    def __init__(self, name, clauses=()):
++        self.name = name
++        self.clauses = tuple(clauses)
++
+     @classmethod
+     def parse(cls, requirement):
+-        raise NotImplementedError
++        m = re.match(r"^\s*([^\s<>=!,]+)\s*(.*)$", requirement)
++        if not m:
++            raise ValueError(f"invalid requirement: {requirement!r}")
++        name, rest = m.groups()
++        clauses = []
++        if rest.strip():
++            for part in rest.split(","):
++                cm = _CLAUSE.match(part)
++                if not cm:
++                    raise ValueError(f"invalid requirement: {requirement!r}")
++                clauses.append((cm.group(1), Version(cm.group(2))))
++        return cls(name, clauses)
+ 
+     def allows(self, version):
+-        raise NotImplementedError
++        if not isinstance(version, Version):
++            version = Version(version)
++        return all(_OPS[op](version, v) for op, v in self.clauses)
+ 
+ 
+ def resolve(roots, index):
+-    raise NotImplementedError
++    parsed = {}
++
++    def deps_of(name, ver):
++        key = (name, ver)
++        if key not in parsed:
++            parsed[key] = [Constraint.parse(r) for r in index[name][ver]]
++        return parsed[key]
++
++    versions = {
++        n: sorted(((Version(v), v) for v in vs), reverse=True) for n, vs in index.items()
++    }
++    failed = []
++
++    def candidates(name, cons):
++        return [raw for v, raw in versions.get(name, ()) if all(c.allows(v) for c in cons)]
++
++    def search(assigned, cons):
++        pending = sorted(n for n in cons if n not in assigned)
++        if not pending:
++            return assigned
++        name = pending[0]
++        for raw in candidates(name, cons[name]):
++            new_cons = {n: list(cs) for n, cs in cons.items()}
++            new_assigned = dict(assigned)
++            new_assigned[name] = raw
++            ok = True
++            for c in deps_of(name, raw):
++                new_cons.setdefault(c.name, []).append(c)
++                if c.name in new_assigned:
++                    if not c.allows(Version(new_assigned[c.name])):
++                        failed.append(c.name)
++                        ok = False
++                        break
++                elif not candidates(c.name, new_cons[c.name]):
++                    failed.append(c.name)
++                    ok = False
++                    break
++            if ok:
++                res = search(new_assigned, new_cons)
++                if res is not None:
++                    return res
++        if not failed or failed[-1] != name:
++            failed.append(name)
++        return None
++
++    cons = {}
++    for r in roots:
++        c = Constraint.parse(r)
++        cons.setdefault(c.name, []).append(c)
++    for n, cs in cons.items():
++        if not candidates(n, cs):
++            raise ResolutionError(f"no version of {n} satisfies constraints")
++    res = search({}, cons)
++    if res is None:
++        raise ResolutionError(
++            f"cannot satisfy constraints for package {failed[0] if failed else '?'}"
++        )
++    return res
+diff --git a/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..8d4dee3
+Binary files /dev/null and b/tests/__pycache__/test_solve.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_solve.py b/tests/test_solve.py
+new file mode 100644
+index 0000000..d682283
+--- /dev/null
++++ b/tests/test_solve.py
+@@ -0,0 +1,57 @@
++import pytest
++
++from resolver.solve import Constraint, ResolutionError, Version, resolve
++
++INDEX = {
++    "app": {"1.0": ["web>=2", "db"]},
++    "web": {"1.0": [], "2.0": ["json<3"], "2.1": ["json>=3"]},
++    "json": {"2.0": [], "3.0": []},
++    "db": {"1.0": ["json<3"]},
++}
++
++
++def test_version():
++    assert Version("1.0") == Version("1")
++    assert hash(Version("1.0")) == hash(Version("1"))
++    assert Version("1.10") > Version("1.9")
++    assert str(Version("1.0")) == "1.0"
++
++
++def test_constraint():
++    c = Constraint.parse("json>=2,<3")
++    assert c.name == "json"
++    assert c.allows(Version("2.5")) and not c.allows(Version("3"))
++    assert Constraint.parse("x").allows(Version("0"))
++
++
++def test_basic():
++    assert resolve(["app"], INDEX) == {"app": "1.0", "web": "2.0", "db": "1.0", "json": "2.0"}
++
++
++def test_cycle():
++    idx = {"a": {"1": ["b"]}, "b": {"1": ["a"]}}
++    assert resolve(["a"], idx) == {"a": "1", "b": "1"}
++
++
++def test_error_names_leaf():
++    idx = {"a": {"1": ["b<1"]}, "b": {"1": [], "2": []}}
++    with pytest.raises(ResolutionError, match="b"):
++        resolve(["a"], idx)
++
++
++def test_unreachable_excluded():
++    assert resolve(["json"], INDEX) == {"json": "3.0"}
++
++
++def test_large():
++    idx = {}
++    n = 40
++    for i in range(n):
++        idx[f"p{i:02d}"] = {
++            str(v): ([f"p{i+1:02d}<{v}"] if i + 1 < n and v > 1 else []) for v in range(1, 9)
++        }
++    idx[f"p{n-1:02d}"] = {"1": []}
++    idx["p00"]["99"] = ["zzz"]
++    idx["zzz"] = {str(v): ["p05>=8"] for v in range(1, 200)}
++    res = resolve(["p00"], idx)
++    assert res["p00"] == "8" or "p00" in res

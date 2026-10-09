@@ -1,0 +1,13 @@
+task: t12_needle_bug
+prompt: 'Support ticket: "Invoice totals are sometimes off by one cent compared to the sum of the
+
+  line items shown on the PDF. Happens maybe one invoice in twenty, only when there are
+
+  discounts involved. No errors in logs."
+
+
+  The `billing` package is in this repo. Find the root cause and fix it. Do not change the
+
+  public API. Add a regression test under `tests/`. Run the full test suite.
+
+  '

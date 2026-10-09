@@ -1,0 +1,131 @@
+diff --git a/logstats/__pycache__/__init__.cpython-314.pyc b/logstats/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..d9501f1
+Binary files /dev/null and b/logstats/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/logstats/__pycache__/parse.cpython-314.pyc b/logstats/__pycache__/parse.cpython-314.pyc
+new file mode 100644
+index 0000000..44e263b
+Binary files /dev/null and b/logstats/__pycache__/parse.cpython-314.pyc differ
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..e0af9ae 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,82 @@
+-"""Implement parse_line and summarize here. See FORMAT.md."""
++"""Parse access logs and summarize them. See FORMAT.md."""
++import math
++import re
++from collections import Counter
++from dataclasses import dataclass, field
++from datetime import datetime, timezone
++
++_LINE_RE = re.compile(
++    r"(\S+) ([A-Z]+) (\S+) (\d+) (\d+(?:\.\d+)?|\.\d+)(?: (\d+))?"
++)
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int = 0
++    malformed: int = 0
++    by_status: dict[int, int] = field(default_factory=dict)
++    by_method: dict[str, int] = field(default_factory=dict)
++    p50_latency_ms: float = 0.0
++    p95_latency_ms: float = 0.0
++    bytes_total: int = 0
++    error_rate: float = 0.0
++    top_paths: list[tuple[str, int]] = field(default_factory=list)
++
++
++def parse_line(line: str) -> Record | None:
++    m = _LINE_RE.fullmatch(line.strip())
++    if not m:
++        return None
++    ts_s, method, path, status, latency, size = m.groups()
++    try:
++        ts = datetime.fromisoformat(ts_s.replace("Z", "+00:00"))
++    except ValueError:
++        return None
++    if ts.tzinfo is None:
++        ts = ts.replace(tzinfo=timezone.utc)
++    else:
++        ts = ts.astimezone(timezone.utc)
++    return Record(ts, method, path, int(status), float(latency), int(size or 0))
++
++
++def _percentile(sorted_vals: list[float], pct: float) -> float:
++    if not sorted_vals:
++        return 0.0
++    rank = math.ceil(pct / 100 * len(sorted_vals))
++    return sorted_vals[max(rank, 1) - 1]
++
++
++def summarize(lines) -> Summary:
++    records = []
++    malformed = 0
++    for line in lines:
++        rec = parse_line(line)
++        if rec is None:
++            malformed += 1
++        else:
++            records.append(rec)
++
++    latencies = sorted(r.latency_ms for r in records)
++    paths = Counter(r.path for r in records)
++    errors = sum(1 for r in records if r.status >= 500)
++    return Summary(
++        total=len(records),
++        malformed=malformed,
++        by_status=dict(Counter(r.status for r in records)),
++        by_method=dict(Counter(r.method for r in records)),
++        p50_latency_ms=_percentile(latencies, 50),
++        p95_latency_ms=_percentile(latencies, 95),
++        bytes_total=sum(r.bytes for r in records),
++        error_rate=errors / len(records) if records else 0.0,
++        top_paths=sorted(paths.items(), key=lambda kv: (-kv[1], kv[0]))[:5],
++    )
+diff --git a/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..c892cd3
+Binary files /dev/null and b/tests/__pycache__/test_parse.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+new file mode 100644
+index 0000000..1cd03f6
+--- /dev/null
++++ b/tests/test_parse.py
+@@ -0,0 +1,25 @@
++from logstats.parse import parse_line, summarize
++
++
++def test_parse_line():
++    r = parse_line("2026-10-01T12:00:02Z GET /api/users/7 404 3.1")
++    assert (r.method, r.status, r.latency_ms, r.bytes) == ("GET", 404, 3.1, 0)
++    assert r.ts.utcoffset().total_seconds() == 0
++    assert parse_line("garbage line here") is None
++
++
++def test_summarize_sample():
++    with open("sample.log") as f:
++        s = summarize(f)
++    assert s.malformed == 1
++    assert s.total == 5
++    assert s.by_status[500] == 1
++    assert s.error_rate == 0.2
++    assert s.bytes_total == 963
++    assert s.p50_latency_ms == 12.5
++    assert s.top_paths[0] == ("/api/users", 3)
++
++
++def test_empty():
++    s = summarize([])
++    assert s.total == 0 and s.p95_latency_ms == 0.0 and s.error_rate == 0.0

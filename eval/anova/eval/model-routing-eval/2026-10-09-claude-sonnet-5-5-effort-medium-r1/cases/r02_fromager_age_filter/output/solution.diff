@@ -1,0 +1,101 @@
+diff --git a/src/fromager/resolver.py b/src/fromager/resolver.py
+index 574c013..2113941 100644
+--- a/src/fromager/resolver.py
++++ b/src/fromager/resolver.py
+@@ -249,7 +249,9 @@ def find_all_matching_from_provider(
+         req: The requirement to match.
+         max_age_cutoff: If set, reject candidates published before this time.
+             If all candidates are older than the cutoff, all are kept and
+-            a warning is emitted to avoid empty resolution.
++            a warning is emitted to avoid empty resolution. Packages with a
++            constraint in ``provider.constraints`` skip age filtering
++            entirely, since a constraint is explicit user intent.
+         fallback_on_empty_age_filter: If ``True`` (default), keep all
+             candidates when age filtering would produce an empty result.
+             If ``False``, return an empty list instead, allowing the
+@@ -290,7 +292,13 @@ def find_all_matching_from_provider(
+     # Materialize candidates so we can iterate more than once if filtering
+     candidates_list = list(candidates)
+ 
+-    if max_age_cutoff is not None:
++    if max_age_cutoff is not None and provider.constraints.get_constraint(req.name):
++        logger.info(
++            "%s: skipping age filter for constrained package (%d candidate(s))",
++            req.name,
++            len(candidates_list),
++        )
++    elif max_age_cutoff is not None:
+         logger.info(
+             "%s: found %d candidate(s) matching %s",
+             req.name,
+diff --git a/tests/test_cooldown.py b/tests/test_cooldown.py
+index 0d47cc5..e402b8c 100644
+--- a/tests/test_cooldown.py
++++ b/tests/test_cooldown.py
+@@ -19,6 +19,7 @@ from packaging.requirements import Requirement
+ from packaging.version import Version
+ 
+ from fromager import candidate, context, packagesettings, resolver, sources, wheels
++from fromager.constraints import Constraints
+ from fromager.requirements_file import RequirementType
+ 
+ _BOOTSTRAP_TIME = datetime.datetime(2026, 3, 26, 0, 0, 0, tzinfo=datetime.UTC)
+@@ -796,6 +797,58 @@ def test_max_release_age_all_too_old_keeps_all(
+     assert "keeping all to avoid empty resolution" in caplog.text
+ 
+ 
++def test_max_release_age_skipped_for_constrained_package(
++    caplog: pytest.LogCaptureFixture,
++) -> None:
++    """Constrained packages skip age filtering, even without fallback."""
++    max_age_cutoff = _BOOTSTRAP_TIME - datetime.timedelta(days=5)
++    constraints = Constraints()
++    constraints.add_constraint("test-pkg<=1.3.2")
++    with requests_mock.Mocker() as r:
++        r.get(
++            "https://pypi.org/simple/test-pkg/",
++            json=_cooldown_json_response,
++            headers={"Content-Type": _PYPI_SIMPLE_JSON_CONTENT_TYPE},
++        )
++        provider = resolver.PyPIProvider(include_sdists=True, constraints=constraints)
++        with caplog.at_level(logging.INFO, logger="fromager.resolver"):
++            results = resolver.find_all_matching_from_provider(
++                provider,
++                Requirement("test-pkg"),
++                max_age_cutoff=max_age_cutoff,
++                fallback_on_empty_age_filter=False,
++            )
++    versions = [str(v) for _, v in results]
++    assert versions == ["1.3.2", "1.2.2"]
++    assert (
++        "test-pkg: skipping age filter for constrained package (2 candidate(s))"
++        in caplog.text
++    )
++    assert "keeping all to avoid empty resolution" not in caplog.text
++
++
++def test_max_release_age_applied_for_unconstrained_package(
++    caplog: pytest.LogCaptureFixture,
++) -> None:
++    """Packages without a constraint are still age filtered."""
++    max_age_cutoff = _BOOTSTRAP_TIME - datetime.timedelta(days=5)
++    constraints = Constraints()
++    constraints.add_constraint("other-pkg==1.0")
++    with requests_mock.Mocker() as r:
++        r.get(
++            "https://pypi.org/simple/test-pkg/",
++            json=_cooldown_json_response,
++            headers={"Content-Type": _PYPI_SIMPLE_JSON_CONTENT_TYPE},
++        )
++        provider = resolver.PyPIProvider(include_sdists=True, constraints=constraints)
++        with caplog.at_level(logging.INFO, logger="fromager.resolver"):
++            results = resolver.find_all_matching_from_provider(
++                provider, Requirement("test-pkg"), max_age_cutoff=max_age_cutoff
++            )
++    assert [str(v) for _, v in results] == ["2.0.0"]
++    assert "skipping age filter" not in caplog.text
++
++
+ def test_max_release_age_all_too_old_returns_empty_when_fallback_disabled(
+     caplog: pytest.LogCaptureFixture,
+ ) -> None:

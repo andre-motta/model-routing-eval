@@ -1,0 +1,623 @@
+diff --git a/resolver/solve.py b/resolver/solve.py
+index 5bcec2a..474bc79 100644
+--- a/resolver/solve.py
++++ b/resolver/solve.py
+@@ -1,20 +1,282 @@
++import operator
++import re
++from functools import total_ordering
++
++
+ class ResolutionError(Exception):
+     pass
+ 
+ 
++_VERSION_RE = re.compile(r"\d+(\.\d+)*")
++_REQ_RE = re.compile(r"\s*([^=!<>,\s]+)\s*(.*)", re.DOTALL)
++_SPEC_RE = re.compile(r"(==|!=|<=|>=|<|>)\s*(\S+)")
++_OPS = {
++    "==": operator.eq,
++    "!=": operator.ne,
++    "<": operator.lt,
++    "<=": operator.le,
++    ">": operator.gt,
++    ">=": operator.ge,
++}
++
++
++@total_ordering
+ class Version:
+     def __init__(self, s):
+-        raise NotImplementedError
++        text = str(s)
++        if not _VERSION_RE.fullmatch(text):
++            raise ValueError(f"invalid version: {text!r}")
++        self._text = text
++        parts = [int(p) for p in text.split(".")]
++        # Missing trailing components count as zero, so "1.0" and "1" compare equal.
++        while parts and parts[-1] == 0:
++            parts.pop()
++        self._key = tuple(parts)
++
++    def __str__(self):
++        return self._text
++
++    def __repr__(self):
++        return f"Version({self._text!r})"
++
++    def __eq__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key == other._key
++
++    def __lt__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key < other._key
++
++    def __hash__(self):
++        return hash(self._key)
+ 
+ 
+ class Constraint:
++    def __init__(self, name, specs=()):
++        self.name = name
++        self.specs = tuple(specs)  # (op, Version) pairs, all of which must hold
++
+     @classmethod
+     def parse(cls, requirement):
+-        raise NotImplementedError
++        match = _REQ_RE.fullmatch(requirement)
++        if not match:
++            raise ValueError(f"invalid requirement: {requirement!r}")
++        name, rest = match.group(1), match.group(2).strip()
++        specs = []
++        if rest:
++            for piece in rest.split(","):
++                spec = _SPEC_RE.fullmatch(piece.strip())
++                if not spec:
++                    raise ValueError(f"invalid constraint {piece.strip()!r} in {requirement!r}")
++                specs.append((spec.group(1), Version(spec.group(2))))
++        return cls(name, specs)
+ 
+     def allows(self, version):
+-        raise NotImplementedError
++        if not isinstance(version, Version):
++            version = Version(version)
++        return _satisfies(version, self.specs)
++
++    def __eq__(self, other):
++        if not isinstance(other, Constraint):
++            return NotImplemented
++        return self.name == other.name and self.specs == other.specs
++
++    def __hash__(self):
++        return hash((self.name, self.specs))
++
++    def __repr__(self):
++        return f"Constraint({self.name!r}, {list(self.specs)!r})"
++
++
++def _satisfies(version, specs):
++    return all(_OPS[op](version, bound) for op, bound in specs)
++
++
++class _Search:
++    """Feasibility oracle: finds any solution that honours the fixed choices.
++
++    `packages` maps name -> list of (Version, [Constraint]) sorted newest first, so a
++    candidate is identified by its position in that list.
++
++    `fixed` maps name -> frozenset of allowed positions. A non-empty set means the
++    package must be present, reachable from the roots, with one of those versions. An
++    empty set means it must be absent.
++    """
++
++    def __init__(self, packages):
++        self.packages = packages
++        self.failures = []  # names blamed for dead ends, in the order they were hit
++
++    def solve(self, root_specs, fixed):
++        must = {}
++        for name, specs in root_specs:
++            must[name] = must.get(name, []) + list(specs)
++        return self._dfs(must, {}, fixed)
++
++    def _dfs(self, must, chosen, fixed):
++        dom = {}
++        for name, specs in must.items():
++            entries = self.packages.get(name, [])
++            if name in chosen:
++                candidates = [chosen[name]] if _satisfies(entries[chosen[name]][0], specs) else []
++            else:
++                allowed = fixed.get(name)
++                candidates = [
++                    i
++                    for i, (version, _) in enumerate(entries)
++                    if (allowed is None or i in allowed) and _satisfies(version, specs)
++                ]
++            if not candidates:
++                self.failures.append(name)
++                return None
++            dom[name] = candidates
++
++        blamed = self._propagate(dom, chosen, fixed)
++        if blamed is not None:
++            self.failures.append(blamed)
++            return None
++
++        pending = sorted(name for name in dom if name not in chosen)
++        if not pending:
++            return dict(chosen)
++
++        name = pending[0]
++        entries = self.packages[name]
++        for i in dom[name]:
++            new_must = dict(must)
++            for dep in entries[i][1]:
++                new_must[dep.name] = new_must.get(dep.name, []) + list(dep.specs)
++            result = self._dfs(new_must, {**chosen, name: i}, fixed)
++            if result is not None:
++                return result
++        return None
++
++    def _propagate(self, dom, chosen, fixed):
++        """Drop candidates whose dependencies have no surviving candidate.
++
++        Returns the name to blame if some domain becomes empty, otherwise None.
++        """
++        changed = True
++        while changed:
++            changed = False
++            support = {}  # (name, specs) -> bool, valid until a domain changes
++            for name in list(dom):
++                if name in chosen:
++                    continue
++                kept = []
++                blamed = None
++                for i in dom[name]:
++                    missing = next(
++                        (dep for dep in self.packages[name][i][1]
++                         if not self._supported(dep, dom, fixed, support)),
++                        None,
++                    )
++                    if missing is None:
++                        kept.append(i)
++                    else:
++                        blamed = missing.name
++                if len(kept) == len(dom[name]):
++                    continue
++                if not kept:
++                    return blamed
++                dom[name] = kept
++                changed = True
++        return self._unreachable(dom, fixed)
++
++    def _unreachable(self, dom, fixed):
++        """A package fixed as present must be pullable from the roots by some candidate."""
++        required = [name for name, allowed in fixed.items() if allowed and name not in dom]
++        if not required:
++            return None
++        # Every package that some surviving candidate could still pull in, transitively.
++        possible = set()
++        stack = list(dom)
++        while stack:
++            owner = stack.pop()
++            positions = dom[owner] if owner in dom else range(len(self.packages.get(owner, [])))
++            for i in positions:
++                for dep in self.packages[owner][i][1]:
++                    if dep.name not in possible:
++                        possible.add(dep.name)
++                        if dep.name in self.packages:
++                            stack.append(dep.name)
++        for name in required:
++            if name not in possible:
++                return name
++        return None
++
++    def _supported(self, dep, dom, fixed, support):
++        key = (dep.name, dep.specs)
++        if key not in support:
++            entries = self.packages.get(dep.name, [])
++            if dep.name in dom:
++                positions = dom[dep.name]
++            else:
++                allowed = fixed.get(dep.name)
++                positions = [i for i in range(len(entries)) if allowed is None or i in allowed]
++            support[key] = any(_satisfies(entries[i][0], dep.specs) for i in positions)
++        return support[key]
++
++
++def _reachable(root_names, packages):
++    seen = set()
++    stack = [name for name in root_names if name in packages]
++    while stack:
++        name = stack.pop()
++        if name in seen:
++            continue
++        seen.add(name)
++        for _, reqs in packages[name]:
++            for dep in reqs:
++                if dep.name in packages and dep.name not in seen:
++                    stack.append(dep.name)
++    return seen
+ 
+ 
+ def resolve(roots, index):
+-    raise NotImplementedError
++    packages = {}
++    for name, versions in index.items():
++        entries = [
++            (Version(text), [Constraint.parse(req) for req in reqs])
++            for text, reqs in versions.items()
++        ]
++        entries.sort(key=lambda entry: entry[0], reverse=True)
++        packages[name] = entries
++
++    root_specs = []
++    for req in roots:
++        dep = Constraint.parse(req)
++        root_specs.append((dep.name, dep.specs))
++
++    search = _Search(packages)
++    if search.solve(root_specs, {}) is None:
++        blamed = search.failures[0] if search.failures else roots[0]
++        raise ResolutionError(f"no solution: constraints on package {blamed!r} cannot be satisfied")
++
++    # Fix packages one at a time in name order. Each gets the highest version that still
++    # admits a complete solution. Absent is the lowest choice, so it is only used when no
++    # version of that package is possible. This gives the lexicographically greatest
++    # assignment as defined in the spec.
++    fixed = {}
++    for name in sorted(_reachable([name for name, _ in root_specs], packages)):
++        entries = packages[name]
++        everything = frozenset(range(len(entries)))
++        witness = search.solve(root_specs, {**fixed, name: everything})
++        if witness is None:
++            fixed[name] = frozenset()
++            continue
++        best = witness[name]
++        while True:
++            higher = frozenset(j for j in range(len(entries)) if entries[j][0] > entries[best][0])
++            if not higher:
++                break
++            witness = search.solve(root_specs, {**fixed, name: higher})
++            if witness is None:
++                break
++            best = witness[name]
++        fixed[name] = frozenset([best])
++
++    solution = search.solve(root_specs, fixed)
++    return {name: str(packages[name][i][0]) for name, i in sorted(solution.items())}
+diff --git a/tests/test_bruteforce.py b/tests/test_bruteforce.py
+new file mode 100644
+index 0000000..f11d182
+--- /dev/null
++++ b/tests/test_bruteforce.py
+@@ -0,0 +1,79 @@
++"""Cross-check resolve() against exhaustive enumeration on small random indexes."""
++
++import itertools
++import random
++
++import pytest
++
++from resolver.solve import Constraint, ResolutionError, Version, resolve
++
++NAMES = ["a", "b", "c", "d"]
++VERSIONS = ["1", "2", "3"]
++OPS = ["", "==1", "==2", ">=2", "<3", ">1", "!=2"]
++
++
++def _random_index(rng):
++    index = {}
++    for name in NAMES[: rng.randint(2, len(NAMES))]:
++        versions = {}
++        for v in rng.sample(VERSIONS, rng.randint(1, 3)):
++            reqs = []
++            for dep in rng.sample(NAMES, rng.randint(0, 2)):
++                reqs.append(dep + rng.choice(OPS))
++            versions[v] = reqs
++        index[name] = versions
++    return index
++
++
++def _valid(assignment, roots, index):
++    """Return True if the assignment is a solution for the given roots."""
++    present = {n: v for n, v in assignment.items() if v is not None}
++    for req in roots:
++        c = Constraint.parse(req)
++        if c.name not in present or not c.allows(present[c.name]):
++            return False
++    reached = set()
++    stack = [Constraint.parse(r).name for r in roots]
++    while stack:
++        name = stack.pop()
++        if name in reached:
++            continue
++        reached.add(name)
++        if name not in present:
++            return False
++        for req in index[name][present[name]]:
++            c = Constraint.parse(req)
++            if c.name not in present or not c.allows(present[c.name]):
++                return False
++            stack.append(c.name)
++    return reached == set(present)
++
++
++def _brute_force(roots, index):
++    names = sorted(index)
++    best = None
++    best_key = None
++    for combo in itertools.product(*[[None, *index[n]] for n in names]):
++        assignment = dict(zip(names, combo))
++        if not _valid(assignment, roots, index):
++            continue
++        # Absent sorts below any version. Versions compare numerically.
++        key = tuple((0,) if v is None else (1, Version(v)._key) for v in combo)
++        if best_key is None or key > best_key:
++            best_key = key
++            best = {n: v for n, v in assignment.items() if v is not None}
++    return best
++
++
++@pytest.mark.parametrize("seed", range(300))
++def test_matches_exhaustive_search(seed):
++    rng = random.Random(seed)
++    index = _random_index(rng)
++    roots = rng.sample(sorted(index), rng.randint(1, min(2, len(index))))
++    roots = [r + rng.choice(OPS) for r in roots]
++    expected = _brute_force(roots, index)
++    if expected is None:
++        with pytest.raises(ResolutionError):
++            resolve(roots, index)
++    else:
++        assert resolve(roots, index) == expected
+diff --git a/tests/test_solve.py b/tests/test_solve.py
+new file mode 100644
+index 0000000..9678434
+--- /dev/null
++++ b/tests/test_solve.py
+@@ -0,0 +1,241 @@
++import time
++
++import pytest
++
++from resolver.solve import Constraint, ResolutionError, Version, resolve
++
++SPEC_INDEX = {
++    "app": {"1.0": ["web>=2", "db"]},
++    "web": {"1.0": [], "2.0": ["json<3"], "2.1": ["json>=3"]},
++    "json": {"2.0": [], "3.0": []},
++    "db": {"1.0": ["json<3"]},
++}
++
++
++# Version and Constraint
++
++def test_version_missing_components_are_zero():
++    assert Version("1.0") == Version("1")
++    assert hash(Version("1.0")) == hash(Version("1"))
++    assert str(Version("1.0")) == "1.0"
++
++
++def test_version_compares_numerically_component_wise():
++    assert Version("1.10") > Version("1.9")
++    assert Version("1.0.1") > Version("1")
++    assert Version("2") > Version("1.99.99")
++    assert sorted([Version("1.10"), Version("1.9"), Version("1.2")]) == [
++        Version("1.2"), Version("1.9"), Version("1.10"),
++    ]
++
++
++@pytest.mark.parametrize("bad", ["", "1.", ".1", "a", "1.x", "1..2"])
++def test_version_rejects_non_numeric(bad):
++    with pytest.raises(ValueError):
++        Version(bad)
++
++
++def test_constraint_parse_name_and_bounds():
++    c = Constraint.parse("json>=2,<3")
++    assert c.name == "json"
++    assert c.allows(Version("2"))
++    assert c.allows(Version("2.5"))
++    assert not c.allows(Version("3"))
++    assert not c.allows(Version("1.9"))
++
++
++def test_constraint_parse_bare_name_allows_everything():
++    c = Constraint.parse("web")
++    assert c.name == "web"
++    assert c.allows(Version("0.1"))
++    assert c.allows(Version("99"))
++
++
++def test_constraint_parse_equality_and_inequality():
++    assert Constraint.parse("db==1.0").allows(Version("1"))
++    assert not Constraint.parse("db==1.0").allows(Version("1.1"))
++    assert not Constraint.parse("db!=1.0").allows(Version("1.0"))
++
++
++def test_constraint_parse_tolerates_spaces():
++    c = Constraint.parse("json >= 2, < 3")
++    assert c.name == "json"
++    assert c.allows(Version("2.9"))
++    assert not c.allows(Version("3"))
++
++
++@pytest.mark.parametrize("bad", ["", ">=2", "web>>2", "web>=", "web>=2,,<3", "web=2"])
++def test_constraint_parse_rejects_malformed(bad):
++    with pytest.raises(ValueError):
++        Constraint.parse(bad)
++
++
++# resolve: spec behaviour
++
++def test_spec_example_prefers_highest_consistent_versions():
++    assert resolve(["app"], SPEC_INDEX) == {
++        "app": "1.0", "db": "1.0", "json": "2.0", "web": "2.0",
++    }
++
++
++def test_highest_version_is_preferred_for_a_root():
++    assert resolve(["web"], SPEC_INDEX) == {"web": "2.1", "json": "3.0"}
++
++
++def test_empty_roots_resolve_to_nothing():
++    assert resolve([], SPEC_INDEX) == {}
++
++
++def test_unreachable_packages_are_excluded():
++    index = {
++        "a": {"1.0": []},
++        "orphan": {"1.0": ["a"]},
++    }
++    assert resolve(["a"], index) == {"a": "1.0"}
++
++
++def test_result_values_keep_the_original_version_string():
++    index = {"a": {"1": [], "1.0.5": []}}
++    assert resolve(["a>=1.0"], index) == {"a": "1.0.5"}
++
++
++def test_cycle_is_tolerated():
++    index = {
++        "a": {"1.0": ["b"]},
++        "b": {"1.0": ["a"]},
++    }
++    assert resolve(["a"], index) == {"a": "1.0", "b": "1.0"}
++
++
++def test_cycle_with_constraints_is_tolerated():
++    index = {
++        "a": {"1.0": ["b>=1"], "2.0": ["b>=2"]},
++        "b": {"1.0": ["a"], "2.0": ["a==2.0"]},
++    }
++    assert resolve(["a"], index) == {"a": "2.0", "b": "2.0"}
++
++
++def test_backtracks_out_of_a_dead_end():
++    # a 3.0 needs b>=2, but b 2.0 needs c>=3, which does not exist.
++    index = {
++        "a": {"3.0": ["b>=2"], "2.0": ["b==1.0"]},
++        "b": {"1.0": [], "2.0": ["c>=3"]},
++        "c": {"1.0": []},
++    }
++    assert resolve(["a"], index) == {"a": "2.0", "b": "1.0"}
++
++
++def test_backtracks_through_a_chain_of_choices():
++    # mid 2.0 would cap low below 2, so the alphabetically first package low takes 2.0
++    # through mid 1.0. top 2.0 still holds because mid 1.0 is reachable.
++    index = {
++        "top": {"2.0": ["mid"], "1.0": []},
++        "mid": {"2.0": ["low<2"], "1.0": ["low"]},
++        "low": {"1.0": [], "2.0": []},
++    }
++    assert resolve(["top"], index) == {"top": "2.0", "mid": "1.0", "low": "2.0"}
++
++
++def test_alphabetically_first_package_gets_highest_version_it_can():
++    # Choosing z 2.0 would force b to 1.0. The spec prefers b 2.0, so z drops to 1.0.
++    index = {
++        "z": {"2.0": ["b<2"], "1.0": ["b>=0"]},
++        "b": {"1.0": [], "2.0": []},
++    }
++    assert resolve(["z"], index) == {"b": "2.0", "z": "1.0"}
++
++
++def test_present_version_beats_absent_for_alphabetically_earlier_package():
++    # a can be 2.0 only if x is 1.0. Name order puts a first, so a gets 2.0 and x is 1.0.
++    index = {
++        "x": {"2.0": [], "1.0": ["a"]},
++        "a": {"1.0": [], "2.0": []},
++    }
++    assert resolve(["x"], index) == {"a": "2.0", "x": "1.0"}
++
++
++# resolve: errors
++
++def test_error_names_the_leaf_package_not_the_root():
++    index = {
++        "a": {"1.0": ["b<1"]},
++        "b": {"1": [], "2": []},
++    }
++    with pytest.raises(ResolutionError) as exc:
++        resolve(["a"], index)
++    assert "'b'" in str(exc.value)
++
++
++def test_error_names_conflicting_package():
++    index = {
++        "app": {"1.0": ["web", "db"]},
++        "web": {"1.0": ["json<3"]},
++        "db": {"1.0": ["json>=3"]},
++        "json": {"2.0": [], "3.0": []},
++    }
++    with pytest.raises(ResolutionError) as exc:
++        resolve(["app"], index)
++    assert "json" in str(exc.value)
++
++
++def test_error_names_unsatisfiable_root():
++    with pytest.raises(ResolutionError) as exc:
++        resolve(["web>=5"], SPEC_INDEX)
++    assert "web" in str(exc.value)
++
++
++def test_error_names_missing_dependency():
++    index = {"a": {"1.0": ["ghost"]}}
++    with pytest.raises(ResolutionError) as exc:
++        resolve(["a"], index)
++    assert "ghost" in str(exc.value)
++
++
++def test_error_for_missing_root():
++    with pytest.raises(ResolutionError) as exc:
++        resolve(["nope"], SPEC_INDEX)
++    assert "nope" in str(exc.value)
++
++
++def test_invalid_requirement_in_roots_raises_value_error():
++    with pytest.raises(ValueError):
++        resolve(["web>>2"], SPEC_INDEX)
++
++
++# resolve: scale
++
++def test_large_chain_with_a_hidden_conflict_resolves_quickly():
++    # Each x_i = v forces x_{i+1} = v. The tail caps the chain at 50, and x1 >= 40.
++    # Naive enumeration over 200^5 combinations would never finish.
++    versions = {str(v): [] for v in range(1, 201)}
++    index = {}
++    for i in range(1, 5):
++        index[f"x{i}"] = {str(v): [f"x{i + 1}=={v}"] for v in range(1, 201)}
++    index["x5"] = versions
++    start = time.monotonic()
++    result = resolve(["x1>=40", "x5<=50"], index)
++    elapsed = time.monotonic() - start
++    assert result == {f"x{i}": "50" for i in range(1, 6)}
++    assert elapsed < 10
++
++
++def test_large_chain_with_no_solution_fails_quickly():
++    index = {}
++    for i in range(1, 5):
++        index[f"x{i}"] = {str(v): [f"x{i + 1}=={v}"] for v in range(1, 201)}
++    index["x5"] = {str(v): [] for v in range(1, 201)}
++    start = time.monotonic()
++    with pytest.raises(ResolutionError):
++        resolve(["x1>=190", "x5<=50"], index)
++    assert time.monotonic() - start < 10
++
++
++def test_many_independent_packages_with_hundreds_of_versions():
++    index = {"root": {"1.0": [f"p{i}" for i in range(8)]}}
++    for i in range(8):
++        index[f"p{i}"] = {str(v): [] for v in range(1, 301)}
++    start = time.monotonic()
++    result = resolve(["root"], index)
++    assert time.monotonic() - start < 10
++    assert result["root"] == "1.0"
++    assert all(result[f"p{i}"] == "300" for i in range(8))

@@ -1,0 +1,579 @@
+diff --git a/docs/concepts/hooks-and-overrides.rst b/docs/concepts/hooks-and-overrides.rst
+index 43d5f28..a25ce84 100644
+--- a/docs/concepts/hooks-and-overrides.rst
++++ b/docs/concepts/hooks-and-overrides.rst
+@@ -22,7 +22,19 @@ Comparison
+ 
+    * - Aspect
+      - Per-Package Overrides
+-     - Global Hooks
++     - ``is_pre_built`` override
++------------------------
++
++``PackageBuildInfo.is_pre_built(version)`` calls the ``is_pre_built``
++override with ``version`` and ``variant`` keyword arguments, but only when
++a version is given.  The version has its local segment removed.  Return
++``True`` or ``False`` to override the YAML settings, or ``None`` to defer
++to them.  Without a version, the variant default is returned and the hook
++is not called.
++
++.. versionadded:: 0.95.0
++
++Global Hooks
+    * - **Scope**
+      - One named package
+      - Every package
+diff --git a/docs/concepts/package-settings.rst b/docs/concepts/package-settings.rst
+index 2f0a0d7..b72a3bf 100644
+--- a/docs/concepts/package-settings.rst
++++ b/docs/concepts/package-settings.rst
+@@ -122,4 +122,17 @@ adds variant awareness, patch discovery, and template resolution.
+      - Build tag (from changelog length), annotations, PURL config,
+        pyproject.toml overrides
+ 
++Version-specific ``pre_built`` and ``wheel_server_url`` values under
++``variants.<variant>.versions.<version>`` are looked up with the local
++version segment removed, so a resolved version ``2.8.0+cpu`` matches the
++YAML key ``2.8.0``.  A bare ``versions:`` key is treated as empty.  When a
++resolved version is pre-built (or uses a different wheel server) unlike the
++variant default, the bootstrapper re-resolves the download URL for that
++exact version before recording it in the dependency graph.
++
++.. versionadded:: 0.95.0
++   ``is_pre_built()`` and ``get_wheel_server_url()`` ignore local version
++   segments, and the bootstrapper re-resolves URLs for version-specific
++   settings.
++
+ See :doc:`/reference/config-reference` for the full field reference.
+diff --git a/src/fromager/bootstrapper/_start.py b/src/fromager/bootstrapper/_start.py
+index 96c7d55..f933e35 100644
+--- a/src/fromager/bootstrapper/_start.py
++++ b/src/fromager/bootstrapper/_start.py
+@@ -3,17 +3,71 @@ from __future__ import annotations
+ import logging
+ import typing
+ 
++from packaging.requirements import Requirement
++from packaging.version import Version
++from resolvelib.resolvers import ResolverException
++
++from .. import resolver, sources, wheels
+ from ..requirements_file import RequirementType
+ from ._phase import Phase
+ from ._prepare_source import PrepareSource
+ from ._types import BootstrapPhase
+ 
+ if typing.TYPE_CHECKING:
++    from .. import context
+     from ._bootstrapper import Bootstrapper
+ 
+ logger = logging.getLogger(__name__)
+ 
+ 
++def _re_resolve_url(
++    ctx: context.WorkContext,
++    req: Requirement,
++    req_type: RequirementType,
++    resolved_version: Version,
++    pre_built: bool,
++    cache_wheel_server_url: str | None,
++) -> str | None:
++    """Re-resolve the download URL for a pinned version.
++
++    Used when the version-specific ``pre_built`` or ``wheel_server_url``
++    settings differ from the variant defaults used for the initial
++    resolution. Returns ``None`` if the pinned version cannot be found.
++    """
++    pinned_req = Requirement(f"{req.name}=={resolved_version}")
++    if pre_built:
++        wheel_server_urls = wheels.get_wheel_server_urls(
++            ctx,
++            pinned_req,
++            cache_wheel_server_url=cache_wheel_server_url,
++            version=resolved_version,
++        )
++        try:
++            url, _ = wheels.resolve_prebuilt_wheel(
++                ctx=ctx,
++                req=pinned_req,
++                wheel_server_urls=wheel_server_urls,
++                req_type=req_type,
++            )
++        except ExceptionGroup:
++            return None
++        return str(url)
++
++    provider = sources.get_source_provider(
++        ctx=ctx,
++        req=pinned_req,
++        sdist_server_url=resolver.PYPI_SERVER_URL,
++        req_type=req_type,
++    )
++    try:
++        results = resolver.find_all_matching_from_provider(provider, pinned_req)
++    except ResolverException:
++        return None
++    if not results:
++        return None
++    return str(results[0][0])
++
++
+ class Start(Phase):
+     """Record a resolved requirement in the dependency graph and deduplicate.
+ 
+@@ -44,6 +98,38 @@ class Start(Phase):
+         assert wi.resolved_version is not None
+         assert wi.source_url is not None
+ 
++        # Must set pbi_pre_built before constructing PrepareSource so that
++        # PrepareSource.background_work() immediately sees the correct value.
++        pbi = bt.ctx.package_build_info(wi.req)
++        wi.pbi_pre_built = pbi.is_pre_built(wi.resolved_version)
++
++        # Version-specific settings may differ from the variant defaults used
++        # to resolve the URL. Fix the URL before it is stored in the graph.
++        if wi.pbi_pre_built != pbi.pre_built or (
++            wi.pbi_pre_built
++            and pbi.get_wheel_server_url(wi.resolved_version) != pbi.wheel_server_url
++        ):
++            logger.info(
++                f"{wi.req.name}: version-specific settings for {wi.resolved_version} "
++                f"(pre_built={wi.pbi_pre_built}) differ from variant defaults, "
++                "re-resolving URL"
++            )
++            new_url = _re_resolve_url(
++                bt.ctx,
++                wi.req,
++                wi.req_type,
++                wi.resolved_version,
++                wi.pbi_pre_built,
++                bt.cache_wheel_server_url,
++            )
++            if new_url is None:
++                logger.warning(
++                    f"{wi.req.name}: could not re-resolve {wi.resolved_version} "
++                    f"(pre_built={wi.pbi_pre_built}), keeping {wi.source_url}"
++                )
++            else:
++                wi.source_url = new_url
++
+         # Add to graph (skip TOP_LEVEL, already added in _resolve_and_add_top_level)
+         if wi.req_type != RequirementType.TOP_LEVEL:
+             bt.add_to_graph(
+@@ -69,9 +155,5 @@ class Start(Phase):
+             f"new {wi.req_type} dependency {wi.req} resolves to {wi.resolved_version}"
+         )
+ 
+-        # Must set pbi_pre_built before constructing PrepareSource so that
+-        # PrepareSource.background_work() immediately sees the correct value.
+-        pbi = bt.ctx.package_build_info(wi.req)
+-        wi.pbi_pre_built = pbi.is_pre_built(wi.resolved_version)
+         wi.exclusive_build = pbi.exclusive_build
+         return [PrepareSource(wi)]
+diff --git a/src/fromager/packagesettings/_pbi.py b/src/fromager/packagesettings/_pbi.py
+index 36b06c3..3cdadbe 100644
+--- a/src/fromager/packagesettings/_pbi.py
++++ b/src/fromager/packagesettings/_pbi.py
+@@ -36,6 +36,11 @@ def get_available_memory_gib() -> float:
+     return psutil.virtual_memory().available / (1024**3)
+ 
+ 
++def _default_is_pre_built(*, version: Version, variant: Variant) -> bool | None:
++    """Default ``is_pre_built`` hook: defer to the YAML settings."""
++    return None
++
++
+ class PackageBuildInfo:
+     """Package build information
+ 
+@@ -163,60 +168,61 @@ class PackageBuildInfo:
+     @property
+     def pre_built(self) -> bool:
+         """Does the variant use pre-build wheels?"""
+-        vi = self._ps.variants.get(self.variant)
+-        if vi is not None:
+-            return vi.pre_built
+-        return False
++        return self.is_pre_built()
+ 
+     def is_pre_built(self, version: Version | None = None) -> bool:
+         """Version-aware pre-built check.
+ 
+         Resolution order:
+ 
+-        1. Plugin hook ``is_pre_built`` (if version given and hook exists)
++        1. Plugin hook ``is_pre_built`` (only if version given; a non-None
++           result wins)
+         2. Version-specific YAML setting
+         3. Variant-wide default
+ 
+-        .. versionadded:: 0.90.0
++        The local version segment is ignored for the version-specific lookup.
++
++        .. versionadded:: 0.95.0
+         """
+         vi = self._ps.variants.get(self.variant)
+         if vi is None:
+             return False
+-        if version is not None:
+-            hook_fn = overrides.find_override_method(self.package, "is_pre_built")
+-            if hook_fn is not None:
+-                result = overrides.invoke(
+-                    hook_fn, version=version, variant=self.variant
+-                )
+-                if result is not None:
+-                    return bool(result)
+-            pv = typing.cast(PackageVersion, version)
+-            vs = vi.versions.get(pv)
+-            if vs is not None and vs.pre_built is not None:
+-                return vs.pre_built
++        if version is None:
++            return vi.pre_built
++        version = Version(version.public)
++        result = overrides.find_and_invoke(
++            self.package,
++            "is_pre_built",
++            _default_is_pre_built,
++            version=version,
++            variant=self.variant,
++        )
++        if result is not None:
++            return bool(result)
++        vs = vi.versions.get(typing.cast(PackageVersion, version))
++        if vs is not None and vs.pre_built is not None:
++            return vs.pre_built
+         return vi.pre_built
+ 
+     @property
+     def wheel_server_url(self) -> str | None:
+         """Alternative package index for pre-build wheel"""
+-        vi = self._ps.variants.get(self.variant)
+-        if vi is not None and vi.wheel_server_url is not None:
+-            return str(vi.wheel_server_url)
+-        return None
++        return self.get_wheel_server_url()
+ 
+     def get_wheel_server_url(self, version: Version | None = None) -> str | None:
+         """Version-aware wheel server URL.
+ 
+         Returns the version-specific URL if defined, otherwise
+-        falls back to the variant-wide default.
++        falls back to the variant-wide default. The local version
++        segment is ignored for the version-specific lookup.
+ 
+-        .. versionadded:: 0.90.0
++        .. versionadded:: 0.95.0
+         """
+         vi = self._ps.variants.get(self.variant)
+         if vi is None:
+             return None
+         if version is not None:
+-            pv = typing.cast(PackageVersion, version)
++            pv = typing.cast(PackageVersion, Version(version.public))
+             vs = vi.versions.get(pv)
+             if vs is not None and vs.wheel_server_url is not None:
+                 return str(vs.wheel_server_url)
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 2a81516..4e7e4d1 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -38,7 +38,7 @@ from fromager.bootstrapper._prepare_build import PrepareBuild
+ from fromager.bootstrapper._prepare_source import PrepareSource
+ from fromager.bootstrapper._process_install_deps import ProcessInstallDeps
+ from fromager.bootstrapper._resolve import Resolve
+-from fromager.bootstrapper._start import Start
++from fromager.bootstrapper._start import Start, _re_resolve_url
+ from fromager.bootstrapper._types import (
+     BootstrapPhase,
+     PreparedSourceData,
+@@ -646,7 +646,12 @@ class TestPhaseStart:
+         with patch.object(
+             tmp_context,
+             "package_build_info",
+-            return_value=Mock(pre_built=True, is_pre_built=Mock(return_value=True)),
++            return_value=Mock(
++                pre_built=True,
++                is_pre_built=Mock(return_value=True),
++                wheel_server_url=None,
++                get_wheel_server_url=Mock(return_value=None),
++            ),
+         ):
+             result = item.run(bt)
+ 
+@@ -654,6 +659,212 @@ class TestPhaseStart:
+         assert isinstance(result[0], PrepareSource)
+         assert result[0].work_item.pbi_pre_built is True
+ 
++    @pytest.mark.parametrize(
++        "variant_pre_built,version_pre_built,variant_url,version_url,expect_re_resolve",
++        [
++            (False, True, None, None, True),
++            (True, False, None, None, True),
++            (True, True, "https://a.test/simple", "https://b.test/simple", True),
++            (True, True, None, None, False),
++            # wheel server only matters for pre-built packages
++            (False, False, "https://a.test/simple", "https://b.test/simple", False),
++        ],
++    )
++    def test_re_resolves_url_on_version_specific_settings(
++        self,
++        tmp_context: WorkContext,
++        variant_pre_built: bool,
++        version_pre_built: bool,
++        variant_url: str | None,
++        version_url: str | None,
++        expect_re_resolve: bool,
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        bt.why = []
++        item = _make_start_item()
++        pbi = Mock(
++            pre_built=variant_pre_built,
++            is_pre_built=Mock(return_value=version_pre_built),
++            wheel_server_url=variant_url,
++            get_wheel_server_url=Mock(return_value=version_url),
++        )
++
++        with (
++            patch.object(tmp_context, "package_build_info", return_value=pbi),
++            patch(
++                "fromager.bootstrapper._start._re_resolve_url",
++                return_value="https://new.test/testpkg-1.0.whl",
++            ) as re_resolve,
++        ):
++            item.run(bt)
++
++        assert re_resolve.called is expect_re_resolve
++        expected = (
++            "https://new.test/testpkg-1.0.whl"
++            if expect_re_resolve
++            else "https://pypi.org/testpkg-1.0.tar.gz"
++        )
++        assert item.work_item.source_url == expected
++        node = tmp_context.dependency_graph.nodes[
++            f"{canonicalize_name('testpkg')}==1.0"
++        ]
++        assert node.download_url == expected
++
++    def test_re_resolve_failure_keeps_original_url(
++        self, tmp_context: WorkContext, caplog: pytest.LogCaptureFixture
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        bt.why = []
++        item = _make_start_item()
++        pbi = Mock(pre_built=False, is_pre_built=Mock(return_value=True))
++
++        with (
++            caplog.at_level(logging.WARNING),
++            patch.object(tmp_context, "package_build_info", return_value=pbi),
++            patch("fromager.bootstrapper._start._re_resolve_url", return_value=None),
++        ):
++            item.run(bt)
++
++        assert item.work_item.source_url == "https://pypi.org/testpkg-1.0.tar.gz"
++        assert "could not re-resolve" in caplog.text
++
++    def test_re_resolve_happens_for_already_seen_parent_edge(
++        self, tmp_context: WorkContext
++    ) -> None:
++        """A second parent of a seen package still gets its edge with the new URL."""
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        bt.why = []
++        pbi = Mock(pre_built=False, is_pre_built=Mock(return_value=True))
++        parents = [
++            (Requirement("parent-a"), Version("1.0")),
++            (Requirement("parent-b"), Version("1.0")),
++        ]
++        for parent in parents:
++            tmp_context.dependency_graph.add_dependency(
++                parent_name=None,
++                parent_version=None,
++                req_type=RequirementType.TOP_LEVEL,
++                req=parent[0],
++                req_version=parent[1],
++                download_url="https://pypi.org/parent.tar.gz",
++            )
++
++        with (
++            patch.object(tmp_context, "package_build_info", return_value=pbi),
++            patch(
++                "fromager.bootstrapper._start._re_resolve_url",
++                return_value="https://new.test/testpkg-1.0.whl",
++            ),
++        ):
++            for parent in parents:
++                _make_start_item(parent=parent).run(bt)
++
++        node = tmp_context.dependency_graph.nodes[
++            f"{canonicalize_name('testpkg')}==1.0"
++        ]
++        assert node.download_url == "https://new.test/testpkg-1.0.whl"
++        assert {e.destination_node.key for e in node.parents} == {
++            "parent-a==1.0",
++            "parent-b==1.0",
++        }
++
++
++class TestReResolveUrl:
++    def test_pre_built_uses_wheel_servers(self, tmp_context: WorkContext) -> None:
++        req = Requirement("testpkg")
++        with (
++            patch(
++                "fromager.wheels.get_wheel_server_urls",
++                return_value=["https://w.test/simple"],
++            ) as get_urls,
++            patch(
++                "fromager.wheels.resolve_prebuilt_wheel",
++                return_value=("https://w.test/testpkg-2.0.whl", Version("2.0")),
++            ) as resolve,
++        ):
++            url = _re_resolve_url(
++                tmp_context,
++                req,
++                RequirementType.INSTALL,
++                Version("2.0+cpu"),
++                True,
++                "https://cache.test/simple",
++            )
++
++        assert url == "https://w.test/testpkg-2.0.whl"
++        get_urls.assert_called_once_with(
++            tmp_context,
++            Requirement("testpkg==2.0+cpu"),
++            cache_wheel_server_url="https://cache.test/simple",
++            version=Version("2.0+cpu"),
++        )
++        assert resolve.call_args.kwargs["req"] == Requirement("testpkg==2.0+cpu")
++        assert resolve.call_args.kwargs["wheel_server_urls"] == [
++            "https://w.test/simple"
++        ]
++
++    def test_pre_built_returns_none_on_exception_group(
++        self, tmp_context: WorkContext
++    ) -> None:
++        with (
++            patch("fromager.wheels.get_wheel_server_urls", return_value=["u"]),
++            patch(
++                "fromager.wheels.resolve_prebuilt_wheel",
++                side_effect=ExceptionGroup("nope", [ValueError("x")]),
++            ),
++        ):
++            url = _re_resolve_url(
++                tmp_context,
++                Requirement("testpkg"),
++                RequirementType.INSTALL,
++                Version("2.0"),
++                True,
++                None,
++            )
++
++        assert url is None
++
++    def test_source_returns_first_match(self, tmp_context: WorkContext) -> None:
++        with (
++            patch("fromager.sources.get_source_provider") as get_provider,
++            patch(
++                "fromager.resolver.find_all_matching_from_provider",
++                return_value=[("https://s.test/testpkg-2.0.tar.gz", Version("2.0"))],
++            ) as find,
++        ):
++            url = _re_resolve_url(
++                tmp_context,
++                Requirement("testpkg"),
++                RequirementType.INSTALL,
++                Version("2.0"),
++                False,
++                None,
++            )
++
++        assert url == "https://s.test/testpkg-2.0.tar.gz"
++        find.assert_called_once_with(
++            get_provider.return_value, Requirement("testpkg==2.0")
++        )
++
++    def test_source_returns_none_without_match(self, tmp_context: WorkContext) -> None:
++        with (
++            patch("fromager.sources.get_source_provider"),
++            patch(
++                "fromager.resolver.find_all_matching_from_provider",
++                side_effect=ResolverException("none"),
++            ),
++        ):
++            url = _re_resolve_url(
++                tmp_context,
++                Requirement("testpkg"),
++                RequirementType.INSTALL,
++                Version("2.0"),
++                False,
++                None,
++            )
++
++        assert url is None
++
+ 
+ class TestComplete:
+     def test_calls_clean_build_dirs(self, tmp_context: WorkContext) -> None:
+diff --git a/tests/test_packagesettings.py b/tests/test_packagesettings.py
+index 3f033d3..d51cadc 100644
+--- a/tests/test_packagesettings.py
++++ b/tests/test_packagesettings.py
+@@ -24,7 +24,11 @@ from fromager.packagesettings import (
+     Variant,
+     substitute_template,
+ )
+-from fromager.packagesettings._models import DeleteEnvPattern, KeepEnvPattern
++from fromager.packagesettings._models import (
++    DeleteEnvPattern,
++    KeepEnvPattern,
++    VariantInfo,
++)
+ from fromager.packagesettings._typedefs import PurlType, UpstreamPurl
+ 
+ TEST_PKG = "test-pkg"
+@@ -643,6 +647,46 @@ def test_get_wheel_server_url_version_specific(
+     assert pbi.get_wheel_server_url(Version("3.0.0")) == "https://wheel.test/simple"
+ 
+ 
++def test_version_specific_lookup_ignores_local_version(
++    testdata_context: context.WorkContext,
++) -> None:
++    """Local version segment does not hide version-specific settings."""
++    pbi = testdata_context.settings.package_build_info(TEST_PKG)
++    assert pbi.is_pre_built(Version("2.9.0+cpu")) is True
++    assert pbi.get_wheel_server_url(Version("2.9.0+cpu")) == (
++        "https://mirror.test/simple"
++    )
++
++
++def test_is_pre_built_hook(testdata_context: context.WorkContext) -> None:
++    """Hook is consulted only with a version; non-None result wins."""
++    pbi = testdata_context.settings.package_build_info(TEST_PKG)
++    calls: list[tuple[Version, str]] = []
++    result: list[bool | None] = [True]
++
++    def hook(*, version: Version, variant: str) -> bool | None:
++        calls.append((version, variant))
++        return result[0]
++
++    with patch("fromager.overrides.find_override_method", return_value=hook):
++        assert pbi.is_pre_built(Version("2.8.0+cpu")) is True
++        assert calls == [(Version("2.8.0"), "cpu")]
++
++        calls.clear()
++        assert pbi.is_pre_built() is False
++        assert pbi.pre_built is False
++        assert calls == []
++
++        result[0] = None
++        assert pbi.is_pre_built(Version("2.9.0")) is True
++
++
++def test_bare_versions_key_is_empty() -> None:
++    """A bare or omitted ``versions`` key yields an empty mapping."""
++    assert VariantInfo.model_validate({"versions": None}).versions == {}
++    assert VariantInfo.model_validate({}).versions == {}
++
++
+ def test_build_tag_version_specific_prebuilt(
+     testdata_context: context.WorkContext,
+ ) -> None:

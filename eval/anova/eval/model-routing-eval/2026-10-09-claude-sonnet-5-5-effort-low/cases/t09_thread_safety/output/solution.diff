@@ -1,0 +1,76 @@
+diff --git a/metrics/__pycache__/__init__.cpython-314.pyc b/metrics/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..1a9d314
+Binary files /dev/null and b/metrics/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/metrics/__pycache__/counter.cpython-314.pyc b/metrics/__pycache__/counter.cpython-314.pyc
+new file mode 100644
+index 0000000..e077ed1
+Binary files /dev/null and b/metrics/__pycache__/counter.cpython-314.pyc differ
+diff --git a/metrics/counter.py b/metrics/counter.py
+index 72d5d3b..b238a21 100644
+--- a/metrics/counter.py
++++ b/metrics/counter.py
+@@ -1,25 +1,50 @@
++import threading
+ import time
+ 
+ 
+ class Counter:
+-    """Named counters. Intended to be shared across request-handler threads."""
++    """Named counters. Intended to be shared across request-handler threads.
++
++    Each name has its own lock, so unrelated counters do not contend. A short
++    registry lock guards the structure of the dicts (adding/removing keys) and
++    is only ever taken while holding at most one name lock (order: name lock,
++    then registry lock), which rules out deadlocks.
++    """
+ 
+     def __init__(self):
+         self._values = {}
++        self._name_locks = {}
++        self._registry = threading.Lock()
++
++    def _lock_for(self, name):
++        with self._registry:
++            lock = self._name_locks.get(name)
++            if lock is None:
++                lock = self._name_locks[name] = threading.Lock()
++            return lock
+ 
+     def incr(self, name, by=1):
+-        current = self._values.get(name, 0)
+-        time.sleep(0)  # yield, simulates real work between read and write
+-        self._values[name] = current + by
++        with self._lock_for(name):
++            current = self._values.get(name, 0)
++            time.sleep(0)  # yield, simulates real work between read and write
++            with self._registry:
++                self._values[name] = current + by
+ 
+     def get(self, name):
+-        return self._values.get(name, 0)
++        with self._registry:
++            return self._values.get(name, 0)
+ 
+     def snapshot(self):
+-        return dict(self._values)
++        with self._registry:
++            return dict(self._values)
+ 
+     def reset(self, name=None):
+         if name is None:
+-            self._values.clear()
+-        else:
+-            self._values.pop(name, None)
++            with self._registry:
++                names = list(self._name_locks)
++            for n in names:
++                self.reset(n)
++            return
++        with self._lock_for(name):
++            with self._registry:
++                self._values.pop(name, None)
+diff --git a/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..e4f58aa
+Binary files /dev/null and b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc differ

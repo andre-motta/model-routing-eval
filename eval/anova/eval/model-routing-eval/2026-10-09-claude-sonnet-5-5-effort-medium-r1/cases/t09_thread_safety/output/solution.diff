@@ -1,0 +1,83 @@
+diff --git a/metrics/__pycache__/__init__.cpython-314.pyc b/metrics/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..f600240
+Binary files /dev/null and b/metrics/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/metrics/__pycache__/counter.cpython-314.pyc b/metrics/__pycache__/counter.cpython-314.pyc
+new file mode 100644
+index 0000000..6e1e025
+Binary files /dev/null and b/metrics/__pycache__/counter.cpython-314.pyc differ
+diff --git a/metrics/counter.py b/metrics/counter.py
+index 72d5d3b..2e38e4a 100644
+--- a/metrics/counter.py
++++ b/metrics/counter.py
+@@ -1,25 +1,58 @@
++import contextlib
++import threading
+ import time
+ 
+ 
+ class Counter:
+-    """Named counters. Intended to be shared across request-handler threads."""
++    """Named counters. Intended to be shared across request-handler threads.
++
++    Each name has its own lock, so unrelated counters do not contend. A small
++    registry lock guards only the creation of per-name locks. Operations that
++    span every counter (snapshot, reset all) take the registry lock and then
++    every per-name lock, which yields a consistent point-in-time view. Writers
++    never hold a name lock while waiting for the registry lock, so this cannot
++    deadlock.
++    """
+ 
+     def __init__(self):
+         self._values = {}
++        self._locks = {}
++        self._registry = threading.Lock()
++
++    def _lock_for(self, name):
++        lock = self._locks.get(name)
++        if lock is None:
++            with self._registry:
++                lock = self._locks.setdefault(name, threading.Lock())
++        return lock
++
++    @contextlib.contextmanager
++    def _all_locked(self):
++        with self._registry:
++            locks = list(self._locks.values())
++            with contextlib.ExitStack() as stack:
++                for lock in locks:
++                    stack.enter_context(lock)
++                yield
+ 
+     def incr(self, name, by=1):
+-        current = self._values.get(name, 0)
+-        time.sleep(0)  # yield, simulates real work between read and write
+-        self._values[name] = current + by
++        with self._lock_for(name):
++            current = self._values.get(name, 0)
++            time.sleep(0)  # yield, simulates real work between read and write
++            self._values[name] = current + by
+ 
+     def get(self, name):
+-        return self._values.get(name, 0)
++        with self._lock_for(name):
++            return self._values.get(name, 0)
+ 
+     def snapshot(self):
+-        return dict(self._values)
++        with self._all_locked():
++            return dict(self._values)
+ 
+     def reset(self, name=None):
+         if name is None:
+-            self._values.clear()
++            with self._all_locked():
++                self._values.clear()
+         else:
+-            self._values.pop(name, None)
++            with self._lock_for(name):
++                self._values.pop(name, None)
+diff --git a/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..860d3ad
+Binary files /dev/null and b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc differ

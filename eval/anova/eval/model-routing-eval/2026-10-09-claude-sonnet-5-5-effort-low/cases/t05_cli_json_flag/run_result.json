@@ -1,0 +1,33 @@
+{
+  "exit_code": 0,
+  "duration_s": 17.4,
+  "token_usage": {
+    "input": 6,
+    "output": 878,
+    "cache_read": 56589,
+    "cache_create": 17955
+  },
+  "cost_usd": 0.0919298,
+  "num_turns": 3,
+  "per_model_usage": {
+    "claude-sonnet-5-5": {
+      "input": 6,
+      "output": 878,
+      "cache_read": 56589,
+      "cache_create": 17955,
+      "cost_usd": 0.0919298
+    }
+  },
+  "per_model_turns": {
+    "claude-sonnet-5-5": 3
+  },
+  "permission_denials": [],
+  "message_ids": [
+    "msg_011CfrwiDt9TADNTKrhymE1C",
+    "msg_011CfrwiVwYDJ4M8afvbHLVu",
+    "msg_011Cfrwj8q4YDkmqY5RV3HhS"
+  ],
+  "cost_source": "runner:reported",
+  "error_class": null,
+  "budget": null
+}

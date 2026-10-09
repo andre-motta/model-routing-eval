@@ -1,0 +1,94 @@
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index f3451ff..254fc7e 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -1,3 +1,5 @@
++import json
++
+ from wc.cli import main
+ 
+ 
+@@ -5,3 +7,46 @@ def test_text(tmp_path, capsys):
+     p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
+     assert main([str(p)]) == 0
+     assert capsys.readouterr().out == f"       2       3      16 {p}\n"
++
++
++def test_text_missing_file(tmp_path, capsys):
++    p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
++    missing = tmp_path / "nope.txt"
++    assert main([str(p), str(missing)]) == 1
++    captured = capsys.readouterr()
++    assert f"wc: {missing}: " in captured.err
++    assert captured.out == f"       2       3      16 {p}\n       2       3      16 total\n"
++
++
++def test_json(tmp_path, capsys):
++    p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
++    assert main(["--json", str(p)]) == 0
++    assert json.loads(capsys.readouterr().out) == {
++        "files": [{"path": str(p), "lines": 2, "words": 3, "chars": 16}],
++        "total": {"lines": 2, "words": 3, "chars": 16},
++    }
++
++
++def test_json_multiple_files(tmp_path, capsys):
++    a = tmp_path / "a.txt"; a.write_text("hello world\nbye\n")
++    b = tmp_path / "b.txt"; b.write_text("one two three")
++    assert main(["--json", str(a), str(b)]) == 0
++    assert json.loads(capsys.readouterr().out) == {
++        "files": [
++            {"path": str(a), "lines": 2, "words": 3, "chars": 16},
++            {"path": str(b), "lines": 0, "words": 3, "chars": 13},
++        ],
++        "total": {"lines": 2, "words": 6, "chars": 29},
++    }
++
++
++def test_json_missing_file(tmp_path, capsys):
++    p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
++    missing = tmp_path / "nope.txt"
++    assert main(["--json", str(p), str(missing)]) == 1
++    captured = capsys.readouterr()
++    assert f"wc: {missing}: " in captured.err
++    assert json.loads(captured.out) == {
++        "files": [{"path": str(p), "lines": 2, "words": 3, "chars": 16}],
++        "total": {"lines": 2, "words": 3, "chars": 16},
++    }
+diff --git a/wc/cli.py b/wc/cli.py
+index 9bb48d5..50e8cd3 100644
+--- a/wc/cli.py
++++ b/wc/cli.py
+@@ -1,4 +1,5 @@
+ import argparse
++import json
+ import sys
+ 
+ 
+@@ -11,8 +12,10 @@ def count(path):
+ def main(argv=None):
+     ap = argparse.ArgumentParser(prog="wc")
+     ap.add_argument("files", nargs="+")
++    ap.add_argument("--json", action="store_true", help="print one JSON object instead of the table")
+     args = ap.parse_args(argv)
+     total = {"lines": 0, "words": 0, "chars": 0}
++    results = []
+     rc = 0
+     for path in args.files:
+         try:
+@@ -21,9 +24,13 @@ def main(argv=None):
+             print(f"wc: {path}: {e.strerror}", file=sys.stderr)
+             rc = 1
+             continue
+-        print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
++        results.append({"path": path, **c})
++        if not args.json:
++            print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
+         for k in total:
+             total[k] += c[k]
+-    if len(args.files) > 1:
++    if args.json:
++        print(json.dumps({"files": results, "total": total}))
++    elif len(args.files) > 1:
+         print(f"{total['lines']:>8}{total['words']:>8}{total['chars']:>8} total")
+     return rc

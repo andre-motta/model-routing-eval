@@ -1,0 +1,94 @@
+diff --git a/src/fromager/bootstrapper/_resolve.py b/src/fromager/bootstrapper/_resolve.py
+index 51dc541..a8b9234 100644
+--- a/src/fromager/bootstrapper/_resolve.py
++++ b/src/fromager/bootstrapper/_resolve.py
+@@ -6,6 +6,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from .. import bootstrap_requirement_resolver
+ from ..log import req_ctxvar_context
+@@ -29,14 +30,25 @@ def _bg_resolve(
+     parent_req: Requirement | None,
+     return_all_versions: bool,
+ ) -> list[tuple[str, Version]]:
+-    """Background-safe resolution: no Bootstrapper state accessed."""
++    """Background-safe resolution: no Bootstrapper state accessed.
++
++    A failure is re-raised naming ``parent_req``, so the error points at the
++    dependency that broke the chain rather than the top-level package.
++    """
+     logger.info(f"{BootstrapPhase.RESOLVE} for {req_type} requirement")
+-    return bg_resolver.resolve(
+-        req=req,
+-        req_type=req_type,
+-        parent_req=parent_req,
+-        return_all_versions=return_all_versions,
+-    )
++    try:
++        return bg_resolver.resolve(
++            req=req,
++            req_type=req_type,
++            parent_req=parent_req,
++            return_all_versions=return_all_versions,
++        )
++    except ResolverException as err:
++        if parent_req is None:
++            raise
++        raise ResolverException(
++            f"{parent_req.name} requires {req}, which cannot be resolved: {err}"
++        ) from err
+ 
+ 
+ class Resolve(Phase):
+diff --git a/tests/test_bootstrapper.py b/tests/test_bootstrapper.py
+index 797121f..b5e1c1f 100644
+--- a/tests/test_bootstrapper.py
++++ b/tests/test_bootstrapper.py
+@@ -27,7 +27,7 @@ from fromager.bootstrapper._process_install_deps import (
+     ProcessInstallDeps,
+     _get_install_dependencies,
+ )
+-from fromager.bootstrapper._resolve import Resolve
++from fromager.bootstrapper._resolve import Resolve, _bg_resolve
+ from fromager.bootstrapper._start import Start
+ from fromager.bootstrapper._types import (
+     BootstrapPhase,
+@@ -509,6 +509,35 @@ def test_cache_lookup_resolver_exception_logs_info(
+     assert "did not find wheel for" in caplog.text
+ 
+ 
++def test_bg_resolve_failure_names_broken_parent() -> None:
++    """A failed dependency resolution names the parent that broke the chain."""
++    bg_resolver = Mock()
++    bg_resolver.resolve.side_effect = ResolverException("no matching version")
++    req = Requirement("flashinfer-python==0.6.8.post1")
++    parent_req = Requirement("vllm==0.20.0")
++
++    with pytest.raises(ResolverException) as exc_info:
++        _bg_resolve(bg_resolver, req, RequirementType.INSTALL, parent_req, False)
++
++    assert str(exc_info.value) == (
++        "vllm requires flashinfer-python==0.6.8.post1, "
++        "which cannot be resolved: no matching version"
++    )
++    assert isinstance(exc_info.value.__cause__, ResolverException)
++
++
++def test_bg_resolve_top_level_failure_is_unchanged() -> None:
++    """Without a parent, the original resolver error is re-raised as is."""
++    bg_resolver = Mock()
++    bg_resolver.resolve.side_effect = ResolverException("no matching version")
++    req = Requirement("its-hub")
++
++    with pytest.raises(ResolverException) as exc_info:
++        _bg_resolve(bg_resolver, req, RequirementType.TOP_LEVEL, None, False)
++
++    assert str(exc_info.value) == "no matching version"
++
++
+ @pytest.mark.parametrize(
+     "exc_class,exc_msg",
+     [

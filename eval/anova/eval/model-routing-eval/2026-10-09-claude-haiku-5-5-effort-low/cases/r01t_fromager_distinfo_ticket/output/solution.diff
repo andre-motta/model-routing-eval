@@ -1,0 +1,128 @@
+diff --git a/src/fromager/candidate.py b/src/fromager/candidate.py
+index 36d5955..4699be8 100644
+--- a/src/fromager/candidate.py
++++ b/src/fromager/candidate.py
+@@ -2,6 +2,7 @@ import dataclasses
+ import datetime
+ import logging
+ import typing
++import urllib.parse
+ from io import BytesIO
+ from zipfile import ZipFile
+ 
+@@ -140,13 +141,32 @@ def get_metadata_for_wheel(
+     # Fallback to existing method: download wheel and extract metadata
+     logger.debug(f"Downloading full wheel to extract metadata: {url}")
+     data = session.get(url).content
++    # Wheels may contain vendored .dist-info directories, so only the wheel's
++    # own root-level {name}-{version}.dist-info/METADATA is valid.
++    metadata_path = _wheel_metadata_path(url)
+     with ZipFile(BytesIO(data)) as z:
+-        for n in z.namelist():
+-            if n.endswith(".dist-info/METADATA"):
+-                metadata_content = z.read(n)
+-                # Parse metadata directly using packaging.metadata.Metadata
+-                # (avoiding circular import with dependencies module)
+-                return Metadata.from_email(metadata_content, validate=validate)
+-
+-    # If we didn't find the metadata, raise an error
+-    raise ValueError(f"Could not find METADATA file in wheel: {url}")
++        if metadata_path not in z.namelist():
++            raise ValueError(f"Could not find {metadata_path} in wheel: {url}")
++        metadata_content = z.read(metadata_path)
++    # Parse metadata directly using packaging.metadata.Metadata
++    # (avoiding circular import with dependencies module)
++    return Metadata.from_email(metadata_content, validate=validate)
++
++
++def _wheel_metadata_path(url: str) -> str:
++    """Return the expected root METADATA path inside a wheel.
++
++    The wheel filename is {name}-{version}[-{build}]-{python}-{abi}-{platform}.whl,
++    and the metadata lives at {name}-{version}.dist-info/METADATA.
++
++    Args:
++        url: URL of the wheel file
++
++    Returns:
++        Path of the METADATA file within the wheel archive
++    """
++    filename = urllib.parse.urlsplit(url).path.rsplit("/", 1)[-1]
++    # Name and version never contain "-", so the first two fields are reliable
++    # even when an optional build tag is present.
++    name, version = filename.split("-")[:2]
++    return f"{name}-{version}.dist-info/METADATA"
+diff --git a/tests/test_pep658_support.py b/tests/test_pep658_support.py
+index 3af992c..2522a29 100644
+--- a/tests/test_pep658_support.py
++++ b/tests/test_pep658_support.py
+@@ -1,8 +1,11 @@
+ """Tests for PEP 658 metadata support."""
+ 
+ import typing
++from io import BytesIO
+ from unittest.mock import Mock, patch
++from zipfile import ZipFile
+ 
++import pytest
+ from packaging.version import Version
+ 
+ from fromager.candidate import Candidate, get_metadata_for_wheel
+@@ -132,6 +135,57 @@ Requires-Dist: requests >= 2.0.0
+         assert responses[0] == ("wheel", wheel_url)
+         mock_session.get.assert_called_once_with(wheel_url)
+ 
++    @patch("fromager.candidate.session")
++    def test_get_metadata_ignores_vendored_dist_info(
++        self, mock_session: typing.Any
++    ) -> None:
++        """Test that vendored .dist-info METADATA files are not used."""
++        # Arrange: a vendored dist-info comes before the wheel's own metadata
++        buffer = BytesIO()
++        with ZipFile(buffer, "w") as z:
++            z.writestr(
++                "vendored_pkg-2.0.0.dist-info/METADATA",
++                "Metadata-Version: 2.1\nName: vendored-pkg\nVersion: 2.0.0\n",
++            )
++            z.writestr(
++                "test_package-1.0.0.dist-info/METADATA",
++                "Metadata-Version: 2.1\nName: test-package\nVersion: 1.0.0\n",
++            )
++        mock_response = Mock()
++        mock_response.content = buffer.getvalue()
++        mock_session.get.return_value = mock_response
++
++        wheel_url = "https://example.com/test_package-1.0.0-py3-none-any.whl"
++
++        # Act
++        metadata = get_metadata_for_wheel(wheel_url, metadata_url=None)
++
++        # Assert
++        assert metadata.name == "test-package"
++        assert str(metadata.version) == "1.0.0"
++
++    @patch("fromager.candidate.session")
++    def test_get_metadata_raises_when_wheel_dist_info_missing(
++        self, mock_session: typing.Any
++    ) -> None:
++        """Test that a vendored .dist-info is not accepted as the wheel's metadata."""
++        # Arrange: only a vendored dist-info is present
++        buffer = BytesIO()
++        with ZipFile(buffer, "w") as z:
++            z.writestr(
++                "vendored_pkg-2.0.0.dist-info/METADATA",
++                "Metadata-Version: 2.1\nName: vendored-pkg\nVersion: 2.0.0\n",
++            )
++        mock_response = Mock()
++        mock_response.content = buffer.getvalue()
++        mock_session.get.return_value = mock_response
++
++        wheel_url = "https://example.com/test_package-1.0.0-py3-none-any.whl"
++
++        # Act / Assert
++        with pytest.raises(ValueError, match="test_package-1.0.0.dist-info/METADATA"):
++            get_metadata_for_wheel(wheel_url, metadata_url=None)
++
+     def test_candidate_repr_with_metadata_url(self) -> None:
+         """Test that Candidate representation includes metadata URL info."""
+         candidate = Candidate(

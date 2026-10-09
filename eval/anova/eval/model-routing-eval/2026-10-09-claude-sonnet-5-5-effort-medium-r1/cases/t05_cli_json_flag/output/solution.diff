@@ -1,0 +1,71 @@
+diff --git a/tests/__pycache__/test_cli.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_cli.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..76ad29c
+Binary files /dev/null and b/tests/__pycache__/test_cli.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index f3451ff..217aaa5 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -5,3 +5,16 @@ def test_text(tmp_path, capsys):
+     p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
+     assert main([str(p)]) == 0
+     assert capsys.readouterr().out == f"       2       3      16 {p}\n"
++
++
++def test_json(tmp_path, capsys):
++    import json
++    p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
++    missing = tmp_path / "nope"
++    assert main(["--json", str(p), str(missing)]) == 1
++    out, err = capsys.readouterr()
++    assert json.loads(out) == {
++        "files": [{"path": str(p), "lines": 2, "words": 3, "chars": 16}],
++        "total": {"lines": 2, "words": 3, "chars": 16},
++    }
++    assert "nope" in err
+diff --git a/wc/__pycache__/__init__.cpython-314.pyc b/wc/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..9a8d6d2
+Binary files /dev/null and b/wc/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/wc/__pycache__/cli.cpython-314.pyc b/wc/__pycache__/cli.cpython-314.pyc
+new file mode 100644
+index 0000000..e43a8f3
+Binary files /dev/null and b/wc/__pycache__/cli.cpython-314.pyc differ
+diff --git a/wc/cli.py b/wc/cli.py
+index 9bb48d5..788c95e 100644
+--- a/wc/cli.py
++++ b/wc/cli.py
+@@ -1,4 +1,5 @@
+ import argparse
++import json
+ import sys
+ 
+ 
+@@ -11,9 +12,11 @@ def count(path):
+ def main(argv=None):
+     ap = argparse.ArgumentParser(prog="wc")
+     ap.add_argument("files", nargs="+")
++    ap.add_argument("--json", action="store_true")
+     args = ap.parse_args(argv)
+     total = {"lines": 0, "words": 0, "chars": 0}
+     rc = 0
++    results = []
+     for path in args.files:
+         try:
+             c = count(path)
+@@ -21,9 +24,13 @@ def main(argv=None):
+             print(f"wc: {path}: {e.strerror}", file=sys.stderr)
+             rc = 1
+             continue
+-        print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
++        results.append({"path": path, **c})
++        if not args.json:
++            print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
+         for k in total:
+             total[k] += c[k]
+-    if len(args.files) > 1:
++    if args.json:
++        print(json.dumps({"files": results, "total": total}))
++    elif len(args.files) > 1:
+         print(f"{total['lines']:>8}{total['words']:>8}{total['chars']:>8} total")
+     return rc

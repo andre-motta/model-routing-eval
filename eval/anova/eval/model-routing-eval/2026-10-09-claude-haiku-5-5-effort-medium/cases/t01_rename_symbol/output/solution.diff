@@ -1,0 +1,82 @@
+diff --git a/README.md b/README.md
+index 5e4132f..6ac5fe3 100644
+--- a/README.md
++++ b/README.md
+@@ -3,6 +3,6 @@
+ Tiny pricing helpers.
+ 
+ ```python
+-from shop import calc
+-calc([(10, 2)], tax_rate=0.1)  # 22.0
++from shop import compute_total
++compute_total([(10, 2)], tax_rate=0.1)  # 22.0
+ ```
+diff --git a/shop/__init__.py b/shop/__init__.py
+index 6118c7e..b6d5993 100644
+--- a/shop/__init__.py
++++ b/shop/__init__.py
+@@ -1,4 +1,4 @@
+-from .pricing import calc
++from .pricing import compute_total
+ from .cart import Cart
+ 
+-__all__ = ["calc", "Cart"]
++__all__ = ["compute_total", "Cart"]
+diff --git a/shop/__pycache__/__init__.cpython-314.pyc b/shop/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..ab54514
+Binary files /dev/null and b/shop/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/shop/__pycache__/cart.cpython-314.pyc b/shop/__pycache__/cart.cpython-314.pyc
+new file mode 100644
+index 0000000..c1888d0
+Binary files /dev/null and b/shop/__pycache__/cart.cpython-314.pyc differ
+diff --git a/shop/__pycache__/pricing.cpython-314.pyc b/shop/__pycache__/pricing.cpython-314.pyc
+new file mode 100644
+index 0000000..6e4a817
+Binary files /dev/null and b/shop/__pycache__/pricing.cpython-314.pyc differ
+diff --git a/shop/cart.py b/shop/cart.py
+index 816f6d5..8aea5f1 100644
+--- a/shop/cart.py
++++ b/shop/cart.py
+@@ -1,4 +1,4 @@
+-from .pricing import calc
++from .pricing import compute_total
+ 
+ 
+ class Cart:
+@@ -10,4 +10,4 @@ class Cart:
+         self.items.append((price, qty))
+ 
+     def total(self):
+-        return calc(self.items, self.tax_rate)
++        return compute_total(self.items, self.tax_rate)
+diff --git a/shop/pricing.py b/shop/pricing.py
+index 98607bf..cb346b2 100644
+--- a/shop/pricing.py
++++ b/shop/pricing.py
+@@ -1,4 +1,4 @@
+-def calc(items, tax_rate=0.0):
++def compute_total(items, tax_rate=0.0):
+     """Return the total price of items with tax applied.
+ 
+     items: iterable of (unit_price, quantity)
+diff --git a/tests/__pycache__/test_pricing.cpython-314.pyc b/tests/__pycache__/test_pricing.cpython-314.pyc
+new file mode 100644
+index 0000000..9d52fb1
+Binary files /dev/null and b/tests/__pycache__/test_pricing.cpython-314.pyc differ
+diff --git a/tests/test_pricing.py b/tests/test_pricing.py
+index e0cf100..25bea37 100644
+--- a/tests/test_pricing.py
++++ b/tests/test_pricing.py
+@@ -1,8 +1,8 @@
+-from shop import calc, Cart
++from shop import compute_total, Cart
+ 
+ 
+-def test_calc():
+-    assert calc([(10, 2), (5, 1)], 0.1) == 27.5
++def test_compute_total():
++    assert compute_total([(10, 2), (5, 1)], 0.1) == 27.5
+ 
+ 
+ def test_cart():

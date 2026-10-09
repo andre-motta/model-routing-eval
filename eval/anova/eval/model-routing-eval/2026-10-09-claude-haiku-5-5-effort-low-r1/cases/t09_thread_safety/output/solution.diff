@@ -1,0 +1,83 @@
+diff --git a/metrics/__pycache__/__init__.cpython-314.pyc b/metrics/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..81355e9
+Binary files /dev/null and b/metrics/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/metrics/__pycache__/counter.cpython-314.pyc b/metrics/__pycache__/counter.cpython-314.pyc
+new file mode 100644
+index 0000000..a8e355c
+Binary files /dev/null and b/metrics/__pycache__/counter.cpython-314.pyc differ
+diff --git a/metrics/counter.py b/metrics/counter.py
+index 72d5d3b..cfdcc96 100644
+--- a/metrics/counter.py
++++ b/metrics/counter.py
+@@ -1,25 +1,55 @@
++import threading
+ import time
+ 
+ 
++class _Cell:
++    """A single counter value guarded by its own lock."""
++
++    __slots__ = ("lock", "value")
++
++    def __init__(self):
++        self.lock = threading.Lock()
++        self.value = 0
++
++
+ class Counter:
+-    """Named counters. Intended to be shared across request-handler threads."""
++    """Named counters. Intended to be shared across request-handler threads.
++
++    Each name has its own lock, so increments to different counters do not
++    contend with each other. The registry lock only guards the name-to-cell
++    mapping, and is held briefly for lookups, inserts, and removals.
++    """
+ 
+     def __init__(self):
+-        self._values = {}
++        self._registry_lock = threading.Lock()
++        self._cells = {}
++
++    def _cell(self, name):
++        with self._registry_lock:
++            cell = self._cells.get(name)
++            if cell is None:
++                cell = self._cells[name] = _Cell()
++            return cell
+ 
+     def incr(self, name, by=1):
+-        current = self._values.get(name, 0)
+-        time.sleep(0)  # yield, simulates real work between read and write
+-        self._values[name] = current + by
++        cell = self._cell(name)
++        with cell.lock:
++            current = cell.value
++            time.sleep(0)  # yield, simulates real work between read and write
++            cell.value = current + by
+ 
+     def get(self, name):
+-        return self._values.get(name, 0)
++        with self._registry_lock:
++            cell = self._cells.get(name)
++        return cell.value if cell is not None else 0
+ 
+     def snapshot(self):
+-        return dict(self._values)
++        with self._registry_lock:
++            return {name: cell.value for name, cell in self._cells.items()}
+ 
+     def reset(self, name=None):
+-        if name is None:
+-            self._values.clear()
+-        else:
+-            self._values.pop(name, None)
++        with self._registry_lock:
++            if name is None:
++                self._cells.clear()
++            else:
++                self._cells.pop(name, None)
+diff --git a/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..b9c215a
+Binary files /dev/null and b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc differ

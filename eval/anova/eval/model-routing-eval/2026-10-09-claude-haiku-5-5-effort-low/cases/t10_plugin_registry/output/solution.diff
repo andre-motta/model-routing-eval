@@ -1,0 +1,247 @@
+diff --git a/export/__init__.py b/export/__init__.py
+index af41b91..1ea64a9 100644
+--- a/export/__init__.py
++++ b/export/__init__.py
+@@ -1,3 +1,13 @@
+-from .core import export_records, export_to_file, UnknownFormat
++from .registry import Exporter, UnknownFormat, get, names, register
++from . import formats  # noqa: F401  registers the built-in formats
++from .core import export_records, export_to_file
+ 
+-__all__ = ["export_records", "export_to_file", "UnknownFormat"]
++__all__ = [
++    "Exporter",
++    "UnknownFormat",
++    "export_records",
++    "export_to_file",
++    "get",
++    "names",
++    "register",
++]
+diff --git a/export/__pycache__/__init__.cpython-314.pyc b/export/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..4bec0ca
+Binary files /dev/null and b/export/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/export/__pycache__/core.cpython-314.pyc b/export/__pycache__/core.cpython-314.pyc
+new file mode 100644
+index 0000000..84cb435
+Binary files /dev/null and b/export/__pycache__/core.cpython-314.pyc differ
+diff --git a/export/__pycache__/registry.cpython-314.pyc b/export/__pycache__/registry.cpython-314.pyc
+new file mode 100644
+index 0000000..15270ba
+Binary files /dev/null and b/export/__pycache__/registry.cpython-314.pyc differ
+diff --git a/export/core.py b/export/core.py
+index 1f64e19..0ee56fe 100644
+--- a/export/core.py
++++ b/export/core.py
+@@ -1,52 +1,16 @@
+-import csv
+-import io
+-import json
+-from xml.sax.saxutils import escape
+-
+-
+-class UnknownFormat(ValueError):
+-    pass
+-
+-
+-def _extension(fmt):
+-    if fmt == "csv":
+-        return ".csv"
+-    elif fmt == "json":
+-        return ".json"
+-    elif fmt == "xml":
+-        return ".xml"
+-    raise UnknownFormat(fmt)
++from .registry import get
+ 
+ 
+ def export_records(records, fmt):
+     """records: list of dicts with identical keys. Returns bytes."""
+-    if fmt == "csv":
+-        buf = io.StringIO()
+-        if records:
+-            w = csv.DictWriter(buf, fieldnames=list(records[0].keys()), lineterminator="\n")
+-            w.writeheader()
+-            w.writerows(records)
+-        return buf.getvalue().encode()
+-    elif fmt == "json":
+-        return json.dumps(records, indent=2, sort_keys=True).encode() + b"\n"
+-    elif fmt == "xml":
+-        parts = ["<records>"]
+-        for r in records:
+-            parts.append("  <record>")
+-            for k, v in r.items():
+-                parts.append(f"    <{k}>{escape(str(v))}</{k}>")
+-            parts.append("  </record>")
+-        parts.append("</records>")
+-        return ("\n".join(parts) + "\n").encode()
+-    raise UnknownFormat(fmt)
++    return get(fmt)().dump(records)
+ 
+ 
+ def export_to_file(records, fmt, path):
+-    if fmt not in ("csv", "json", "xml"):
+-        raise UnknownFormat(fmt)
++    exporter = get(fmt)
+     path = str(path)
+-    if not path.endswith(_extension(fmt)):
+-        path += _extension(fmt)
++    if not path.endswith(exporter.extension):
++        path += exporter.extension
+     with open(path, "wb") as f:
+-        f.write(export_records(records, fmt))
++        f.write(exporter().dump(records))
+     return path
+diff --git a/export/formats/__init__.py b/export/formats/__init__.py
+new file mode 100644
+index 0000000..fa21620
+--- /dev/null
++++ b/export/formats/__init__.py
+@@ -0,0 +1,8 @@
++import importlib
++import pkgutil
++
++
++# Import every module in this package so its @register decorators run.
++# Adding a format means adding a module here; nothing else needs to change.
++for _info in pkgutil.iter_modules(__path__):
++    importlib.import_module(f"{__name__}.{_info.name}")
+diff --git a/export/formats/__pycache__/__init__.cpython-314.pyc b/export/formats/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..6fc915f
+Binary files /dev/null and b/export/formats/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/export/formats/__pycache__/csv.cpython-314.pyc b/export/formats/__pycache__/csv.cpython-314.pyc
+new file mode 100644
+index 0000000..37a1dd6
+Binary files /dev/null and b/export/formats/__pycache__/csv.cpython-314.pyc differ
+diff --git a/export/formats/__pycache__/json.cpython-314.pyc b/export/formats/__pycache__/json.cpython-314.pyc
+new file mode 100644
+index 0000000..27ac760
+Binary files /dev/null and b/export/formats/__pycache__/json.cpython-314.pyc differ
+diff --git a/export/formats/__pycache__/xml.cpython-314.pyc b/export/formats/__pycache__/xml.cpython-314.pyc
+new file mode 100644
+index 0000000..024efd3
+Binary files /dev/null and b/export/formats/__pycache__/xml.cpython-314.pyc differ
+diff --git a/export/formats/csv.py b/export/formats/csv.py
+new file mode 100644
+index 0000000..5e34ec2
+--- /dev/null
++++ b/export/formats/csv.py
+@@ -0,0 +1,18 @@
++import csv
++import io
++
++from ..registry import Exporter, register
++
++
++@register
++class CsvExporter(Exporter):
++    name = "csv"
++    extension = ".csv"
++
++    def dump(self, records):
++        buf = io.StringIO()
++        if records:
++            w = csv.DictWriter(buf, fieldnames=list(records[0].keys()), lineterminator="\n")
++            w.writeheader()
++            w.writerows(records)
++        return buf.getvalue().encode()
+diff --git a/export/formats/json.py b/export/formats/json.py
+new file mode 100644
+index 0000000..fa919d0
+--- /dev/null
++++ b/export/formats/json.py
+@@ -0,0 +1,12 @@
++import json
++
++from ..registry import Exporter, register
++
++
++@register
++class JsonExporter(Exporter):
++    name = "json"
++    extension = ".json"
++
++    def dump(self, records):
++        return json.dumps(records, indent=2, sort_keys=True).encode() + b"\n"
+diff --git a/export/formats/xml.py b/export/formats/xml.py
+new file mode 100644
+index 0000000..2ac34ff
+--- /dev/null
++++ b/export/formats/xml.py
+@@ -0,0 +1,19 @@
++from xml.sax.saxutils import escape
++
++from ..registry import Exporter, register
++
++
++@register
++class XmlExporter(Exporter):
++    name = "xml"
++    extension = ".xml"
++
++    def dump(self, records):
++        parts = ["<records>"]
++        for r in records:
++            parts.append("  <record>")
++            for k, v in r.items():
++                parts.append(f"    <{k}>{escape(str(v))}</{k}>")
++            parts.append("  </record>")
++        parts.append("</records>")
++        return ("\n".join(parts) + "\n").encode()
+diff --git a/export/registry.py b/export/registry.py
+new file mode 100644
+index 0000000..eba1249
+--- /dev/null
++++ b/export/registry.py
+@@ -0,0 +1,45 @@
++from abc import ABC, abstractmethod
++
++
++class UnknownFormat(ValueError):
++    pass
++
++
++class Exporter(ABC):
++    """Base class for an output format.
++
++    Subclasses set `name` and `extension` and implement `dump`.
++    """
++
++    name = None
++    extension = None
++
++    @abstractmethod
++    def dump(self, records):
++        """records: list of dicts with identical keys. Returns bytes."""
++
++
++_registry = {}
++
++
++def register(exporter_cls):
++    """Class decorator: add an Exporter subclass to the registry under its name."""
++    if not exporter_cls.name:
++        raise ValueError(f"{exporter_cls.__name__} must set a name")
++    if exporter_cls.name in _registry:
++        raise ValueError(f"format {exporter_cls.name!r} is already registered")
++    _registry[exporter_cls.name] = exporter_cls
++    return exporter_cls
++
++
++def get(name):
++    try:
++        return _registry[name]
++    except KeyError:
++        raise UnknownFormat(
++            f"unknown format {name!r}; known formats: {', '.join(names())}"
++        ) from None
++
++
++def names():
++    return sorted(_registry)
+diff --git a/tests/__pycache__/test_export.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_export.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..d4e02d9
+Binary files /dev/null and b/tests/__pycache__/test_export.cpython-314-pytest-9.1.1.pyc differ

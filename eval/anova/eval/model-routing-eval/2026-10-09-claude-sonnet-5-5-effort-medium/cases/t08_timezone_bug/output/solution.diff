@@ -1,0 +1,36 @@
+diff --git a/sched/__pycache__/core.cpython-314.pyc b/sched/__pycache__/core.cpython-314.pyc
+index 97eb68c..af4328c 100644
+Binary files a/sched/__pycache__/core.cpython-314.pyc and b/sched/__pycache__/core.cpython-314.pyc differ
+diff --git a/sched/core.py b/sched/core.py
+index f434c9e..4318e2e 100644
+--- a/sched/core.py
++++ b/sched/core.py
+@@ -2,14 +2,23 @@ from datetime import datetime, timedelta, timezone
+ from zoneinfo import ZoneInfo
+ 
+ 
++def _at(day, hour: int, minute: int, zone: ZoneInfo) -> datetime:
++    """Wall-clock hour:minute on `day` in zone; a nonexistent time (DST gap) is shifted forward."""
++    wall = datetime(day.year, day.month, day.day, hour, minute, tzinfo=zone)
++    # Round-trip through UTC so gap times get a valid offset.
++    return wall.astimezone(timezone.utc).astimezone(zone)
++
++
+ def next_run(now: datetime, hour: int, minute: int, tz: str) -> datetime:
+     """Next hour:minute in tz strictly after now. `now` may be naive (treated as UTC) or aware."""
+     if now.tzinfo is None:
+         now = now.replace(tzinfo=timezone.utc)
+     zone = ZoneInfo(tz)
+-    today = now.date()
+-    candidate = datetime(today.year, today.month, today.day, hour, minute, tzinfo=zone)
+-    if candidate <= now:
+-        # advance one day; do the arithmetic in UTC to avoid tz surprises
+-        candidate = (candidate.astimezone(timezone.utc) + timedelta(days=1)).astimezone(zone)
++    # Use the calendar date in the target zone, not the UTC date.
++    day = now.astimezone(zone).date()
++    candidate = _at(day, hour, minute, zone)
++    # Compare as UTC instants: same-tzinfo comparison would ignore fold/offset.
++    if candidate.astimezone(timezone.utc) <= now.astimezone(timezone.utc):
++        # Advance the local calendar day (not 24h) so the wall-clock time survives DST changes.
++        candidate = _at(day + timedelta(days=1), hour, minute, zone)
+     return candidate

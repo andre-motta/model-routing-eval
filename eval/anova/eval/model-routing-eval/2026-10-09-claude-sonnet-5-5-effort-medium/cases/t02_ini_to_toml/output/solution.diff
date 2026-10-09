@@ -1,0 +1,48 @@
+diff --git a/app/__pycache__/__init__.cpython-314.pyc b/app/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..d816089
+Binary files /dev/null and b/app/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/app/__pycache__/config.cpython-314.pyc b/app/__pycache__/config.cpython-314.pyc
+new file mode 100644
+index 0000000..fcabdef
+Binary files /dev/null and b/app/__pycache__/config.cpython-314.pyc differ
+diff --git a/app/config.py b/app/config.py
+index 94daf71..81b2b80 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -1,7 +1,6 @@
+-import configparser
++import tomllib
+ 
+ 
+-def load_config(path="config.ini"):
+-    cp = configparser.ConfigParser()
+-    cp.read(path)
+-    return {section: dict(cp[section]) for section in cp.sections()}
++def load_config(path="config.toml"):
++    with open(path, "rb") as f:
++        return tomllib.load(f)
+diff --git a/config.ini b/config.toml
+similarity index 69%
+rename from config.ini
+rename to config.toml
+index 5942898..86225a1 100644
+--- a/config.ini
++++ b/config.toml
+@@ -1,10 +1,10 @@
+ [server]
+-host = 0.0.0.0
++host = "0.0.0.0"
+ port = 8080
+ debug = false
+ 
+ [database]
+-url = postgresql://localhost/app
++url = "postgresql://localhost/app"
+ pool_size = 5
+ timeout = 2.5
+ 
+diff --git a/tests/__pycache__/test_config.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_config.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..3dd9f53
+Binary files /dev/null and b/tests/__pycache__/test_config.cpython-314-pytest-9.1.1.pyc differ

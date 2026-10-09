@@ -26,7 +26,7 @@ n=0
 for d in "$SRC"/*/; do
   [ -f "$d/condition.json" ] || continue
   m=$(.venv/bin/python -c "import json;print(json.load(open('$d/run_result.json'))['model'])")
-  case " $MODELS " in *" $m "*) ln -s "$d" "$VIEW/$NAME/$(basename "$d")"; n=$((n+1));; esac
+  case " $MODELS " in *" $m "*) cp -r "$d" "$VIEW/$NAME/$(basename "$d")"; n=$((n+1));; esac
 done
 echo "anova view: $n runs for models [$MODELS]"
 unset CLAUDE_CODE_USE_VERTEX; export CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-$HOME/.claude}

@@ -1,0 +1,50 @@
+...F
+=================================== FAILURES ===================================
+_________ TestPEP658Support.test_get_metadata_pep658_fallback_behavior _________
+
+self = <test_pep658_support.TestPEP658Support object at 0x7f6409add0f0>
+mock_session = <MagicMock name='session' id='140067636019616'>
+
+    @patch("fromager.candidate.session")
+    def test_get_metadata_pep658_fallback_behavior(
+        self, mock_session: typing.Any
+    ) -> None:
+        """Test that PEP 658 is tried first, then falls back to wheel download."""
+        # Mock that metadata URL fails, then wheel URL succeeds
+        responses = []
+    
+        def side_effect(url: str) -> typing.Any:
+            if url.endswith(".metadata"):
+                # First call - metadata request fails
+                mock_response = Mock()
+                mock_response.raise_for_status.side_effect = Exception("404 Not Found")
+                responses.append(("metadata", url))
+                return mock_response
+            else:
+                # Second call - wheel request
+                responses.append(("wheel", url))
+                raise Exception("Wheel parsing intentionally mocked to fail")
+    
+        mock_session.get.side_effect = side_effect
+    
+        wheel_url = "https://example.com/test-package-1.0.0-py3-none-any.whl"
+        metadata_url = (
+            "https://example.com/test-package-1.0.0-py3-none-any.whl.metadata"
+        )
+    
+        # This should raise an exception during wheel parsing, but we can verify the order
+        try:
+            get_metadata_for_wheel(wheel_url, metadata_url)
+        except Exception:
+            pass  # Expected to fail during wheel parsing mock
+    
+        # Verify that both URLs were called in the correct order
+>       assert len(responses) == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len([('metadata', 'https://example.com/test-package-1.0.0-py3-none-any.whl.metadata')])
+
+tests/test_pep658_support.py:111: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_pep658_support.py::TestPEP658Support::test_get_metadata_pep658_fallback_behavior
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 3 passed in 0.12s

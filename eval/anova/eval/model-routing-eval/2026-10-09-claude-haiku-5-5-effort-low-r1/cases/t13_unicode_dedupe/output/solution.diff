@@ -1,0 +1,39 @@
+diff --git a/contacts/__pycache__/dedupe.cpython-314.pyc b/contacts/__pycache__/dedupe.cpython-314.pyc
+index 61e290a..771ff25 100644
+Binary files a/contacts/__pycache__/dedupe.cpython-314.pyc and b/contacts/__pycache__/dedupe.cpython-314.pyc differ
+diff --git a/contacts/dedupe.py b/contacts/dedupe.py
+index f27e236..f2cd612 100644
+--- a/contacts/dedupe.py
++++ b/contacts/dedupe.py
+@@ -1,19 +1,24 @@
+ import re
++import unicodedata
+ 
+ _WS = re.compile(r"\s+")
+ 
+ 
+ def email_key(email):
+-    return email.strip().lower()
++    return email.strip().casefold()
+ 
+ 
+ def name_key(name):
+-    """Key for matching names: lower-case, single spaces, no accents."""
+-    s = _WS.sub(" ", name.strip()).lower()
+-    # strip common accents
+-    for a, b in (("é", "e"), ("è", "e"), ("á", "a"), ("ó", "o"), ("ü", "u"), ("ö", "o"), ("ä", "a"), ("ñ", "n")):
+-        s = s.replace(a, b)
+-    return s
++    """Key for matching names: casefolded, single spaces, no accents.
++
++    Casefold before decomposing so that "ß" becomes "ss" and uppercase
++    accented letters are reduced to their base letter. NFKD splits both
++    precomposed (Windows) and decomposed (Mac) accents into base letter plus
++    combining mark, and the combining marks are then dropped.
++    """
++    s = unicodedata.normalize("NFKD", name.casefold())
++    s = "".join(c for c in s if not unicodedata.combining(c))
++    return _WS.sub(" ", s).strip()
+ 
+ 
+ def dedupe(records):

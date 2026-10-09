@@ -1,0 +1,66 @@
+diff --git a/geo/__pycache__/__init__.cpython-314.pyc b/geo/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..2b73870
+Binary files /dev/null and b/geo/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/geo/__pycache__/shapes.cpython-314.pyc b/geo/__pycache__/shapes.cpython-314.pyc
+new file mode 100644
+index 0000000..d4c5b80
+Binary files /dev/null and b/geo/__pycache__/shapes.cpython-314.pyc differ
+diff --git a/geo/shapes.py b/geo/shapes.py
+index 856a6da..64e7138 100644
+--- a/geo/shapes.py
++++ b/geo/shapes.py
+@@ -1,17 +1,20 @@
+ import math
++from collections.abc import Iterable, Sequence
+ 
++Point = tuple[float, float]
+ 
+-def distance(a, b):
++
++def distance(a: Point, b: Point) -> float:
+     return math.hypot(a[0] - b[0], a[1] - b[1])
+ 
+ 
+-def perimeter(points):
++def perimeter(points: Sequence[Point]) -> float:
+     if len(points) < 2:
+         return 0.0
+     return sum(distance(points[i], points[(i + 1) % len(points)]) for i in range(len(points)))
+ 
+ 
+-def centroid(points):
++def centroid(points: Sequence[Point]) -> Point | None:
+     if not points:
+         return None
+     n = len(points)
+@@ -19,19 +22,19 @@ def centroid(points):
+ 
+ 
+ class Polygon:
+-    def __init__(self, points, name=None):
+-        self.points = list(points)
+-        self.name = name
++    def __init__(self, points: Iterable[Point], name: str | None = None) -> None:
++        self.points: list[Point] = list(points)
++        self.name: str | None = name
+ 
+-    def area(self):
++    def area(self) -> float:
+         s = 0.0
+         for i, (x1, y1) in enumerate(self.points):
+             x2, y2 = self.points[(i + 1) % len(self.points)]
+             s += x1 * y2 - x2 * y1
+         return abs(s) / 2
+ 
+-    def scaled(self, factor):
++    def scaled(self, factor: float) -> "Polygon":
+         return Polygon([(x * factor, y * factor) for x, y in self.points], self.name)
+ 
+-    def describe(self):
++    def describe(self) -> dict[str, str | int | float | None]:
+         return {"name": self.name, "sides": len(self.points), "area": self.area()}
+diff --git a/tests/__pycache__/test_shapes.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_shapes.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..f5bc6ec
+Binary files /dev/null and b/tests/__pycache__/test_shapes.cpython-314-pytest-9.1.1.pyc differ

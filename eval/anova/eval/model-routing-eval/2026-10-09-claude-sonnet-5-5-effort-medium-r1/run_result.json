@@ -1,0 +1,1035 @@
+{
+  "exit_code": 0,
+  "duration_s": 846.4,
+  "wall_clock_s": 882.2,
+  "cost_usd": 5.84,
+  "token_usage": {
+    "input": 270,
+    "output": 84399,
+    "cache_read": 5296094,
+    "cache_create": 984124
+  },
+  "num_turns": 135,
+  "per_model_usage": {
+    "claude-sonnet-5-5": {
+      "input": 270,
+      "output": 84399,
+      "cache_read": 5296094,
+      "cache_create": 984124,
+      "cost_usd": 5.840244799999998
+    }
+  },
+  "per_model_turns": {
+    "claude-sonnet-5-5": 135
+  },
+  "permission_denials": [],
+  "num_cases": 24,
+  "model": "claude-sonnet-5-5",
+  "agent": "claude-code",
+  "agent_version": "2.1.295 (Claude Code)",
+  "execution_mode": "case",
+  "eval_params": {
+    "execution_mode": "case",
+    "max_budget_usd": 5.0,
+    "timeout_s": 2400,
+    "config_chain": [
+      "eval.yaml"
+    ],
+    "skill_args": "{{ input.prompt }}",
+    "effort": "medium"
+  },
+  "per_case": {
+    "r01_fromager_distinfo": {
+      "exit_code": 0,
+      "duration_s": 61.2,
+      "token_usage": {
+        "input": 16,
+        "output": 5354,
+        "cache_read": 347171,
+        "cache_create": 65862
+      },
+      "cost_usd": 0.3864542,
+      "num_turns": 8,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 16,
+          "output": 5354,
+          "cache_read": 347171,
+          "cache_create": 65862,
+          "cost_usd": 0.3864542
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 8
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6CLHKZioQ521C2GLnw",
+        "msg_011Cfs6CZxqYs8QCbNwBefUy",
+        "msg_011Cfs6CoWvRZkt53DZwrgrX",
+        "msg_011Cfs6D1TWr84rh6A9xFb1w",
+        "msg_011Cfs6DsGBAKkYo8QFVLQPc",
+        "msg_011Cfs6EcKXiQVbF6qcJMNXi",
+        "msg_011Cfs6FQh4wuiTt4V3oirPY",
+        "msg_011Cfs6GGAdEUtwAcCydZ5dp"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r01t_fromager_distinfo_ticket": {
+      "exit_code": 0,
+      "duration_s": 31.4,
+      "token_usage": {
+        "input": 10,
+        "output": 3861,
+        "cache_read": 126932,
+        "cache_create": 28405
+      },
+      "cost_usd": 0.1776364,
+      "num_turns": 5,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 10,
+          "output": 3861,
+          "cache_read": 126932,
+          "cache_create": 28405,
+          "cost_usd": 0.1776364
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 5
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6H376Zyqka2TYxdaz7",
+        "msg_011Cfs6HGMKkRgR1piFsoyhP",
+        "msg_011Cfs6HWVP8vQrXBbgozu2G",
+        "msg_011Cfs6JavJYLJznqczLSwT9",
+        "msg_011Cfs6JwvrSU69ajEqSZ7zM"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r02_fromager_age_filter": {
+      "exit_code": 0,
+      "duration_s": 26.9,
+      "token_usage": {
+        "input": 10,
+        "output": 2848,
+        "cache_read": 169021,
+        "cache_create": 55371
+      },
+      "cost_usd": 0.2837882,
+      "num_turns": 5,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 10,
+          "output": 2848,
+          "cache_read": 169021,
+          "cache_create": 55371,
+          "cost_usd": 0.2837882
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 5
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6KVLUaYrgt2erJqKaZ",
+        "msg_011Cfs6KgtzaRkb6FHBgoxT6",
+        "msg_011Cfs6KpCJTNXnk7LPpAAoa",
+        "msg_011Cfs6LhmNhBdPvtySMfbs8",
+        "msg_011Cfs6M1gPFicLV228WAoex"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r02t_fromager_age_filter_ticket": {
+      "exit_code": 0,
+      "duration_s": 38.9,
+      "token_usage": {
+        "input": 14,
+        "output": 2689,
+        "cache_read": 247000,
+        "cache_create": 44049
+      },
+      "cost_usd": 0.25251399999999996,
+      "num_turns": 7,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 14,
+          "output": 2689,
+          "cache_read": 247000,
+          "cache_create": 44049,
+          "cost_usd": 0.25251399999999996
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 7
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6MieUjdTbnjdyKEYq8",
+        "msg_011Cfs6NL8fYqGhQLpY9gDuY",
+        "msg_011Cfs6NXehzTGjNxKSxcW7q",
+        "msg_011Cfs6NjpCq867KbrXHXhXe",
+        "msg_011Cfs6P2SKw3jguZaP2LZ73",
+        "msg_011Cfs6PjkmPpXT24ckLeDqi",
+        "msg_011Cfs6Q8o6ctnkdVpoTjATD"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r03_fromager_dep_chain": {
+      "exit_code": 0,
+      "duration_s": 46.6,
+      "token_usage": {
+        "input": 16,
+        "output": 5001,
+        "cache_read": 289462,
+        "cache_create": 53317
+      },
+      "cost_usd": 0.3212024,
+      "num_turns": 8,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 16,
+          "output": 5001,
+          "cache_read": 289462,
+          "cache_create": 53317,
+          "cost_usd": 0.3212024
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 8
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6Qi8JduLium7yYkHRx",
+        "msg_011Cfs6Qu6cABTnEwAwkEjd1",
+        "msg_011Cfs6R6EqRqvoS4CCz5JRW",
+        "msg_011Cfs6RiURKPWq2ipR18f6G",
+        "msg_011Cfs6RtK1udGs8gBDCPJeh",
+        "msg_011Cfs6Sk6gpbqbQPTGWoV7u",
+        "msg_011Cfs6TBwvrPf3ZVyDbQUpi",
+        "msg_011Cfs6TfA3ez1ZP2UNmoPJe"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r03t_fromager_dep_chain_ticket": {
+      "exit_code": 0,
+      "duration_s": 78.0,
+      "token_usage": {
+        "input": 32,
+        "output": 7850,
+        "cache_read": 1206445,
+        "cache_create": 131605
+      },
+      "cost_usd": 0.8462729999999998,
+      "num_turns": 16,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 32,
+          "output": 7850,
+          "cache_read": 1206445,
+          "cache_create": 131605,
+          "cost_usd": 0.8462729999999998
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 16
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6UStPti9E1RjxWTd1i",
+        "msg_011Cfs6Ud3q9BsX7h4tu65VZ",
+        "msg_011Cfs6UmHfm8PQtSoFUg7Ku",
+        "msg_011Cfs6UwLApGQBdb4yduKs4",
+        "msg_011Cfs6V3Frorf513rvkvhfs",
+        "msg_011Cfs6VLRjTRd2FqSRMfaM9",
+        "msg_011Cfs6VcStKq9p9yeZnZnHP",
+        "msg_011Cfs6W1o5b8GeEJE2F9m34",
+        "msg_011Cfs6WMJayjybCmioZ6mRH",
+        "msg_011Cfs6WbEkAET98FpqdzGja",
+        "msg_011Cfs6WxaP8F9X3G4TY9U2s",
+        "msg_011Cfs6XF4aYxVjJZdTPaA2Z",
+        "msg_011Cfs6XmuiKzK4vuxY9RJnf",
+        "msg_011Cfs6YXiiBHFa5m4Scoeqn",
+        "msg_011Cfs6Z18jJ1rpE2aVSQgJv",
+        "msg_011Cfs6Zes6gzjVebiivNaPp"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r04_fromager_age_fallback": {
+      "exit_code": 0,
+      "duration_s": 56.2,
+      "token_usage": {
+        "input": 20,
+        "output": 6764,
+        "cache_read": 413653,
+        "cache_create": 55640
+      },
+      "cost_usd": 0.3729706,
+      "num_turns": 10,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 20,
+          "output": 6764,
+          "cache_read": 413653,
+          "cache_create": 55640,
+          "cost_usd": 0.3729706
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 10
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6aKJe1NvbCbrFxaefR",
+        "msg_011Cfs6aZWfLh9G8Xr3sFL5i",
+        "msg_011Cfs6amMYzZaiH4iwTms9T",
+        "msg_011Cfs6ayqecmyTXBwbSPu3w",
+        "msg_011Cfs6bgKixcLLBTvPNLP7D",
+        "msg_011Cfs6bqFVEoQkH9wiUgiDX",
+        "msg_011Cfs6cjAeUSgb9TphGNA47",
+        "msg_011Cfs6dL4cYmvmF7QSEd2Ka",
+        "msg_011Cfs6dWVvg3TWnPTjV7vGP",
+        "msg_011Cfs6drdtqgH25jnBKDbAR"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "r05_fromager_version_prebuilt": {
+      "exit_code": 0,
+      "duration_s": 145.6,
+      "token_usage": {
+        "input": 32,
+        "output": 14349,
+        "cache_read": 1110257,
+        "cache_create": 118722
+      },
+      "cost_usd": 0.8404934000000002,
+      "num_turns": 16,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 32,
+          "output": 14349,
+          "cache_read": 1110257,
+          "cache_create": 118722,
+          "cost_usd": 0.8404934000000002
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 16
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6ehjdnrCPg4sDsif7n",
+        "msg_011Cfs6evRsZ2vJf3tkVHDJh",
+        "msg_011Cfs6f8MiSEDuySUk9NjEx",
+        "msg_011Cfs6fMbhJ9ww8yzHprci3",
+        "msg_011Cfs6fbqxXREoeySFzvx74",
+        "msg_011Cfs6fy3QQkSpRXnAd8znV",
+        "msg_011Cfs6gJ8cS9cgPPEh77kkn",
+        "msg_011Cfs6gqz2uvrsLvRJQcB4w",
+        "msg_011Cfs6hgdysP6BKvUSrcuTE",
+        "msg_011Cfs6i27WN8mSKJrMDXSVd",
+        "msg_011Cfs6ik8ryT2dE49k1DhQw",
+        "msg_011Cfs6j89Rm45TgUXYGwHuD",
+        "msg_011Cfs6kxs98fMDcPDsVzdsL",
+        "msg_011Cfs6mdN9JX6tPyogmPnKL",
+        "msg_011Cfs6pTRhB3SDmDsG9Hdi7",
+        "msg_011Cfs6ppx16qvsLy2S6dek2"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t01_rename_symbol": {
+      "exit_code": 0,
+      "duration_s": 12.1,
+      "token_usage": {
+        "input": 8,
+        "output": 596,
+        "cache_read": 102299,
+        "cache_create": 29229
+      },
+      "cost_usd": 0.1433518,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 596,
+          "cache_read": 102299,
+          "cache_create": 29229,
+          "cost_usd": 0.1433518
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6qdwjMoy2zhFQQrK7F",
+        "msg_011Cfs6qpCdNmgjNqP211rBx",
+        "msg_011Cfs6r2tdAp9JCadhPH1Nu",
+        "msg_011Cfs6rCSLgP5pWwD2idQQb"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t02_ini_to_toml": {
+      "exit_code": 0,
+      "duration_s": 22.2,
+      "token_usage": {
+        "input": 10,
+        "output": 1134,
+        "cache_read": 130270,
+        "cache_create": 33343
+      },
+      "cost_usd": 0.17078600000000002,
+      "num_turns": 5,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 10,
+          "output": 1134,
+          "cache_read": 130270,
+          "cache_create": 33343,
+          "cost_usd": 0.17078600000000002
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 5
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6rYvdxJVWTkmpEqVn6",
+        "msg_011Cfs6s1jCXPSjuQZJQXHg2",
+        "msg_011Cfs6sLtctmdoQ1VdKGrfw",
+        "msg_011Cfs6sXtAeAabaSPrwFU97",
+        "msg_011Cfs6ssXrJRmSW646WeiZE"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t03_add_type_hints": {
+      "exit_code": 0,
+      "duration_s": 10.9,
+      "token_usage": {
+        "input": 6,
+        "output": 975,
+        "cache_read": 55433,
+        "cache_create": 14056
+      },
+      "cost_usd": 0.0770726,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 975,
+          "cache_read": 55433,
+          "cache_create": 14056,
+          "cost_usd": 0.0770726
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6tFafLKce6ZuhUW1ga",
+        "msg_011Cfs6tPUBYGsXqVGuy65kz",
+        "msg_011Cfs6tiFHaLW68UTMmLpaz"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t04_lru_cache": {
+      "exit_code": 0,
+      "duration_s": 20.2,
+      "token_usage": {
+        "input": 6,
+        "output": 2728,
+        "cache_read": 59027,
+        "cache_create": 19021
+      },
+      "cost_usd": 0.11518139999999999,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 2728,
+          "cache_read": 59027,
+          "cache_create": 19021,
+          "cost_usd": 0.11518139999999999
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6u6s4rYdiTW974HB4W",
+        "msg_011Cfs6uN5cL2U2jG7TTEGFo",
+        "msg_011Cfs6vCQyT8HV6qQmnwad4"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t05_cli_json_flag": {
+      "exit_code": 0,
+      "duration_s": 11.7,
+      "token_usage": {
+        "input": 6,
+        "output": 1089,
+        "cache_read": 59114,
+        "cache_create": 20759
+      },
+      "cost_usd": 0.1057608,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 1089,
+          "cache_read": 59114,
+          "cache_create": 20759,
+          "cost_usd": 0.1057608
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6vdBjY6DpDqcPmEJXs",
+        "msg_011Cfs6vqKjdhwVpd6sSk1Zy",
+        "msg_011Cfs6wB39iwkPfiVqh9Q81"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t06_log_parser": {
+      "exit_code": 0,
+      "duration_s": 19.6,
+      "token_usage": {
+        "input": 6,
+        "output": 2624,
+        "cache_read": 56754,
+        "cache_create": 16881
+      },
+      "cost_usd": 0.10512679999999999,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 2624,
+          "cache_read": 56754,
+          "cache_create": 16881,
+          "cost_usd": 0.10512679999999999
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6waiRiKhhPGFq4sX75",
+        "msg_011Cfs6woHDy1dWPMk2LpWQe",
+        "msg_011Cfs6xepWqgb6xHq2uonMM"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t07_mutable_default": {
+      "exit_code": 0,
+      "duration_s": 14.7,
+      "token_usage": {
+        "input": 8,
+        "output": 1056,
+        "cache_read": 101801,
+        "cache_create": 30944
+      },
+      "cost_usd": 0.15471220000000002,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 1056,
+          "cache_read": 101801,
+          "cache_create": 30944,
+          "cost_usd": 0.15471220000000002
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6y3R4hFTeavrm5EC9m",
+        "msg_011Cfs6yJaNhMmwv5n7D1D2W",
+        "msg_011Cfs6yTFXbZc1TMCan3LQh",
+        "msg_011Cfs6ym17u4Ci1VUmWzMPJ"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t08_timezone_bug": {
+      "exit_code": 0,
+      "duration_s": 24.7,
+      "token_usage": {
+        "input": 10,
+        "output": 1825,
+        "cache_read": 143850,
+        "cache_create": 48026
+      },
+      "cost_usd": 0.23914400000000002,
+      "num_turns": 5,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 10,
+          "output": 1825,
+          "cache_read": 143850,
+          "cache_create": 48026,
+          "cost_usd": 0.23914400000000002
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 5
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs6zBPKYY8AYxdocxkab",
+        "msg_011Cfs6zLj8wy8CUGANwTPrV",
+        "msg_011Cfs6zXAhCxupS2Y77B2BP",
+        "msg_011Cfs6znqmmJTfxx5HMSUWW",
+        "msg_011Cfs71Pb4fVVFp5Dh75cbo"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t09_thread_safety": {
+      "exit_code": 0,
+      "duration_s": 28.5,
+      "token_usage": {
+        "input": 8,
+        "output": 2255,
+        "cache_read": 91590,
+        "cache_create": 21815
+      },
+      "cost_usd": 0.128144,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 2255,
+          "cache_read": 91590,
+          "cache_create": 21815,
+          "cost_usd": 0.128144
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs723hmNFBAdRk1jC5iF",
+        "msg_011Cfs72GSEh4w2NYv2EVxvj",
+        "msg_011Cfs72TaCvRzEWacCGV8EA",
+        "msg_011Cfs73iPxWk3yxF8HVsc1F"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t10_plugin_registry": {
+      "exit_code": 0,
+      "duration_s": 23.5,
+      "token_usage": {
+        "input": 8,
+        "output": 2118,
+        "cache_read": 86015,
+        "cache_create": 25143
+      },
+      "cost_usd": 0.138971,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 2118,
+          "cache_read": 86015,
+          "cache_create": 25143,
+          "cost_usd": 0.138971
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs74GDeNGRpW39Mi7cAt",
+        "msg_011Cfs74nMcJNnbp7S5PQgK5",
+        "msg_011Cfs74u8fK4rVsmJuzA3nn",
+        "msg_011Cfs75b21DgewFKECYgm5j"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t11_async_migration": {
+      "exit_code": 0,
+      "duration_s": 22.0,
+      "token_usage": {
+        "input": 6,
+        "output": 2741,
+        "cache_read": 60025,
+        "cache_create": 27865
+      },
+      "cost_usd": 0.150887,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 2741,
+          "cache_read": 60025,
+          "cache_create": 27865,
+          "cost_usd": 0.150887
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs761Wuy3eEB7SLKxq5u",
+        "msg_011Cfs76HekwUCwsJiDgxWGA",
+        "msg_011Cfs77D5DbiAc4rwEmmKYi"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t12_needle_bug": {
+      "exit_code": 0,
+      "duration_s": 20.8,
+      "token_usage": {
+        "input": 10,
+        "output": 1757,
+        "cache_read": 130559,
+        "cache_create": 26200
+      },
+      "cost_usd": 0.14850180000000002,
+      "num_turns": 5,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 10,
+          "output": 1757,
+          "cache_read": 130559,
+          "cache_create": 26200,
+          "cost_usd": 0.14850180000000002
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 5
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs77k1ZCgPMDWvWAkh4K",
+        "msg_011Cfs77wsSgS6qHs7gdrh1b",
+        "msg_011Cfs7853nhu9RJFNaeBM86",
+        "msg_011Cfs78cpVNxUV199R5SqZs",
+        "msg_011Cfs78rbiHa3fvgXVimatV"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t13_unicode_dedupe": {
+      "exit_code": 0,
+      "duration_s": 20.1,
+      "token_usage": {
+        "input": 6,
+        "output": 1522,
+        "cache_read": 59484,
+        "cache_create": 21323
+      },
+      "cost_usd": 0.1124208,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 1522,
+          "cache_read": 59484,
+          "cache_create": 21323,
+          "cost_usd": 0.1124208
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs79M4VEPYKAHX8NaT9p",
+        "msg_011Cfs79g2zdDfPohW93fp6m",
+        "msg_011Cfs7AKmdTg6WTkDzkiuV2"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t14_dep_resolver": {
+      "exit_code": 0,
+      "duration_s": 34.9,
+      "token_usage": {
+        "input": 6,
+        "output": 4494,
+        "cache_read": 58849,
+        "cache_create": 28722
+      },
+      "cost_usd": 0.17160979999999998,
+      "num_turns": 3,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 6,
+          "output": 4494,
+          "cache_read": 58849,
+          "cache_create": 28722,
+          "cost_usd": 0.17160979999999998
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 3
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs7AriTdofxdVi2SqChC",
+        "msg_011Cfs7B2AVhUCxqZYg24xuu",
+        "msg_011Cfs7CxEegPt2f4CZA8QBz"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t15_perf_regression": {
+      "exit_code": 0,
+      "duration_s": 30.7,
+      "token_usage": {
+        "input": 8,
+        "output": 1418,
+        "cache_read": 89460,
+        "cache_create": 21391
+      },
+      "cost_usd": 0.117652,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 1418,
+          "cache_read": 89460,
+          "cache_create": 21391,
+          "cost_usd": 0.117652
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs7DVLveyKoKeZLuQTTs",
+        "msg_011Cfs7DgzQoJZNKAHjKM5xX",
+        "msg_011Cfs7DousuPMLXq9wEUsbr",
+        "msg_011Cfs7FQZVceXr4yhPjL867"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    },
+    "t16_json_patch": {
+      "exit_code": 0,
+      "duration_s": 45.0,
+      "token_usage": {
+        "input": 8,
+        "output": 7351,
+        "cache_read": 101623,
+        "cache_create": 46435
+      },
+      "cost_usd": 0.2795906,
+      "num_turns": 4,
+      "per_model_usage": {
+        "claude-sonnet-5-5": {
+          "input": 8,
+          "output": 7351,
+          "cache_read": 101623,
+          "cache_create": 46435,
+          "cost_usd": 0.2795906
+        }
+      },
+      "per_model_turns": {
+        "claude-sonnet-5-5": 4
+      },
+      "permission_denials": [],
+      "message_ids": [
+        "msg_011Cfs7FoyeezBXoktW3h1F4",
+        "msg_011Cfs7G3yWy3fPfJFwySKsw",
+        "msg_011Cfs7GAvEXBnwyj1fKwzf5",
+        "msg_011Cfs7JjA2PP4xurfVAzbny"
+      ],
+      "cost_source": "runner:reported",
+      "error_class": null,
+      "budget": null
+    }
+  },
+  "message_ids": [
+    "msg_011Cfs6CLHKZioQ521C2GLnw",
+    "msg_011Cfs6CZxqYs8QCbNwBefUy",
+    "msg_011Cfs6CoWvRZkt53DZwrgrX",
+    "msg_011Cfs6D1TWr84rh6A9xFb1w",
+    "msg_011Cfs6DsGBAKkYo8QFVLQPc",
+    "msg_011Cfs6EcKXiQVbF6qcJMNXi",
+    "msg_011Cfs6FQh4wuiTt4V3oirPY",
+    "msg_011Cfs6GGAdEUtwAcCydZ5dp",
+    "msg_011Cfs6H376Zyqka2TYxdaz7",
+    "msg_011Cfs6HGMKkRgR1piFsoyhP",
+    "msg_011Cfs6HWVP8vQrXBbgozu2G",
+    "msg_011Cfs6JavJYLJznqczLSwT9",
+    "msg_011Cfs6JwvrSU69ajEqSZ7zM",
+    "msg_011Cfs6KVLUaYrgt2erJqKaZ",
+    "msg_011Cfs6KgtzaRkb6FHBgoxT6",
+    "msg_011Cfs6KpCJTNXnk7LPpAAoa",
+    "msg_011Cfs6LhmNhBdPvtySMfbs8",
+    "msg_011Cfs6M1gPFicLV228WAoex",
+    "msg_011Cfs6MieUjdTbnjdyKEYq8",
+    "msg_011Cfs6NL8fYqGhQLpY9gDuY",
+    "msg_011Cfs6NXehzTGjNxKSxcW7q",
+    "msg_011Cfs6NjpCq867KbrXHXhXe",
+    "msg_011Cfs6P2SKw3jguZaP2LZ73",
+    "msg_011Cfs6PjkmPpXT24ckLeDqi",
+    "msg_011Cfs6Q8o6ctnkdVpoTjATD",
+    "msg_011Cfs6Qi8JduLium7yYkHRx",
+    "msg_011Cfs6Qu6cABTnEwAwkEjd1",
+    "msg_011Cfs6R6EqRqvoS4CCz5JRW",
+    "msg_011Cfs6RiURKPWq2ipR18f6G",
+    "msg_011Cfs6RtK1udGs8gBDCPJeh",
+    "msg_011Cfs6Sk6gpbqbQPTGWoV7u",
+    "msg_011Cfs6TBwvrPf3ZVyDbQUpi",
+    "msg_011Cfs6TfA3ez1ZP2UNmoPJe",
+    "msg_011Cfs6UStPti9E1RjxWTd1i",
+    "msg_011Cfs6Ud3q9BsX7h4tu65VZ",
+    "msg_011Cfs6UmHfm8PQtSoFUg7Ku",
+    "msg_011Cfs6UwLApGQBdb4yduKs4",
+    "msg_011Cfs6V3Frorf513rvkvhfs",
+    "msg_011Cfs6VLRjTRd2FqSRMfaM9",
+    "msg_011Cfs6VcStKq9p9yeZnZnHP",
+    "msg_011Cfs6W1o5b8GeEJE2F9m34",
+    "msg_011Cfs6WMJayjybCmioZ6mRH",
+    "msg_011Cfs6WbEkAET98FpqdzGja",
+    "msg_011Cfs6WxaP8F9X3G4TY9U2s",
+    "msg_011Cfs6XF4aYxVjJZdTPaA2Z",
+    "msg_011Cfs6XmuiKzK4vuxY9RJnf",
+    "msg_011Cfs6YXiiBHFa5m4Scoeqn",
+    "msg_011Cfs6Z18jJ1rpE2aVSQgJv",
+    "msg_011Cfs6Zes6gzjVebiivNaPp",
+    "msg_011Cfs6aKJe1NvbCbrFxaefR",
+    "msg_011Cfs6aZWfLh9G8Xr3sFL5i",
+    "msg_011Cfs6amMYzZaiH4iwTms9T",
+    "msg_011Cfs6ayqecmyTXBwbSPu3w",
+    "msg_011Cfs6bgKixcLLBTvPNLP7D",
+    "msg_011Cfs6bqFVEoQkH9wiUgiDX",
+    "msg_011Cfs6cjAeUSgb9TphGNA47",
+    "msg_011Cfs6dL4cYmvmF7QSEd2Ka",
+    "msg_011Cfs6dWVvg3TWnPTjV7vGP",
+    "msg_011Cfs6drdtqgH25jnBKDbAR",
+    "msg_011Cfs6ehjdnrCPg4sDsif7n",
+    "msg_011Cfs6evRsZ2vJf3tkVHDJh",
+    "msg_011Cfs6f8MiSEDuySUk9NjEx",
+    "msg_011Cfs6fMbhJ9ww8yzHprci3",
+    "msg_011Cfs6fbqxXREoeySFzvx74",
+    "msg_011Cfs6fy3QQkSpRXnAd8znV",
+    "msg_011Cfs6gJ8cS9cgPPEh77kkn",
+    "msg_011Cfs6gqz2uvrsLvRJQcB4w",
+    "msg_011Cfs6hgdysP6BKvUSrcuTE",
+    "msg_011Cfs6i27WN8mSKJrMDXSVd",
+    "msg_011Cfs6ik8ryT2dE49k1DhQw",
+    "msg_011Cfs6j89Rm45TgUXYGwHuD",
+    "msg_011Cfs6kxs98fMDcPDsVzdsL",
+    "msg_011Cfs6mdN9JX6tPyogmPnKL",
+    "msg_011Cfs6pTRhB3SDmDsG9Hdi7",
+    "msg_011Cfs6ppx16qvsLy2S6dek2",
+    "msg_011Cfs6qdwjMoy2zhFQQrK7F",
+    "msg_011Cfs6qpCdNmgjNqP211rBx",
+    "msg_011Cfs6r2tdAp9JCadhPH1Nu",
+    "msg_011Cfs6rCSLgP5pWwD2idQQb",
+    "msg_011Cfs6rYvdxJVWTkmpEqVn6",
+    "msg_011Cfs6s1jCXPSjuQZJQXHg2",
+    "msg_011Cfs6sLtctmdoQ1VdKGrfw",
+    "msg_011Cfs6sXtAeAabaSPrwFU97",
+    "msg_011Cfs6ssXrJRmSW646WeiZE",
+    "msg_011Cfs6tFafLKce6ZuhUW1ga",
+    "msg_011Cfs6tPUBYGsXqVGuy65kz",
+    "msg_011Cfs6tiFHaLW68UTMmLpaz",
+    "msg_011Cfs6u6s4rYdiTW974HB4W",
+    "msg_011Cfs6uN5cL2U2jG7TTEGFo",
+    "msg_011Cfs6vCQyT8HV6qQmnwad4",
+    "msg_011Cfs6vdBjY6DpDqcPmEJXs",
+    "msg_011Cfs6vqKjdhwVpd6sSk1Zy",
+    "msg_011Cfs6wB39iwkPfiVqh9Q81",
+    "msg_011Cfs6waiRiKhhPGFq4sX75",
+    "msg_011Cfs6woHDy1dWPMk2LpWQe",
+    "msg_011Cfs6xepWqgb6xHq2uonMM",
+    "msg_011Cfs6y3R4hFTeavrm5EC9m",
+    "msg_011Cfs6yJaNhMmwv5n7D1D2W",
+    "msg_011Cfs6yTFXbZc1TMCan3LQh",
+    "msg_011Cfs6ym17u4Ci1VUmWzMPJ",
+    "msg_011Cfs6zBPKYY8AYxdocxkab",
+    "msg_011Cfs6zLj8wy8CUGANwTPrV",
+    "msg_011Cfs6zXAhCxupS2Y77B2BP",
+    "msg_011Cfs6znqmmJTfxx5HMSUWW",
+    "msg_011Cfs71Pb4fVVFp5Dh75cbo",
+    "msg_011Cfs723hmNFBAdRk1jC5iF",
+    "msg_011Cfs72GSEh4w2NYv2EVxvj",
+    "msg_011Cfs72TaCvRzEWacCGV8EA",
+    "msg_011Cfs73iPxWk3yxF8HVsc1F",
+    "msg_011Cfs74GDeNGRpW39Mi7cAt",
+    "msg_011Cfs74nMcJNnbp7S5PQgK5",
+    "msg_011Cfs74u8fK4rVsmJuzA3nn",
+    "msg_011Cfs75b21DgewFKECYgm5j",
+    "msg_011Cfs761Wuy3eEB7SLKxq5u",
+    "msg_011Cfs76HekwUCwsJiDgxWGA",
+    "msg_011Cfs77D5DbiAc4rwEmmKYi",
+    "msg_011Cfs77k1ZCgPMDWvWAkh4K",
+    "msg_011Cfs77wsSgS6qHs7gdrh1b",
+    "msg_011Cfs7853nhu9RJFNaeBM86",
+    "msg_011Cfs78cpVNxUV199R5SqZs",
+    "msg_011Cfs78rbiHa3fvgXVimatV",
+    "msg_011Cfs79M4VEPYKAHX8NaT9p",
+    "msg_011Cfs79g2zdDfPohW93fp6m",
+    "msg_011Cfs7AKmdTg6WTkDzkiuV2",
+    "msg_011Cfs7AriTdofxdVi2SqChC",
+    "msg_011Cfs7B2AVhUCxqZYg24xuu",
+    "msg_011Cfs7CxEegPt2f4CZA8QBz",
+    "msg_011Cfs7DVLveyKoKeZLuQTTs",
+    "msg_011Cfs7DgzQoJZNKAHjKM5xX",
+    "msg_011Cfs7DousuPMLXq9wEUsbr",
+    "msg_011Cfs7FQZVceXr4yhPjL867",
+    "msg_011Cfs7FoyeezBXoktW3h1F4",
+    "msg_011Cfs7G3yWy3fPfJFwySKsw",
+    "msg_011Cfs7GAvEXBnwyj1fKwzf5",
+    "msg_011Cfs7JjA2PP4xurfVAzbny"
+  ]
+}

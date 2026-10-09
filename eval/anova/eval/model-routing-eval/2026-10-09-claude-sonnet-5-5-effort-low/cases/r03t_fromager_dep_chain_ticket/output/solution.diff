@@ -1,0 +1,70 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..a85d8d1 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -14,6 +14,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from .. import (
+     bootstrap_requirement_resolver,
+@@ -1158,6 +1159,15 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
++            if isinstance(err, ResolverException):
++                # The outer handler logs under the top-level requirement, so
++                # name the failing requirement and its dependency chain here.
++                chain = " -> ".join(
++                    [f"{r.name}=={v}" for _, r, v in wi.why_snapshot] + [str(wi.req)]
++                )
++                raise ResolverException(
++                    f"cannot resolve {wi.req} (dependency chain: {chain}): {err}"
++                ) from err
+             raise
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 6761bcf..b61e6cc 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -27,6 +27,7 @@ import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from fromager import bootstrapper, build_environment
+ from fromager.bootstrapper._build import Build
+@@ -722,6 +723,29 @@ class TestHandlePhaseError:
+             except RuntimeError:
+                 bt._handle_phase_error(item, err)
+ 
++    def test_resolve_error_names_failing_requirement_and_chain(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item()
++        item.work_item.why_snapshot = [
++            (RequirementType.TOP_LEVEL, Requirement("its-hub"), Version("1.0")),
++            (RequirementType.INSTALL, Requirement("vllm"), Version("0.1")),
++        ]
++        err = ResolverException("no match")
++
++        with pytest.raises(ResolverException) as exc_info:
++            try:
++                raise err
++            except ResolverException:
++                bt._handle_phase_error(item, err)
++
++        msg = str(exc_info.value)
++        assert f"cannot resolve {item.work_item.req}" in msg
++        assert "its-hub==1.0 -> vllm==0.1 ->" in msg
++        assert "no match" in msg
++        assert exc_info.value.__cause__ is err
++
+     def test_resolve_error_in_multiple_versions_mode_continues(
+         self, tmp_context: WorkContext
+     ) -> None:

@@ -1,0 +1,83 @@
+diff --git a/src/fromager/bootstrapper/_resolve.py b/src/fromager/bootstrapper/_resolve.py
+index 51dc541..ce041df 100644
+--- a/src/fromager/bootstrapper/_resolve.py
++++ b/src/fromager/bootstrapper/_resolve.py
+@@ -6,6 +6,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from .. import bootstrap_requirement_resolver
+ from ..log import req_ctxvar_context
+@@ -88,7 +89,18 @@ class Resolve(Phase):
+         assert self.bg_future is not None
+         # bg_future.result() blocks until the background resolution completes,
+         # then returns the result or re-raises any exception from the background.
+-        resolved_versions = self.bg_future.result()
++        try:
++            resolved_versions = self.bg_future.result()
++        except ResolverException as err:
++            # The error is logged under the active top-level requirement, so
++            # name the broken arc (parent -> this requirement) and the chain.
++            if not self.work_item.why_snapshot:
++                raise
++            parent = self.work_item.why_snapshot[-1][1].name
++            chain = " -> ".join(req.name for _, req, _ in self.work_item.why_snapshot)
++            raise ResolverException(
++                f"{err} (required by {parent}, dependency chain: {chain})"
++            ) from err
+         if not resolved_versions:
+             raise RuntimeError(
+                 f"Could not resolve any versions for {self.work_item.req}"
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 6761bcf..937b432 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -27,6 +27,7 @@ import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from fromager import bootstrapper, build_environment
+ from fromager.bootstrapper._build import Build
+@@ -368,6 +369,38 @@ class TestPhaseResolve:
+         assert result[0].work_item.resolved_version == Version("1.0")
+         assert result[0].work_item.parent == wi.parent
+ 
++    def test_resolver_error_names_broken_parent(self, tmp_context: WorkContext) -> None:
++        """A resolution failure names the parent arc and the full chain, not the top-level req."""
++        # Arrange
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        why = [
++            (RequirementType.TOP_LEVEL, Requirement("its-hub"), Version("1.0")),
++            (RequirementType.INSTALL, Requirement("reward-hub"), Version("2.0")),
++            (RequirementType.INSTALL, Requirement("vllm"), Version("3.0")),
++        ]
++        item = _make_resolve_item(
++            req="flashinfer-python==0.6.8.post1",
++            req_type=RequirementType.INSTALL,
++            why_snapshot=why,
++        )
++        future: concurrent.futures.Future[typing.Any] = concurrent.futures.Future()
++        future.set_exception(
++            ResolverException(
++                "Unable to resolve requirement specifier flashinfer-python==0.6.8.post1"
++            )
++        )
++        item.bg_future = future
++
++        # Act
++        with pytest.raises(ResolverException) as exc_info:
++            item.run(bt)
++
++        # Assert
++        message = str(exc_info.value)
++        assert "required by vllm" in message
++        assert "dependency chain: its-hub -> reward-hub -> vllm" in message
++        assert isinstance(exc_info.value.__cause__, ResolverException)
++
+     def test_multiple_versions(self, tmp_context: WorkContext) -> None:
+         bt = bootstrapper.Bootstrapper(tmp_context, multiple_versions=True)
+         item = _make_resolve_item()

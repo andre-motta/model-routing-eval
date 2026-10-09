@@ -1,0 +1,61 @@
+diff --git a/src/fromager/candidate.py b/src/fromager/candidate.py
+index 36d5955..f3d95b6 100644
+--- a/src/fromager/candidate.py
++++ b/src/fromager/candidate.py
+@@ -142,7 +142,12 @@ def get_metadata_for_wheel(
+     data = session.get(url).content
+     with ZipFile(BytesIO(data)) as z:
+         for n in z.namelist():
+-            if n.endswith(".dist-info/METADATA"):
++            # Only consider the wheel's root dist-info; vendored packages may
++            # ship their own nested dist-info directories.
++            dirname, _, filename = n.rpartition("/")
++            if filename == "METADATA" and dirname.endswith(".dist-info"):
++                if "/" in dirname:
++                    continue
+                 metadata_content = z.read(n)
+                 # Parse metadata directly using packaging.metadata.Metadata
+                 # (avoiding circular import with dependencies module)
+diff --git a/tests/test_pep658_support.py b/tests/test_pep658_support.py
+index 3af992c..f527935 100644
+--- a/tests/test_pep658_support.py
++++ b/tests/test_pep658_support.py
+@@ -1,6 +1,8 @@
+ """Tests for PEP 658 metadata support."""
+ 
++import io
+ import typing
++import zipfile
+ from unittest.mock import Mock, patch
+ 
+ from packaging.version import Version
+@@ -132,6 +134,29 @@ Requires-Dist: requests >= 2.0.0
+         assert responses[0] == ("wheel", wheel_url)
+         mock_session.get.assert_called_once_with(wheel_url)
+ 
++    @patch("fromager.candidate.session")
++    def test_get_metadata_ignores_vendored_dist_info(
++        self, mock_session: typing.Any
++    ) -> None:
++        """Test that only the root dist-info METADATA is used."""
++
++        def metadata(name: str) -> str:
++            return f"Metadata-Version: 2.1\nName: {name}\nVersion: 1.0.0\n"
++
++        buf = io.BytesIO()
++        with zipfile.ZipFile(buf, "w") as zf:
++            zf.writestr(
++                "test_package/_vendor/other-2.0.dist-info/METADATA", metadata("other")
++            )
++            zf.writestr("test_package-1.0.0.dist-info/METADATA", metadata("test-package"))
++        mock_session.get.return_value = Mock(content=buf.getvalue())
++
++        result = get_metadata_for_wheel(
++            "https://pkg.test/test_package-1.0.0-py3-none-any.whl"
++        )
++
++        assert result.name == "test-package"
++
+     def test_candidate_repr_with_metadata_url(self) -> None:
+         """Test that Candidate representation includes metadata URL info."""
+         candidate = Candidate(

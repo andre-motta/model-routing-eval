@@ -1,0 +1,585 @@
+from __future__ import annotations
+
+import copy
+import logging
+import os
+import pathlib
+import tempfile
+import typing
+import zipfile
+
+import pyproject_hooks
+import tomlkit
+from packaging.metadata import Metadata
+from packaging.requirements import Requirement
+from packaging.utils import NormalizedName, canonicalize_name
+from packaging.version import Version
+
+from . import (
+    build_environment,
+    external_commands,
+    overrides,
+    packagesettings,
+    requirements_file,
+)
+from .pkgmetadata import dist_info_name
+
+if typing.TYPE_CHECKING:
+    from . import context
+
+logger = logging.getLogger(__name__)
+
+BUILD_SYSTEM_REQ_FILE_NAME = "build-system-requirements.txt"
+BUILD_BACKEND_REQ_FILE_NAME = "build-backend-requirements.txt"
+BUILD_SDIST_REQ_FILE_NAME = "build-sdist-requirements.txt"
+INSTALL_REQ_FILE_NAME = "requirements.txt"
+
+# marker for Fromager's stub PKG-INFO
+STUB_PKG_INFO_SUMMARY = "Fromage stub PKG-INFO"
+
+
+def get_build_system_dependencies(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version | None = None,
+    sdist_root_dir: pathlib.Path,
+) -> set[Requirement]:
+    logger.info(f"getting build system dependencies for {req} in {sdist_root_dir}")
+    pbi = ctx.package_build_info(req)
+
+    build_system_req_file = sdist_root_dir.parent / BUILD_SYSTEM_REQ_FILE_NAME
+    if build_system_req_file.exists():
+        logger.info(f"loading build system dependencies from {build_system_req_file}")
+        return _read_requirements_file(build_system_req_file)
+
+    logger.debug(
+        f"file {build_system_req_file} does not exist, getting dependencies from hook"
+    )
+    orig_deps = overrides.find_and_invoke(
+        req.name,
+        "get_build_system_dependencies",
+        default_get_build_system_dependencies,
+        ctx=ctx,
+        req=req,
+        sdist_root_dir=sdist_root_dir,
+        build_dir=pbi.build_dir(sdist_root_dir),
+    )
+    deps = _filter_requirements(req, orig_deps)
+
+    _write_requirements_file(
+        deps,
+        build_system_req_file,
+    )
+    return deps
+
+
+def _filter_requirements(
+    req: Requirement,
+    requirements: typing.Iterable[Requirement | str],
+) -> set[Requirement]:
+    requires = set()
+    for r in requirements:
+        if not isinstance(r, Requirement):
+            r = Requirement(r)
+        # Use the parent's extras for marker evaluation because PEP 508
+        # markers like `extra == "foo"` refer to the parent's install extras.
+        if requirements_file.evaluate_marker(req, r, req.extras):
+            requires.add(r)
+        else:
+            logger.debug(
+                f"evaluated {r} in the context of {req} and ignored because the environment marker does not match"
+            )
+    return requires
+
+
+def default_get_build_system_dependencies(
+    ctx: context.WorkContext,
+    req: Requirement,
+    sdist_root_dir: pathlib.Path,
+    build_dir: pathlib.Path,
+) -> typing.Iterable[str]:
+    """Get build system requirements
+
+    Defaults to ``[build-system] requires`` from ``pyproject.toml``.
+    """
+    pyproject_toml = get_pyproject_contents(build_dir)
+    return typing.cast(list[str], get_build_backend(pyproject_toml)["requires"])
+
+
+def get_build_backend_dependencies(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version | None = None,
+    sdist_root_dir: pathlib.Path,
+    build_env: build_environment.BuildEnvironment,
+) -> set[Requirement]:
+    logger.info(f"getting build backend dependencies for {req} in {sdist_root_dir}")
+    pbi = ctx.package_build_info(req)
+
+    build_backend_req_file = sdist_root_dir.parent / BUILD_BACKEND_REQ_FILE_NAME
+    if build_backend_req_file.exists():
+        logger.info(f"loading build backend dependencies from {build_backend_req_file}")
+        return _read_requirements_file(build_backend_req_file)
+
+    logger.debug(
+        f"file {build_backend_req_file} does not exist, getting dependencies from hook"
+    )
+    extra_environ = packagesettings.get_extra_environ(
+        ctx=ctx,
+        req=req,
+        version=version,
+        sdist_root_dir=sdist_root_dir,
+        build_env=build_env,
+    )
+    orig_deps = overrides.find_and_invoke(
+        req.name,
+        "get_build_backend_dependencies",
+        default_get_build_backend_dependencies,
+        ctx=ctx,
+        req=req,
+        sdist_root_dir=sdist_root_dir,
+        build_dir=pbi.build_dir(sdist_root_dir),
+        extra_environ=extra_environ,
+        build_env=build_env,
+    )
+    deps = _filter_requirements(req, orig_deps)
+
+    _write_requirements_file(
+        deps,
+        build_backend_req_file,
+    )
+    return deps
+
+
+def default_get_build_backend_dependencies(
+    ctx: context.WorkContext,
+    req: Requirement,
+    sdist_root_dir: pathlib.Path,
+    build_dir: pathlib.Path,
+    extra_environ: dict[str, str],
+    build_env: build_environment.BuildEnvironment,
+) -> typing.Iterable[str]:
+    """Get build backend dependencies
+
+    Defaults to result of hook call
+    :meth:`~pyproject_hooks.BuildBackendHookCaller.get_requires_for_build_wheel`
+    """
+    pbi = ctx.package_build_info(req)
+    hook_caller = get_build_backend_hook_caller(
+        ctx=ctx,
+        req=req,
+        build_dir=build_dir,
+        override_environ=extra_environ,
+        build_env=build_env,
+    )
+    return hook_caller.get_requires_for_build_wheel(
+        config_settings=pbi.config_settings,
+    )
+
+
+def get_build_sdist_dependencies(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version | None = None,
+    sdist_root_dir: pathlib.Path,
+    build_env: build_environment.BuildEnvironment,
+) -> set[Requirement]:
+    logger.info(f"getting build sdist dependencies for {req} in {sdist_root_dir}")
+    pbi = ctx.package_build_info(req)
+
+    build_sdist_req_file = sdist_root_dir.parent / BUILD_SDIST_REQ_FILE_NAME
+    if build_sdist_req_file.exists():
+        logger.info(f"loading build sdist dependencies from {build_sdist_req_file}")
+        return _read_requirements_file(build_sdist_req_file)
+
+    logger.debug(
+        f"file {build_sdist_req_file} does not exist, getting dependencies from hook"
+    )
+    extra_environ = packagesettings.get_extra_environ(
+        ctx=ctx,
+        req=req,
+        version=version,
+        sdist_root_dir=sdist_root_dir,
+        build_env=build_env,
+    )
+    orig_deps = overrides.find_and_invoke(
+        req.name,
+        "get_build_sdist_dependencies",
+        default_get_build_sdist_dependencies,
+        ctx=ctx,
+        req=req,
+        sdist_root_dir=sdist_root_dir,
+        build_dir=pbi.build_dir(sdist_root_dir),
+        extra_environ=extra_environ,
+        build_env=build_env,
+    )
+    deps = _filter_requirements(req, orig_deps)
+
+    _write_requirements_file(
+        deps,
+        build_sdist_req_file,
+    )
+    return deps
+
+
+def default_get_build_sdist_dependencies(
+    ctx: context.WorkContext,
+    req: Requirement,
+    sdist_root_dir: pathlib.Path,
+    build_dir: pathlib.Path,
+    extra_environ: dict[str, str],
+    build_env: build_environment.BuildEnvironment,
+) -> typing.Iterable[str]:
+    """Get build sdist dependencies
+
+    Defaults to result of hook call
+    :meth:`~pyproject_hooks.BuildBackendHookCaller.get_requires_for_build_wheel`
+    """
+    logger.info(f"looking for build sdist dependencies in {build_dir}")
+    pbi = ctx.package_build_info(req)
+    hook_caller = get_build_backend_hook_caller(
+        ctx=ctx,
+        req=req,
+        build_dir=build_dir,
+        override_environ=extra_environ,
+        build_env=build_env,
+    )
+    return hook_caller.get_requires_for_build_wheel(
+        config_settings=pbi.config_settings,
+    )
+
+
+def get_install_dependencies_of_sdist(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version,
+    sdist_root_dir: pathlib.Path,
+    build_env: build_environment.BuildEnvironment,
+) -> set[Requirement]:
+    """Get install requirements (Requires-Dist) from sources
+
+    Uses PEP 517 prepare_metadata_for_build_wheel() API.
+    """
+    logger.info(
+        f"getting install requirements for {req} from sdist in {sdist_root_dir}"
+    )
+    pbi = ctx.package_build_info(req)
+    extra_environ = packagesettings.get_extra_environ(
+        ctx=ctx,
+        req=req,
+        version=version,
+        sdist_root_dir=sdist_root_dir,
+        build_env=build_env,
+    )
+    build_dir = pbi.build_dir(sdist_root_dir)
+    orig_deps = overrides.find_and_invoke(
+        req.name,
+        "get_install_dependencies_of_sdist",
+        default_get_install_dependencies_of_sdist,
+        ctx=ctx,
+        req=req,
+        version=version,
+        sdist_root_dir=sdist_root_dir,
+        build_env=build_env,
+        extra_environ=extra_environ,
+        build_dir=build_dir,
+        config_settings=pbi.config_settings,
+    )
+    deps = _filter_requirements(req, orig_deps)
+    _write_requirements_file(
+        deps,
+        sdist_root_dir.parent / INSTALL_REQ_FILE_NAME,
+    )
+    return deps
+
+
+def default_get_install_dependencies_of_sdist(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version,
+    sdist_root_dir: pathlib.Path,
+    build_env: build_environment.BuildEnvironment,
+    extra_environ: dict[str, str],
+    build_dir: pathlib.Path,
+    config_settings: dict[str, str],
+) -> set[Requirement]:
+    """Get install requirements (Requires-Dist) from sources
+
+    Uses PEP 517 prepare_metadata_for_build_wheel() API.
+    """
+    metadata = pep517_metadata_of_sdist(
+        ctx=ctx,
+        req=req,
+        version=version,
+        sdist_root_dir=sdist_root_dir,
+        build_env=build_env,
+        extra_environ=extra_environ,
+        build_dir=build_dir,
+        config_settings=config_settings,
+        validate=True,
+    )
+    if metadata.summary is None or STUB_PKG_INFO_SUMMARY not in metadata.summary:
+        # Do not attempt to validate stub metadata. Version may be incorrect.
+        # Treat other validation errors as non-fatal errors.
+        try:
+            validate_dist_name_version(
+                req=req,
+                version=version,
+                what="sdist metadata",
+                # Metadata name is a non-normalized string
+                dist_name=canonicalize_name(metadata.name),
+                dist_version=metadata.version,
+            )
+        except Exception as e:
+            logger.error(
+                "metadata for %s==%s in %r failed to validate: %s",
+                req.name,
+                version,
+                sdist_root_dir,
+                e,
+            )
+    else:
+        logger.debug("Fromager stub metadata detected, not validating name and version")
+    if not metadata.requires_dist:
+        return set()
+    return set(metadata.requires_dist)
+
+
+def parse_metadata(
+    metadata_source: pathlib.Path | bytes, *, validate: bool = True
+) -> Metadata:
+    """Parse metadata from a file path or bytes.
+
+    Args:
+        metadata_source: Path to METADATA file or bytes containing metadata
+        validate: Whether to validate metadata (default: True)
+
+    Returns:
+        Parsed Metadata object
+    """
+    if isinstance(metadata_source, pathlib.Path):
+        metadata_bytes = metadata_source.read_bytes()
+    else:
+        metadata_bytes = metadata_source
+    return Metadata.from_email(metadata_bytes, validate=validate)
+
+
+def pep517_metadata_of_sdist(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    version: Version,
+    sdist_root_dir: pathlib.Path,
+    build_env: build_environment.BuildEnvironment,
+    extra_environ: dict[str, str],
+    build_dir: pathlib.Path,
+    config_settings: dict[str, str],
+    validate: bool = True,
+) -> Metadata:
+    """Get wheel metadata from a source distribution
+
+    Uses PEP 517 prepare_metadata_for_build_wheel() API.
+    """
+    hook_caller = get_build_backend_hook_caller(
+        ctx=ctx,
+        req=req,
+        build_dir=build_dir,
+        override_environ=extra_environ,
+        build_env=build_env,
+    )
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        distinfo_name = hook_caller.prepare_metadata_for_build_wheel(
+            tmp_dir,
+            config_settings=config_settings,
+        )
+        metadata_file = pathlib.Path(tmp_dir) / distinfo_name / "METADATA"
+        metadata = parse_metadata(metadata_file, validate=validate)
+
+    return metadata
+
+
+def validate_dist_name_version(
+    req: Requirement,
+    version: Version,
+    what: str,
+    dist_name: NormalizedName,
+    dist_version: Version,
+) -> None:
+    """Validate that dist name and version matches expected values"""
+    req_name = canonicalize_name(req.name)
+    if dist_name != req_name:
+        if dist_name != canonicalize_name(dist_name):
+            # API misuse
+            raise RuntimeError("dist_name argument {dist_name!r} is not normalized")
+        else:
+            raise ValueError(
+                f"{what} {dist_name!r} does not match requirement {req_name!r}"
+            )
+    if dist_version.public != version.public:
+        raise ValueError(
+            f"{what} {dist_version.public!r} does not match public version {version.public!r}"
+        )
+    if dist_version.local != version.local:
+        logger.warning(
+            f"{what} {dist_version.local!r} has different local version than {version.local!r}"
+        )
+
+
+def get_install_dependencies_of_wheel(
+    req: Requirement, wheel_filename: pathlib.Path, requirements_file_dir: pathlib.Path
+) -> set[Requirement]:
+    """Get install dependencies from a wheel file.
+
+    Extracts and parses the METADATA file from the wheel to get the
+    Requires-Dist entries.
+
+    Args:
+        req: The requirement being processed
+        wheel_filename: Path to the wheel file
+        requirements_file_dir: Directory to write the requirements file
+
+    Returns:
+        Set of requirements from the wheel's metadata
+    """
+    logger.info(f"getting installation dependencies from {wheel_filename}")
+    # Disable validation because many third-party packages have metadata version
+    # mismatches (e.g., setuptools declares Metadata-Version: 2.2 but uses
+    # license-file which was introduced in 2.4). The old pkginfo library
+    # didn't validate this, so we maintain backward compatibility.
+    metadata = _get_metadata_from_wheel(wheel_filename, validate=False)
+    requires_dist = metadata.requires_dist or []
+    deps = _filter_requirements(req, requires_dist)
+    _write_requirements_file(
+        deps,
+        requirements_file_dir / INSTALL_REQ_FILE_NAME,
+    )
+    return deps
+
+
+def _get_metadata_from_wheel(
+    wheel_filename: pathlib.Path, *, validate: bool = True
+) -> Metadata:
+    """Extract and parse METADATA from a wheel file.
+
+    Args:
+        wheel_filename: Path to the wheel file
+        validate: Whether to validate metadata (default: True)
+
+    Returns:
+        Parsed Metadata object
+
+    Raises:
+        ValueError: If no METADATA file is found in the wheel
+    """
+    metadata_path = f"{dist_info_name(wheel_filename.name)}/METADATA"
+
+    with zipfile.ZipFile(wheel_filename) as whl:
+        try:
+            metadata_content = whl.read(metadata_path)
+        except KeyError:
+            raise ValueError(
+                f"Could not find METADATA file in wheel: {wheel_filename}"
+            ) from None
+        return parse_metadata(metadata_content, validate=validate)
+
+
+def get_pyproject_contents(sdist_root_dir: pathlib.Path) -> dict[str, typing.Any]:
+    pyproject_toml_filename = sdist_root_dir / "pyproject.toml"
+    if not os.path.exists(pyproject_toml_filename):
+        return {}
+    return tomlkit.loads(pyproject_toml_filename.read_text())
+
+
+# From pypa/build/src/build/__main__.py
+_DEFAULT_BACKEND = {
+    "build-backend": "setuptools.build_meta:__legacy__",
+    "backend-path": None,
+    "requires": ["setuptools >= 40.8.0"],
+}
+
+
+def get_build_backend(pyproject_toml: dict[str, typing.Any]) -> dict[str, typing.Any]:
+    # Build a set of defaults. Use a copy to ensure that if anything
+    # modifies the values returned by this function our defaults are
+    # not changed.
+    backend_settings = copy.deepcopy(_DEFAULT_BACKEND)
+
+    # Override it with local settings. This allows for some projects
+    # like pyarrow, that don't have 'build-backend' set but *do* have
+    # 'requires' set.
+    for key in ["build-backend", "backend-path", "requires"]:
+        if key in pyproject_toml.get("build-system", {}):
+            backend_settings[key] = pyproject_toml["build-system"][key]
+
+    return backend_settings
+
+
+def get_build_backend_hook_caller(
+    *,
+    ctx: context.WorkContext,
+    req: Requirement,
+    build_dir: pathlib.Path,
+    override_environ: dict[str, typing.Any],
+    build_env: build_environment.BuildEnvironment,
+    log_filename: str | None = None,
+) -> pyproject_hooks.BuildBackendHookCaller:
+    """Create a ``BuildBackendHookCaller`` with merged environment variables.
+
+    Environment variables are merged from three sources, where later
+    sources override earlier ones: hook-provided ``extra_environ``,
+    package-specific ``override_environ``, and ``build_env`` virtualenv
+    variables.
+    """
+
+    def _run_hook_with_extra_environ(
+        cmd: typing.Sequence[str],
+        cwd: str | None = None,
+        extra_environ: typing.Mapping[str, str] | None = None,
+    ) -> None:
+        """The BuildBackendHookCaller is going to pass extra_environ
+        and our build system may want to set some values, too. The hook
+        also needs env vars from the build environment's virtualenv. Merge
+        the 3 sets of values before calling the actual runner function.
+        """
+        extra_environ = dict(extra_environ) if extra_environ else {}
+        extra_environ.update(override_environ)
+        extra_environ.update(build_env.get_venv_environ(template_env=extra_environ))
+        external_commands.run(
+            cmd,
+            cwd=cwd,
+            extra_environ=extra_environ,
+            network_isolation=ctx.network_isolation,
+            log_filename=log_filename,
+        )
+
+    pyproject_toml = get_pyproject_contents(build_dir)
+    backend = get_build_backend(pyproject_toml)
+
+    return pyproject_hooks.BuildBackendHookCaller(
+        source_dir=str(build_dir),
+        build_backend=backend["build-backend"],
+        backend_path=backend["backend-path"],
+        runner=_run_hook_with_extra_environ,
+        python_executable=str(build_env.python),
+    )
+
+
+def _write_requirements_file(
+    requirements: typing.Iterable[Requirement],
+    filename: pathlib.Path,
+) -> None:
+    with open(filename, "w") as f:
+        for r in requirements:
+            f.write(f"{r}\n")
+
+
+def _read_requirements_file(
+    filename: pathlib.Path,
+) -> set[Requirement]:
+    lines = requirements_file.parse_requirements_file(filename)
+    return set([Requirement(line) for line in lines])

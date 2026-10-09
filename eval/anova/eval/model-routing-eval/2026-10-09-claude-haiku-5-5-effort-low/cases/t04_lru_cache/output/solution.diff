@@ -1,0 +1,246 @@
+diff --git a/cachelib/__pycache__/__init__.cpython-314.pyc b/cachelib/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..0221b05
+Binary files /dev/null and b/cachelib/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/cachelib/__pycache__/lru.cpython-314.pyc b/cachelib/__pycache__/lru.cpython-314.pyc
+new file mode 100644
+index 0000000..49d63b5
+Binary files /dev/null and b/cachelib/__pycache__/lru.cpython-314.pyc differ
+diff --git a/cachelib/lru.py b/cachelib/lru.py
+index 783e3e0..96b7d8c 100644
+--- a/cachelib/lru.py
++++ b/cachelib/lru.py
+@@ -1,24 +1,69 @@
+ import time
++from collections import OrderedDict
+ 
+ 
+ class LRUCache:
+     def __init__(self, capacity, ttl=None, clock=time.monotonic):
+-        raise NotImplementedError
++        if capacity <= 0:
++            raise ValueError("capacity must be positive")
++        self.capacity = capacity
++        self.ttl = ttl
++        self._clock = clock
++        # key -> (value, expires_at); expires_at is None when there is no TTL.
++        # The end of the OrderedDict is the most recently used entry.
++        self._data = OrderedDict()
++        self._hits = 0
++        self._misses = 0
++        self._evictions = 0
++        self._expirations = 0
++
++    def _is_expired(self, expires_at):
++        return expires_at is not None and self._clock() >= expires_at
++
++    def _lookup_live(self, key):
++        """Return the stored (value, expires_at) if live, else drop it and return None."""
++        entry = self._data.get(key)
++        if entry is None:
++            return None
++        if self._is_expired(entry[1]):
++            del self._data[key]
++            self._expirations += 1
++            return None
++        return entry
+ 
+     def get(self, key, default=None):
+-        raise NotImplementedError
++        entry = self._lookup_live(key)
++        if entry is None:
++            self._misses += 1
++            return default
++        self._data.move_to_end(key)
++        self._hits += 1
++        return entry[0]
+ 
+     def put(self, key, value):
+-        raise NotImplementedError
++        expires_at = None if self.ttl is None else self._clock() + self.ttl
++        self._data[key] = (value, expires_at)
++        self._data.move_to_end(key)
++        if len(self._data) > self.capacity:
++            self._data.popitem(last=False)
++            self._evictions += 1
+ 
+     def delete(self, key):
+-        raise NotImplementedError
++        if self._lookup_live(key) is None:
++            return False
++        del self._data[key]
++        return True
+ 
+     def stats(self):
+-        raise NotImplementedError
++        return {
++            "hits": self._hits,
++            "misses": self._misses,
++            "evictions": self._evictions,
++            "expirations": self._expirations,
++        }
+ 
+     def __len__(self):
+-        raise NotImplementedError
++        return len(self._data)
+ 
+     def __contains__(self, key):
+-        raise NotImplementedError
++        return self._lookup_live(key) is not None
+diff --git a/tests/__pycache__/test_lru.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_lru.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..f6b6e46
+Binary files /dev/null and b/tests/__pycache__/test_lru.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_lru.py b/tests/test_lru.py
+new file mode 100644
+index 0000000..2f35ecf
+--- /dev/null
++++ b/tests/test_lru.py
+@@ -0,0 +1,147 @@
++import pytest
++
++from cachelib.lru import LRUCache
++
++
++class FakeClock:
++    def __init__(self, now=0.0):
++        self.now = now
++
++    def __call__(self):
++        return self.now
++
++    def advance(self, seconds):
++        self.now += seconds
++
++
++def test_rejects_non_positive_capacity():
++    with pytest.raises(ValueError):
++        LRUCache(0)
++    with pytest.raises(ValueError):
++        LRUCache(-1)
++
++
++def test_get_returns_value_and_default_for_missing():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    assert cache.get("a") == 1
++    assert cache.get("missing") is None
++    assert cache.get("missing", "dflt") == "dflt"
++
++
++def test_get_refreshes_recency_so_other_key_is_evicted():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    cache.put("b", 2)
++    cache.get("a")  # "b" is now least recently used
++    cache.put("c", 3)
++    assert "a" in cache
++    assert "b" not in cache
++    assert "c" in cache
++
++
++def test_put_existing_key_updates_value_and_refreshes_recency():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    cache.put("b", 2)
++    cache.put("a", 10)  # update makes "b" the LRU entry
++    cache.put("c", 3)
++    assert cache.get("a") == 10
++    assert "b" not in cache
++    assert len(cache) == 2
++
++
++def test_eviction_counts_and_len_capped_at_capacity():
++    cache = LRUCache(2)
++    for i in range(5):
++        cache.put(i, i)
++    assert len(cache) == 2
++    assert cache.stats()["evictions"] == 3
++    assert 3 in cache and 4 in cache
++
++
++def test_delete_returns_whether_key_existed():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    assert cache.delete("a") is True
++    assert cache.delete("a") is False
++    assert "a" not in cache
++    assert len(cache) == 0
++
++
++def test_stats_track_hits_and_misses():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    cache.get("a")
++    cache.get("b")
++    assert cache.stats() == {"hits": 1, "misses": 1, "evictions": 0, "expirations": 0}
++
++
++def test_contains_does_not_change_recency():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    cache.put("b", 2)
++    assert "a" in cache  # must not refresh "a"
++    cache.put("c", 3)
++    assert "a" not in cache
++    assert "b" in cache
++
++
++def test_contains_does_not_touch_hit_or_miss_stats():
++    cache = LRUCache(2)
++    cache.put("a", 1)
++    _ = "a" in cache
++    _ = "b" in cache
++    assert cache.stats()["hits"] == 0
++    assert cache.stats()["misses"] == 0
++
++
++def test_ttl_expired_entry_behaves_as_missing_and_counts_as_expiration():
++    clock = FakeClock()
++    cache = LRUCache(2, ttl=10, clock=clock)
++    cache.put("a", 1)
++    clock.advance(9.9)
++    assert cache.get("a") == 1
++    clock.advance(0.2)
++    assert cache.get("a", "gone") == "gone"
++    stats = cache.stats()
++    assert stats["misses"] == 1
++    assert stats["expirations"] == 1
++    assert stats["evictions"] == 0
++    assert len(cache) == 0
++
++
++def test_ttl_contains_respects_expiry():
++    clock = FakeClock()
++    cache = LRUCache(2, ttl=5, clock=clock)
++    cache.put("a", 1)
++    clock.advance(5)
++    assert "a" not in cache
++    assert cache.stats()["expirations"] == 1
++
++
++def test_ttl_delete_of_expired_entry_returns_false():
++    clock = FakeClock()
++    cache = LRUCache(2, ttl=5, clock=clock)
++    cache.put("a", 1)
++    clock.advance(5)
++    assert cache.delete("a") is False
++
++
++def test_put_resets_ttl_on_update():
++    clock = FakeClock()
++    cache = LRUCache(2, ttl=10, clock=clock)
++    cache.put("a", 1)
++    clock.advance(8)
++    cache.put("a", 2)
++    clock.advance(8)
++    assert cache.get("a") == 2
++
++
++def test_no_ttl_entries_never_expire():
++    clock = FakeClock()
++    cache = LRUCache(2, clock=clock)
++    cache.put("a", 1)
++    clock.advance(1_000_000)
++    assert cache.get("a") == 1
++    assert cache.stats()["expirations"] == 0

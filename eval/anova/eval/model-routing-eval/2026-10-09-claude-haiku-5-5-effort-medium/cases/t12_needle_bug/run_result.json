@@ -1,0 +1,38 @@
+{
+  "exit_code": 0,
+  "duration_s": 28.2,
+  "token_usage": {
+    "input": 16,
+    "output": 4510,
+    "cache_read": 273383,
+    "cache_create": 43346
+  },
+  "cost_usd": 0.01365963,
+  "num_turns": 8,
+  "per_model_usage": {
+    "claude-haiku-5-5": {
+      "input": 16,
+      "output": 4510,
+      "cache_read": 273383,
+      "cache_create": 43346,
+      "cost_usd": 0.01365963
+    }
+  },
+  "per_model_turns": {
+    "claude-haiku-5-5": 8
+  },
+  "permission_denials": [],
+  "message_ids": [
+    "msg_011CfrymatFn8m4uhHppqwEW",
+    "msg_011CfrymkPkfWQBryoZLDa2q",
+    "msg_011Cfrymsb6Ewpy9oSvGgkt5",
+    "msg_011Cfryn61iC1fFR6AV9r3xc",
+    "msg_011CfrynQuGjJAYLvjX8LGew",
+    "msg_011CfryneKQXxJqwzBRurAdZ",
+    "msg_011CfryntziTTnmactSqfKhB",
+    "msg_011CfryoEg8neKsxYmDvifEz"
+  ],
+  "cost_source": "runner:reported",
+  "error_class": null,
+  "budget": null
+}

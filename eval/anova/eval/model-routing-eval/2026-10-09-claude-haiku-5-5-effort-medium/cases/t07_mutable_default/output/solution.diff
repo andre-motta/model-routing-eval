@@ -1,0 +1,55 @@
+diff --git a/inv/__pycache__/__init__.cpython-314.pyc b/inv/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..4d5b01a
+Binary files /dev/null and b/inv/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/inv/__pycache__/warehouse.cpython-314.pyc b/inv/__pycache__/warehouse.cpython-314.pyc
+new file mode 100644
+index 0000000..c6a8920
+Binary files /dev/null and b/inv/__pycache__/warehouse.cpython-314.pyc differ
+diff --git a/inv/warehouse.py b/inv/warehouse.py
+index 29a3256..ca6c2a7 100644
+--- a/inv/warehouse.py
++++ b/inv/warehouse.py
+@@ -9,15 +9,15 @@ class Item:
+ 
+ 
+ class Warehouse:
+-    def __init__(self, name, stock={}, history=[]):
++    def __init__(self, name, stock=None, history=None):
+         self.name = name
+-        self.stock = stock
+-        self.history = history
++        self.stock = {} if stock is None else stock
++        self.history = [] if history is None else history
+ 
+-    def restock(self, sku, qty, tags=[]):
++    def restock(self, sku, qty, tags=None):
+         item = self.stock.get(sku)
+         if item is None:
+-            item = Item(sku, 0, tags)
++            item = Item(sku, 0, list(tags or []))
+             self.stock[sku] = item
+         item.qty += qty
+         self.history.append(("restock", sku, qty))
+diff --git a/tests/__pycache__/test_inv.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_inv.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..872fe26
+Binary files /dev/null and b/tests/__pycache__/test_inv.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_inv.py b/tests/test_inv.py
+index ea36962..84d4939 100644
+--- a/tests/test_inv.py
++++ b/tests/test_inv.py
+@@ -9,3 +9,13 @@ def test_independent_warehouses():
+     b.restock("nut", 2)
+     assert a.report() == {"bolt": 5}
+     assert len(b.history) == 1
++
++
++def test_restock_tags_not_shared():
++    a = Warehouse("a")
++    a.restock("bolt", 1, tags=["metal"])
++    b = Warehouse("b")
++    b.restock("nut", 1)
++    assert a.stock["bolt"].tags == ["metal"]
++    assert b.stock["nut"].tags == []
++    assert a.stock["bolt"].tags is not b.stock["nut"].tags

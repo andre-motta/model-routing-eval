@@ -1,0 +1,255 @@
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..6e851ef 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,104 @@
+-"""Implement parse_line and summarize here. See FORMAT.md."""
++"""Parse access log lines and summarize them. See FORMAT.md."""
++
++import math
++import re
++from collections import Counter
++from dataclasses import dataclass
++from datetime import datetime, timezone
++from typing import Iterable
++
++_STATUS_RE = re.compile(r"[1-5][0-9]{2}")
++_LATENCY_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")
++_BYTES_RE = re.compile(r"[0-9]+")
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int
++    malformed: int
++    by_status: dict[int, int]
++    by_method: dict[str, int]
++    p50_latency_ms: float
++    p95_latency_ms: float
++    bytes_total: int
++    error_rate: float
++    top_paths: list[tuple[str, int]]
++
++
++def parse_line(line: str) -> Record | None:
++    """Return the Record for a log line, or None if the line is malformed."""
++    parts = line.split()
++    if len(parts) not in (5, 6):
++        return None
++
++    ts_text, method, path, status_text, latency_text, *rest = parts
++    bytes_text = rest[0] if rest else "0"
++    if not (
++        _STATUS_RE.fullmatch(status_text)
++        and _LATENCY_RE.fullmatch(latency_text)
++        and _BYTES_RE.fullmatch(bytes_text)
++    ):
++        return None
++
++    try:
++        ts = datetime.fromisoformat(ts_text)
++    except ValueError:
++        return None
++    if ts.tzinfo is None:
++        return None
++
++    return Record(
++        ts=ts.astimezone(timezone.utc),
++        method=method,
++        path=path,
++        status=int(status_text),
++        latency_ms=float(latency_text),
++        bytes=int(bytes_text),
++    )
++
++
++def _percentile(sorted_values: list[float], pct: int) -> float:
++    """Nearest-rank percentile over already-sorted values; 0.0 if empty."""
++    if not sorted_values:
++        return 0.0
++    rank = math.ceil(pct * len(sorted_values) / 100)
++    return sorted_values[rank - 1]
++
++
++def summarize(lines: Iterable[str]) -> Summary:
++    """Aggregate log lines, counting malformed lines instead of failing on them."""
++    records: list[Record] = []
++    malformed = 0
++    for line in lines:
++        record = parse_line(line)
++        if record is None:
++            malformed += 1
++        else:
++            records.append(record)
++
++    total = len(records)
++    latencies = sorted(r.latency_ms for r in records)
++    errors = sum(1 for r in records if r.status >= 500)
++    path_counts = Counter(r.path for r in records)
++
++    return Summary(
++        total=total,
++        malformed=malformed,
++        by_status=dict(sorted(Counter(r.status for r in records).items())),
++        by_method=dict(sorted(Counter(r.method for r in records).items())),
++        p50_latency_ms=_percentile(latencies, 50),
++        p95_latency_ms=_percentile(latencies, 95),
++        bytes_total=sum(r.bytes for r in records),
++        error_rate=errors / total if total else 0.0,
++        top_paths=sorted(path_counts.items(), key=lambda item: (-item[1], item[0]))[:5],
++    )
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+new file mode 100644
+index 0000000..e2b0a43
+--- /dev/null
++++ b/tests/test_parse.py
+@@ -0,0 +1,139 @@
++from datetime import datetime, timedelta, timezone
++from pathlib import Path
++
++import pytest
++
++from logstats.parse import Record, parse_line, summarize
++
++SAMPLE = Path(__file__).resolve().parents[1] / "sample.log"
++
++
++def test_parse_line_with_bytes():
++    record = parse_line("2026-10-01T12:00:00Z GET /api/users 200 12.5 843")
++    assert record == Record(
++        ts=datetime(2026, 10, 1, 12, 0, 0, tzinfo=timezone.utc),
++        method="GET",
++        path="/api/users",
++        status=200,
++        latency_ms=12.5,
++        bytes=843,
++    )
++
++
++def test_parse_line_without_bytes_defaults_to_zero():
++    record = parse_line("2026-10-01T12:00:02Z GET /api/users/7 404 3.1")
++    assert record is not None
++    assert record.status == 404
++    assert record.latency_ms == 3.1
++    assert record.bytes == 0
++
++
++def test_parse_line_integer_latency():
++    record = parse_line("2026-10-01T12:00:01Z POST /api/users 201 40 120")
++    assert record is not None
++    assert record.latency_ms == 40.0
++    assert isinstance(record.latency_ms, float)
++
++
++def test_timestamp_with_offset_is_converted_to_utc():
++    record = parse_line("2026-10-01T14:00:00+02:00 GET /health 200 0.4")
++    assert record is not None
++    assert record.ts == datetime(2026, 10, 1, 12, 0, 0, tzinfo=timezone.utc)
++    assert record.ts.utcoffset() == timedelta(0)
++
++
++@pytest.mark.parametrize(
++    "line",
++    [
++        "",
++        "   ",
++        "garbage line here",
++        "2026-10-01T12:00:00Z GET /api/users 200",
++        "2026-10-01T12:00:00Z GET /api/users 200 12.5 843 extra",
++        "not-a-date GET /api/users 200 12.5",
++        "2026-10-01T12:00:00 GET /api/users 200 12.5",  # no timezone
++        "2026-10-01T12:00:00Z GET /api/users abc 12.5",
++        "2026-10-01T12:00:00Z GET /api/users 99 12.5",
++        "2026-10-01T12:00:00Z GET /api/users 200 -1.0",
++        "2026-10-01T12:00:00Z GET /api/users 200 nan",
++        "2026-10-01T12:00:00Z GET /api/users 200 inf",
++        "2026-10-01T12:00:00Z GET /api/users 200 1e3",
++        "2026-10-01T12:00:00Z GET /api/users 200 12.5 -5",
++        "2026-10-01T12:00:00Z GET /api/users 200 12.5 1.5",
++    ],
++)
++def test_malformed_lines_return_none(line):
++    assert parse_line(line) is None
++
++
++def test_summarize_sample_log():
++    with SAMPLE.open() as f:
++        summary = summarize(f)
++
++    assert summary.total == 5
++    assert summary.malformed == 1
++    assert summary.by_status == {200: 2, 201: 1, 404: 1, 500: 1}
++    assert summary.by_method == {"GET": 4, "POST": 1}
++    assert summary.bytes_total == 843 + 120
++    assert summary.error_rate == pytest.approx(1 / 5)
++    # sorted latencies: 0.4, 3.1, 12.5, 40, 120.0
++    assert summary.p50_latency_ms == 12.5
++    assert summary.p95_latency_ms == 120.0
++    assert summary.top_paths == [("/api/users", 3), ("/api/users/7", 1), ("/health", 1)]
++
++
++def test_summarize_empty():
++    summary = summarize([])
++    assert summary.total == 0
++    assert summary.malformed == 0
++    assert summary.by_status == {}
++    assert summary.by_method == {}
++    assert summary.p50_latency_ms == 0.0
++    assert summary.p95_latency_ms == 0.0
++    assert summary.bytes_total == 0
++    assert summary.error_rate == 0.0
++    assert summary.top_paths == []
++
++
++def test_summarize_all_malformed():
++    summary = summarize(["junk", "more junk"])
++    assert summary.total == 0
++    assert summary.malformed == 2
++    assert summary.error_rate == 0.0
++    assert summary.p50_latency_ms == 0.0
++
++
++def test_percentiles_are_nearest_rank():
++    lines = [
++        f"2026-10-01T12:00:00Z GET /x 200 {ms} 0" for ms in range(1, 21)
++    ]
++    summary = summarize(lines)
++    # ceil(0.50 * 20) = 10th value, ceil(0.95 * 20) = 19th value
++    assert summary.p50_latency_ms == 10.0
++    assert summary.p95_latency_ms == 19.0
++
++
++def test_error_rate_counts_only_5xx():
++    lines = [
++        "2026-10-01T12:00:00Z GET /a 404 1",
++        "2026-10-01T12:00:00Z GET /a 500 1",
++        "2026-10-01T12:00:00Z GET /a 503 1",
++        "2026-10-01T12:00:00Z GET /a 200 1",
++    ]
++    assert summarize(lines).error_rate == 0.5
++
++
++def test_top_paths_limited_to_five_with_stable_tiebreak():
++    paths = ["/e", "/d", "/c", "/b", "/a", "/f", "/g"]
++    lines = [f"2026-10-01T12:00:00Z GET {p} 200 1" for p in paths]
++    summary = summarize(lines)
++    assert summary.top_paths == [("/a", 1), ("/b", 1), ("/c", 1), ("/d", 1), ("/e", 1)]
++
++
++def test_top_paths_orders_by_count_descending():
++    lines = [
++        "2026-10-01T12:00:00Z GET /z 200 1",
++        "2026-10-01T12:00:00Z GET /z 200 1",
++        "2026-10-01T12:00:00Z GET /a 200 1",
++    ]
++    assert summarize(lines).top_paths == [("/z", 2), ("/a", 1)]

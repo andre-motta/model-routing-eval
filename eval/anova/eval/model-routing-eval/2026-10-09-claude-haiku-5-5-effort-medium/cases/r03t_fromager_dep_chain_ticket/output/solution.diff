@@ -1,0 +1,74 @@
+diff --git a/src/fromager/bootstrap_requirement_resolver.py b/src/fromager/bootstrap_requirement_resolver.py
+index 1f12a8a..163d123 100644
+--- a/src/fromager/bootstrap_requirement_resolver.py
++++ b/src/fromager/bootstrap_requirement_resolver.py
+@@ -13,6 +13,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from . import finders, resolver, sources, wheels
+ from .dependency_graph import DependencyGraph
+@@ -141,7 +142,16 @@ class BootstrapRequirementResolver:
+             if rule_key not in self._resolved_rules:
+                 # Rule not seen before — resolve from graph or network and
+                 # extend the package-level known-versions cache.
+-                self._resolve_and_extend(req, req_type, pre_built, parent_req)
++                try:
++                    self._resolve_and_extend(req, req_type, pre_built, parent_req)
++                except ResolverException as err:
++                    # Name the parent so the error points at the broken arc,
++                    # not at the top-level package in the logging context.
++                    if parent_req is None:
++                        raise
++                    raise ResolverException(
++                        f"Unable to resolve {req} required by {parent_req}: {err}"
++                    ) from err
+                 self._resolved_rules.add(rule_key)
+             else:
+                 logger.debug(f"rule already resolved: {req}")
+diff --git a/tests/test_bootstrap_requirement_resolver.py b/tests/test_bootstrap_requirement_resolver.py
+index 4c9148c..e78cbc0 100644
+--- a/tests/test_bootstrap_requirement_resolver.py
++++ b/tests/test_bootstrap_requirement_resolver.py
+@@ -6,6 +6,7 @@ import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from fromager.bootstrap_requirement_resolver import BootstrapRequirementResolver
+ from fromager.context import WorkContext
+@@ -448,6 +449,31 @@ def test_resolve_rejects_git_urls_for_source(tmp_context: WorkContext) -> None:
+         )
+ 
+ 
++@patch("fromager.resolver.find_all_matching_from_provider")
++def test_resolve_error_names_parent_requirement(
++    mock_resolve: MagicMock,
++    tmp_context: WorkContext,
++) -> None:
++    """A failed dependency resolution reports the parent that required it (#1214)."""
++    # Arrange: the broken arc is vllm -> flashinfer-python
++    mock_resolve.side_effect = ResolverException("no matching candidates")
++    resolver = BootstrapRequirementResolver(tmp_context)
++
++    # Act / Assert
++    with pytest.raises(ResolverException) as exc_info:
++        resolver.resolve(
++            req=Requirement("flashinfer-python==0.6.8.post1"),
++            req_type=RequirementType.INSTALL,
++            pre_built=False,
++            parent_req=Requirement("vllm"),
++        )
++
++    message = str(exc_info.value)
++    assert "flashinfer-python==0.6.8.post1" in message
++    assert "required by vllm" in message
++    assert "no matching candidates" in message
++
++
+ @patch("fromager.resolver.find_all_matching_from_provider")
+ def test_resolve_allows_git_urls_for_prebuilt(
+     mock_resolve: MagicMock,

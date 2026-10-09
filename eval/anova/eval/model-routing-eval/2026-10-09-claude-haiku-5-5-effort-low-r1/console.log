@@ -1,0 +1,727 @@
+Executing: prompt (per-case, 24 cases)
+Agent: claude-code | Model: claude-haiku-5-5
+  [1/24] r01_fromager_distinfo: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Issue #1146: get_metadata_for_wheel() may return wrong metadata
+
+> `get_metadata_for_wheel` returns the first match for `name.endswith(".dist-info/METADATA")`.
+> This is a bad assumption. A wheel can contain multiple `.dist-info` directories. It's
+> common to include dist-info directories of vendored packages.
+>
+> `get_metadata_for_wheel` should only look at `dist-info` directories in the root of the
+> wheel. Or better: parse the URL, split the name, and use
+> `{dist_name}-{dist_version}.dist-info/METADATA`.
+
+Fix it. Requirements agreed in review:
+
+- Add a module `src/fromager/pkgmetadata/pep376.py` with two helpers, both exported from
+  `fromager.pkgmetadata`:
+  - `verbatim_dist_name(wheel_filename: str) -> str`: the distribution name exactly as
+    spelled in the wheel filename (`MarkupSafe`, not `markupsafe`). Validate the filename
+    with `packaging.utils.parse_wheel_filename` first so malformed names or non-wheel
+    extensions raise `packaging.utils.InvalidWheelFilename`.
+  - `dist_info_name(wheel_filename: str) -> str`: `{verbatim_name}-{version}.dist-info`,
+    version taken verbatim from the filename, same validation.
+- In `candidate.py` add `_wheel_metadata_path(url: str) -> str` that takes a wheel URL
+  (last path segment is the filename; ignore query string and fragment) and returns
+  `f"{dist_info_name(filename)}/METADATA"`. `get_metadata_for_wheel()` uses it to read
+  exactly that member from the zip. If the member is missing raise `ValueError`.
+- Reuse `verbatim_dist_name` wherever `wheels.py` or `dependencies.py` currently
+  re-implements the "first segment of the filename" logic.
+
+Keep existing tests passing; add tests for the helpers and the fallback path.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | I'll start by reading the relevant code and the contributing guide the project requires.
+  eval | Running: git status --short && ls src/fromager/pkgmetadata 2>/dev/nul
+  eval | Running: sed -n 1,200p CONTRIBUTING.md | head -150
+  eval | Running: sed -n 1,30p src/fromager/candidate.py; echo ----; sed -n 95
+  eval | Running: grep -rn "get_metadata_for_wheel\|parse_wheel_filename\|spli
+  eval | Reading: candidate.py
+  eval | Reading: test_pep658_support.py
+  eval | Reading: wheels.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" -q tests/test_pep65
+  eval | Write: pep376.py
+  eval | Running: cat > /dev/null <<'EOF'
+EOF
+git log --oneline -1 -- src/from
+  eval | The module is written. Next I'll export the helpers from the package, then update `candidate.py`.
+  eval | Edit: __init__.py
+  eval | Now `candidate.py`: the URL-to-member helper, and the fallback reads that exact member.
+  eval | Edit: candidate.py
+  eval | Edit: candidate.py
+  eval | Edit: candidate.py
+  eval | Edit: wheels.py
+  eval | Edit: wheels.py
+  eval | Edit: dependencies.py
+  eval | Reading: dependencies.py
+  eval | Edit: dependencies.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" -q tests/test_pep65
+  eval | Two existing PEP 658 tests now fail. I'll look at the actual error before changing anything.
+  eval | Running: .venv/bin/python -m pytest -o addopts="" -q tests/test_pep65
+  eval | Edit: test_pep658_support.py
+  eval | Edit: test_pep658_support.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" -q tests/test_pep65
+  eval | Write: test_pep376.py
+  eval | Write: test_candidate.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" -q tests/test_pep37
+  eval | Running: F="src/fromager/candidate.py src/fromager/dependencies.py sr
+  eval | Edit: test_candidate.py
+  eval | Edit: test_candidate.py
+  eval | Running: ruff format tests/test_candidate.py tests/test_pep376.py >/d
+  eval | Done (32 turns, $0.10)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r01_fromager_distinfo: OK | 103s | $0.10
+  [2/24] r01t_fromager_distinfo_ticket: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Fix the issue below. Add a regression test and run the relevant test file.
+
+Issue #1146: get_metadata_for_wheel() may return wrong metadata
+
+`get_metadata_for_wheel` returns the first match for `name.endswith(".dist-info/METADATA")`.
+This is a bad assumption. A wheel can contain multiple `.dist-info` directories. It's
+common to include dist-info directories of vendored packages.
+
+`get_metadata_for_wheel` should only look at `dist-info` directories in the root of the
+wheel. Or better: parse the URL, split the name, and use
+`{dist_name}-{dist_version}.dist-info/METADATA`.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: grep -rn "get_metadata_for_wheel" --include=*.py . | grep -v
+  eval | Reading: candidate.py
+  eval | Reading: test_pep658_support.py
+  eval | Edit: candidate.py
+  eval | Edit: candidate.py
+  eval | Edit: candidate.py
+  eval | Now the regression tests, appended to the existing PEP 658 test module.
+  eval | Edit: test_pep658_support.py
+  eval | Running: tail -c 200 tests/test_pep658_support.py | od -c | tail -3
+  eval | Edit: test_pep658_support.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_pep658_s
+  eval | All 11 tests pass. I'll run the file-scoped lint and type check that the project's guide asks for.
+  eval | Running: (.venv/bin/ruff format --check src/fromager/candidate.py tes
+  eval | Done (12 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r01t_fromager_distinfo_ticket: OK | 44s | $0.01
+  [3/24] r02_fromager_age_filter: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Bug report:
+
+> With `--max-release-age` in multi-version bootstrap mode, a package that is pinned in
+> the constraints file (for example `boto3==1.35.88`) to a version older than the age
+> window has every candidate removed by the age filter and resolution fails silently.
+> In single-version mode the fallback keeps all candidates anyway, but logs a misleading
+> "keeping all to avoid empty resolution" warning for a package the user explicitly
+> pinned.
+>
+> A constraint is explicit user intent. Packages that have a constraint in the provider's
+> constraints object should skip age filtering entirely in
+> `find_all_matching_from_provider()` (see `src/fromager/resolver.py`), and log at INFO
+> level on the `fromager.resolver` logger:
+> `"<name>: skipping age filter for constrained package (<N> candidate(s))"`.
+> Unconstrained packages keep the current behaviour.
+
+Fix it, update the docstring, add tests in `tests/test_cooldown.py` for both the
+constrained and the unconstrained case, and run that test file.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: grep -n "find_all_matching_from_provider" -A80 src/fromager/
+  eval | Running: cat tests/test_cooldown.py | head -150; wc -l tests/test_coo
+  eval | Running: sed -n 293,340p src/fromager/resolver.py; echo ----; grep -n
+  eval | Running: sed -n 695,870p tests/test_cooldown.py; echo ----; sed -n 11
+  eval | Edit: resolver.py
+  eval | Now the docstring.
+  eval | Edit: resolver.py
+  eval | Running: sed -n 49,60p src/fromager/constraints.py && grep -n "Constr
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_cooldown
+  eval | Running: (.venv/bin/ruff check src/fromager/resolver.py tests/test_co
+  eval | Done (10 turns, $0.02)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r02_fromager_age_filter: OK | 30s | $0.02
+  [4/24] r02t_fromager_age_filter_ticket: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Fix the issue below. Add a regression test and run the relevant test file.
+
+Bug: with `--max-release-age` in multi-version bootstrap mode, a package that is pinned in
+the constraints file (for example `boto3==1.35.88`) to a version older than the age window
+has every candidate removed by the age filter and resolution fails silently. In
+single-version mode the fallback keeps all candidates anyway, but logs a misleading
+"keeping all to avoid empty resolution" warning for a package the user explicitly pinned.
+A constraint is explicit user intent and should not be overridden by the age heuristic.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: grep -rn "avoid empty resolution\|max_release_age\|max-relea
+  eval | Reading: resolver.py
+  eval | Running: grep -rn "find_all_matching_from_provider\|fallback_on_empty
+  eval | Reading: bootstrap_requirement_resolver.py
+  eval | Running: grep -n "def get_constraint\|def constraints\|class Constrai
+  eval | Running: grep -n "self.constraints\|constraints:" src/fromager/resolv
+  eval | Running: grep -n "    def " src/fromager/constraints.py; echo ---; se
+  eval | Edit: resolver.py
+  eval | Calling `get_constraint` twice is clumsy, so I'll bind it to a local first.
+  eval | Edit: resolver.py
+  eval | Edit: test_cooldown.py
+  eval | Edit: test_cooldown.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_cooldown
+  eval | Edit: test_cooldown.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_cooldown
+  eval | Edit: resolver.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_cooldown
+  eval | Done (17 turns, $0.03)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r02t_fromager_age_filter_ticket: OK | 51s | $0.03
+  [5/24] r03_fromager_dep_chain: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Issue #1214: fromager might "lie" about the reason of a dependency resolution failure
+
+> Expected: fromager states the exact reason of the broken dependency chain.
+> Actual: with ENABLE_REPEATABLE_BUILD_MODE and a broken indirect dependency, the error is
+> logged under whatever top-level package is active in the logging context, e.g.
+> `ERROR its-hub: Unable to resolve requirement specifier flashinfer-python==0.6.8.post1 ...`
+> while the real chain is its-hub -> reward-hub -> vllm and vllm is the broken arc.
+> fromager should say the resolution is broken because of vllm, not its-hub.
+
+Fix it in the iterative bootstrapper (`src/fromager/bootstrapper/_bootstrapper.py`).
+Design agreed in review:
+
+- Add `Bootstrapper._dependency_chain_suffix(self, wi: WorkItem) -> str` returning
+  `" (dependency chain: a==1 -> b==2 -> <wi.req>)"` built from `wi.why_snapshot`
+  (each entry is `(_, req, version)`, rendered as `req.name==version`).
+- Add `Bootstrapper._enrich_resolution_error(self, item: Phase, err: Exception) -> Exception`.
+  For a `Resolve` phase item whose work item has a non-empty `why_snapshot`, return a
+  new exception of the same shape with the chain suffix appended to the message:
+  `resolvelib.resolvers.ResolverException` stays a `ResolverException`, `RuntimeError`
+  stays a `RuntimeError`, anything else becomes `RuntimeError("<TypeName>: <msg><suffix>")`.
+  For other phases or top-level requirements return `err` unchanged (same object).
+- `_handle_phase_error()` must raise the enriched exception without a `from` clause,
+  still inside the original handler, so the original is reachable via `__context__`
+  but `__cause__` stays unset (the top-level formatter follows `__cause__` and would
+  otherwise print the message twice). Enrichment must happen before the error is
+  recorded in test mode or multiple-versions mode, and before the normal-mode raise.
+
+Add tests to `tests/test_bootstrapper_iterative.py` and run that file.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && grep -n "_handle_phase_error\|why_snap
+  eval | Running: sed -n 36,44p src/fromager/bootstrapper/_bootstrapper.py && 
+  eval | Running: grep -n "resolvelib\|ResolverException" -r src/fromager | he
+  eval | Running: sed -n 40,135p tests/test_bootstrapper_iterative.py; echo --
+  eval | Edit: _bootstrapper.py
+  eval | Edit: _bootstrapper.py
+  eval | Edit: _bootstrapper.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: sed -n 146,152p tests/test_bootstrapper_iterative.py
+  eval | Running: sed -n 146,183p tests/test_bootstrapper_iterative.py | grep 
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_bootstra
+  eval | Running: git stash && .venv/bin/python -m pytest -o addopts="" tests/
+  eval | Running: (.venv/bin/ruff format --check src/fromager/bootstrapper/_bo
+  eval | Done (17 turns, $0.03)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r03_fromager_dep_chain: OK | 71s | $0.03
+  [6/24] r03t_fromager_dep_chain_ticket: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Fix the issue below. Add a regression test and run the relevant test file.
+
+Issue #1214: fromager might "lie" about the reason of a dependency resolution failure
+
+Expected: fromager states the exact reason of the broken dependency chain.
+Actual: with ENABLE_REPEATABLE_BUILD_MODE and a broken indirect dependency, the error is
+logged under whatever top-level package is active in the logging context, e.g.
+`ERROR its-hub: Unable to resolve requirement specifier flashinfer-python==0.6.8.post1 ...`
+while the real chain is its-hub -> reward-hub -> vllm and vllm is the broken arc.
+fromager should say the resolution is broken because of vllm, not its-hub.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short | head && grep -rn "Unable to resolve req
+  eval | Reading: resolver.py
+  eval | Running: grep -rn "ENABLE_REPEATABLE\|repeatable" src/ tests/ | head 
+  eval | Running: grep -rn -i "repeatable\|find_all_matching_from_provider\|fa
+  eval | Reading: bootstrap_requirement_resolver.py
+  eval | Running: grep -rn "req_ctxvar_context\|ctxvar\b\|def req_ctxvar\|ENV\
+  eval | Running: grep -rln "req_ctxvar" src/fromager/ ; grep -rn "def req_ctx
+  eval | Running: cat src/fromager/bootstrapper/_resolve.py; echo ----; sed -n
+  eval | Running: grep -rn "logger.error\|logger.exception\|def _format_why\|w
+  eval | Running: sed -n 50,95p src/fromager/bootstrapper/_work_item.py; echo 
+  eval | Running: grep -n "def \|class " src/fromager/bootstrapper/_work_item.
+  eval | Running: sed -n 1,60p src/fromager/bootstrapper/_phase.py | grep -v "
+  eval | Running: sed -n 1,30p tests/test_bootstrapper_iterative.py | grep -v 
+  eval | Reading: _resolve.py
+  eval | Edit: _resolve.py
+  eval | Edit: _resolve.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: grep -n "^import\|^from" tests/test_bootstrapper_iterative.p
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_bootstra
+  eval | Running: git stash -q && .venv/bin/python -m pytest -o addopts="" tes
+  eval | Running: (.venv/bin/ruff format src/fromager/bootstrapper/_resolve.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_bootstra
+  eval | Done (26 turns, $0.18)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r03t_fromager_dep_chain_ticket: OK | 77s | $0.18
+  [7/24] r04_fromager_age_fallback: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Implement the following change to the resolver's max-release-age handling
+(`src/fromager/resolver.py`, `find_all_matching_from_provider()`, and its callers in
+`src/fromager/bootstrap_requirement_resolver.py`).
+
+1. Replace the boolean `fallback_on_empty_age_filter` parameter of
+   `find_all_matching_from_provider()` with an `AgeFallback` enum (exported from
+   `fromager.resolver`) selecting what happens when age filtering removes every candidate:
+   - `AgeFallback.ALL`: keep every candidate (this is the single-version default and the
+     current behaviour, including its "keeping all to avoid empty resolution" warning)
+   - `AgeFallback.NEWEST`: keep only the single newest candidate (new)
+   - `AgeFallback.NONE`: return an empty list
+   Name the new keyword parameter `age_fallback`, default `AgeFallback.ALL`.
+   Log on the `fromager.resolver` logger when the fallback triggers, with these exact
+   messages (`%s`/`%d` formatting, `name` is `req.name`):
+   - ALL, warning: `"%s: all %d candidate(s) of %s are older than %d days, keeping all to avoid empty resolution"`
+   - NEWEST, info: `"%s: all %d candidate(s) of %s are older than %d days, falling back to newest version %s"`
+   - NONE, info: `"%s: all %d candidate(s) of %s are older than %d days"`
+   Multi-version bootstrap mode must use `AgeFallback.NEWEST`, so that when a dependency
+   has no release inside the age window (bar from two years ago depended on by a recent
+   foo) its newest version is built instead of failing, which avoids cascading failures
+   in the dependent package.
+
+2. Packages whose constraint pins an exact version (the provider's `constraints` object
+   returns a constraint for the requirement name and that constraint is a single `==`
+   specifier) skip age filtering entirely. A pin is explicit user intent and must not be
+   overridden by the age heuristic. Range constraints (`>=`, `<`, `!=`, ...) are still
+   age-filtered like unconstrained packages. Log at INFO on the
+   `fromager.resolver` logger: `"%s: skipping age filter for pinned constraint (%d candidate(s))"`.
+   Previously, in multi-version mode a constrained package pinned to a version older than
+   the window lost every candidate and resolution failed silently; in single-version mode
+   the fallback kept all candidates but logged the misleading warning.
+
+Update docstrings, add tests in `tests/test_cooldown.py` and
+`tests/test_bootstrap_requirement_resolver.py`, and run both files.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && grep -n "fallback_on_empty_age_filter\
+  eval | Reading: resolver.py
+  eval | Reading: bootstrap_requirement_resolver.py
+  eval | Running: grep -n "def get_constraint" -A12 src/fromager/constraints.p
+  eval | Running: sed -n 700,870p tests/test_cooldown.py; sed -n 60,110p src/f
+  eval | Edit: resolver.py
+  eval | Edit: resolver.py
+  eval | Next, the filtering body: add the pin bypass and the three fallback modes.
+  eval | Edit: resolver.py
+  eval | Now the bootstrap caller, which switches multi-version mode to `NEWEST`.
+  eval | Edit: bootstrap_requirement_resolver.py
+  eval | Running: sed -n 477,520p tests/test_bootstrap_requirement_resolver.py
+  eval | I have what I need. Updating the old test to the new enum, then adding the new cooldown tests.
+  eval | Edit: test_cooldown.py
+  eval | Running: sed -i 's/context\.Constraints()/Constraints()/g; s/^from fr
+  eval | Running: git status --short && git diff --stat && git diff tests/test
+  eval | Running: git show HEAD:tests/test_cooldown.py | grep -n "Constraints"
+  eval | Running: cat >> tests/test_bootstrap_requirement_resolver.py <<'EOF'
+
+  eval | Edit: test_bootstrap_requirement_resolver.py
+  eval | Running: .venv/bin/python -m ruff format src/fromager/resolver.py src
+  eval | Running: .venv/bin/python - <<'EOF'
+import re
+p = "tests/test_cooldow
+  eval | Running: F="src/fromager/resolver.py src/fromager/bootstrap_requireme
+  eval | Done (20 turns, $0.08)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r04_fromager_age_fallback: OK | 87s | $0.08
+  [8/24] r05_fromager_version_prebuilt: This is the fromager repository (Python wheel builder). A virtualenv with the project
+and test dependencies is already set up at `.venv`; run tests with
+`.venv/bin/python -m pytest -o addopts="" tests/...`.
+
+Package settings already support version-specific overrides of `pre_built` and
+`wheel_server_url` under `variants.<variant>.versions.<version>` (see
+`src/fromager/packagesettings/_pbi.py`, `is_pre_built()` and `get_wheel_server_url()`),
+but the START phase of the iterative bootstrapper (`src/fromager/bootstrapper/_start.py`)
+resolves the download URL before it knows the version, so a version that is pre-built
+while the variant default is source (or the other way round, or a version with a
+different wheel server) ends up with a URL of the wrong kind. Also, resolved versions can
+carry a local segment (`2.8.0+cpu`) which does not match the YAML key `2.8.0`.
+
+Make this work end to end:
+
+1. `_pbi.py`:
+   - `is_pre_built(version)` and `get_wheel_server_url(version)` strip the local version
+     segment before the version-specific lookup (use `Version(version.public)`), like
+     `get_changelog` and `get_patches` already do.
+   - `is_pre_built(version)` consults the `is_pre_built` override hook only when a version
+     is given (the version-specific path); with no version it returns the variant default
+     without calling the hook. It calls the hook through
+     `overrides.find_and_invoke(self.package, "is_pre_built", _default_is_pre_built,
+     version=version, variant=self.variant)` where the module-level
+     `_default_is_pre_built(*, version, variant)` returns `None` (defer to YAML). A
+     non-None hook result wins over YAML.
+   - The `pre_built` and `wheel_server_url` properties delegate to `is_pre_built()` and
+     `get_wheel_server_url()` with no version, so there is a single code path.
+   - `_models.py`: a bare `versions:` key in YAML (parsed as None) or an omitted key
+     yields an empty mapping.
+2. `wheels.get_wheel_server_urls(ctx, req, cache_wheel_server_url=..., version=None)`
+   accepts an optional `version` and uses the version-specific wheel server URL when given.
+3. `_start.py`: add a module-level function
+   `_re_resolve_url(ctx, req, req_type, resolved_version, pre_built, cache_wheel_server_url) -> str | None`.
+   For `pre_built=True` it builds the pinned requirement `name==version`, gets the wheel
+   server URLs for that version and calls `wheels.resolve_prebuilt_wheel(ctx=, req=,
+   wheel_server_urls=, req_type=)`, returning the URL as a string, or `None` if that
+   raises `ExceptionGroup`. For `pre_built=False` it uses `sources.get_source_provider`
+   with the package's sdist server and `resolver.find_all_matching_from_provider`,
+   returning the first match's URL or `None`.
+   In the START phase, after `wi.pbi_pre_built = pbi.is_pre_built(wi.resolved_version)`:
+   re-resolve when `wi.pbi_pre_built != pbi.pre_built`, or when the package is pre-built
+   and `pbi.get_wheel_server_url(wi.resolved_version) != pbi.wheel_server_url`. Log at
+   INFO before, use the new URL on success, log a WARNING and keep the original URL on
+   `None`. This must happen before the work item is added to the dependency graph (so the
+   graph stores the final URL) and before the has-been-seen check (so a second parent of
+   an already-seen package still gets its edge recorded).
+4. Docs: bump the related `versionadded` directives in `_pbi.py` to 0.95.0 and mention the
+   behaviour in `docs/concepts/package-settings.rst` and `docs/concepts/hooks-and-overrides.rst`.
+
+Add tests in `tests/test_packagesettings.py` and `tests/test_bootstrapper_iterative.py`
+and run both files.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | I'll start by reading the files the spec touches.
+  eval | Running: git status --short && ls src/fromager/packagesettings/ && ca
+  eval | Running: cat src/fromager/bootstrapper/_start.py && grep -n "def get_
+  eval | Running: grep -n "def find_and_invoke\|def find_override_method\|def 
+  eval | Running: sed -n 1,160p src/fromager/bootstrapper/_resolve.py; echo --
+  eval | Running: grep -rn "get_source_provider(\|find_all_matching_from_provi
+  eval | Reading: test_packagesettings.py
+  eval | Reading: test_bootstrapper_iterative.py
+  eval | Reading: test_bootstrapper_iterative.py
+  eval | Running: sed -n 1,200p CONTRIBUTING.md | grep -v "^$" | head -150; ec
+  eval | Reading: test_override_hook_names.py
+  eval | Running: grep -n "get_resolver_provider\|^[A-Za-z].*\n\|^\.\. _\|^[=~
+  eval | Running: grep -rn "is_pre_built\|OVERRIDE_HOOK_NAMES = " src docs | g
+  eval | Edit: _pbi.py
+  eval | Edit: _pbi.py
+  eval | Reading: _start.py
+  eval | Write: _start.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_packages
+  eval | Reading: test_packagesettings.py
+  eval | Edit: test_packagesettings.py
+  eval | Edit: test_packagesettings.py
+  eval | Edit: test_packagesettings.py
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | The new tests call `_re_resolve_url` directly, so the test module needs that import too.
+  eval | Edit: test_bootstrapper_iterative.py
+  eval | Running: .venv/bin/python -m pytest -o addopts="" tests/test_packages
+  eval | Running: for f in docs/concepts/package-settings.rst docs/concepts/ho
+  eval | Reading: package-settings.rst
+  eval | Edit: package-settings.rst
+  eval | Edit: package-settings.rst
+  eval | Edit: hooks-and-overrides.rst
+  eval | Docs are done. Now lint, format, and type checks on the changed files, using the venv's tools.
+  eval | Running: F="src/fromager/packagesettings/_pbi.py src/fromager/bootstr
+  eval | Ruff and mypy aren't in the venv. I'll check whether they're on the PATH.
+  eval | Running: F="src/fromager/packagesettings/_pbi.py src/fromager/bootstr
+  eval | Running: ruff format tests/test_bootstrapper_iterative.py 2>&1 | tail
+  eval | Running: timeout 300 hatch run mypy:check src/fromager/packagesetting
+  eval | Reading: _start.py
+  eval | Edit: _start.py
+  eval | Running: timeout 300 hatch run mypy:check src/fromager/packagesetting
+  eval | Running: ruff check src tests/test_packagesettings.py tests/test_boot
+  eval | Done (38 turns, $0.35)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → r05_fromager_version_prebuilt: OK | 219s | $0.35
+  [9/24] t01_rename_symbol: Rename the function `calc` in the `shop` package to `compute_total`. Update every
+call site, the tests, and the docs. Keep behaviour identical. Run the tests when done.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Reading: pricing.py
+  eval | Reading: cart.py
+  eval | Reading: __init__.py
+  eval | Reading: test_pricing.py
+  eval | Reading: README.md
+  eval | Edit: pricing.py
+  eval | Edit: cart.py
+  eval | Edit: cart.py
+  eval | Edit: __init__.py
+  eval | Edit: test_pricing.py
+  eval | Edit: README.md
+  eval | Running: grep -rn "calc" --exclude-dir=.git . ; python3 -m pytest -q 
+  eval | Done (14 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t01_rename_symbol: OK | 14s | $0.01
+  [10/24] t02_ini_to_toml: The app reads `config.ini` with configparser. Migrate it to `config.toml` read with
+the standard library `tomllib`. Keep the same sections and keys, keep numeric values
+numeric (ints and floats, not strings), keep booleans as booleans, and keep the
+public function `load_config(path)` returning the same nested dict shape it does
+today, but with proper types. Delete `config.ini` when done. Run the tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && git ls-files && echo ---- && cat confi
+  eval | Reading: config.py
+  eval | Reading: test_config.py
+  eval | Reading: __init__.py
+  eval | Reading: subagent_stop.py
+  eval | Reading: input.yaml
+  eval | Write: config.toml
+  eval | Write: config.py
+  eval | Running: git rm -q config.ini && ls && python3 -m pytest -q 2>&1 | ta
+  eval | Edit: test_config.py
+  eval | Running: python3 -m pytest -q 2>&1 | tail -3; git status --short
+  eval | Both tests pass. I'll remove the `__pycache__` directories my test run created, then report.
+  eval | Running: rm -rf app/__pycache__ tests/__pycache__ .pytest_cache && gi
+  eval | Done (13 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t02_ini_to_toml: OK | 21s | $0.01
+  [11/24] t03_add_type_hints: Add complete, accurate type hints to every function and method in `geo/shapes.py`
+(parameters and return types). Use modern syntax (`list[float]`, `X | None`). Do not
+change behaviour. The tests must still pass.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Reading: shapes.py
+  eval | Write: shapes.py
+  eval | Running: ls && (python -m pytest -q 2>&1 | tail -15)
+  eval | Running: (python -m mypy --strict geo/shapes.py 2>&1 | tail -5)
+  eval | Done (5 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t03_add_type_hints: OK | 12s | $0.01
+  [12/24] t04_lru_cache: Implement `cachelib/lru.py` according to the spec in `cachelib/SPEC.md`. The stub
+already exists with the public interface. Add tests of your own under `tests/`.
+Run the tests when done.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && ls -la && cat cachelib/SPEC.md && echo
+  eval | The spec is clear enough to implement directly. I'll write the implementation, then the tests.
+  eval | Write: lru.py
+  eval | Running: mkdir -p tests && ls tests && cat cachelib/__init__.py | hea
+  eval | Implementation is in place. Now the tests, using a fake clock so TTL behavior is deterministic.
+  eval | Write: test_lru.py
+  eval | Running: touch tests/__init__.py && python3 -m pytest -q tests 2>&1 |
+  eval | Done (6 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t04_lru_cache: OK | 22s | $0.01
+  [13/24] t05_cli_json_flag: `wc` is a small word-count CLI (`python -m wc FILE...`). Add a `--json` flag. With it,
+the tool prints one JSON object to stdout: `{"files": [{"path": ..., "lines": ..., "words":
+..., "chars": ...}, ...], "total": {"lines": ..., "words": ..., "chars": ...}}`. Without
+the flag, output must stay byte-for-byte identical to today. Missing files must still
+produce an error on stderr and exit code 1 in both modes, and in JSON mode a missing
+file must not appear in `files`. Run the tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Reading: test_cli.py
+  eval | Edit: cli.py
+  eval | Edit: cli.py
+  eval | Running: cat .claude/settings.json | head -30; echo ---; python -m py
+  eval | Edit: test_cli.py
+  eval | Running: python -m pytest -q 2>&1 | tail -15; echo "rc=$?"; python -m
+  eval | Done (8 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t05_cli_json_flag: OK | 19s | $0.01
+  [14/24] t06_log_parser: Implement `logstats/parse.py`: `parse_line(line) -> Record | None` and
+`summarize(lines) -> Summary` for the access log format documented in
+`logstats/FORMAT.md`. A sample log is in `sample.log`. Malformed lines are skipped
+and counted. Run the tests when done.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: ls -la && find . -path ./.git -prune -o -type f -print && ca
+  eval | Write: parse.py
+  eval | Write: test_parse.py
+  eval | Running: python3 -m unittest discover -s tests -t . -v 2>&1 | tail -3
+  eval | Running: python3 -m unittest tests.test_parse -v 2>&1 | tail -40
+  eval | Done (6 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t06_log_parser: OK | 23s | $0.01
+  [15/24] t07_mutable_default: Users report that creating a second `Warehouse` sometimes shows stock from the first one,
+and that `restock` on one warehouse changes another. `tests/test_inv.py` has a failing
+reproduction. Find the root cause, fix it properly (not by working around it in the
+test), and make sure nothing else regresses. Run the tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -name "*.py" -not -path "./.git
+  eval | Running: python3 -m pytest -q tests/test_inv.py 2>&1 | tail -15; grep
+  eval | Edit: warehouse.py
+  eval | Running: python3 -m pytest -q tests/ 2>&1 | tail -3 && python3 -I -c 
+  eval | Done (5 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t07_mutable_default: OK | 15s | $0.01
+  [16/24] t08_timezone_bug: `sched.next_run(now, hour, minute, tz)` should return the next wall-clock time at
+`hour:minute` in timezone `tz` that is strictly after `now`, as an aware datetime in that
+zone. Users in Europe/Berlin report it skips a day after 22:00 UTC, and that around the
+DST change in March it returns a time that is off by one hour. `tests/test_sched.py`
+reproduces the first bug. Find the root cause of both, fix the function, keep the
+signature. Run the tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -name "*.py" -not -path "./.git
+  eval | Running: cat sched/__init__.py && echo ---- && cat -n sched/core.py &
+  eval | Edit: core.py
+  eval | Running: python -m pytest -q tests/test_sched.py 2>&1 | tail -3 && py
+  eval | Running: python -c "
+from datetime import datetime, timezone
+from sch
+  eval | Done (6 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t08_timezone_bug: OK | 22s | $0.01
+  [17/24] t09_thread_safety: `metrics.Counter` loses increments when used from several threads, and `snapshot()`
+sometimes returns a dict that is mid-update. `tests/test_metrics.py` reproduces it
+(it is non-deterministic, run it a few times). Fix the root cause with proper
+synchronisation, keep the API, keep `snapshot()` returning a plain dict copy, and do
+not serialise unrelated counters behind one global lock if you can avoid it. Run the
+tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Reading: counter.py
+  eval | Reading: __init__.py
+  eval | Write: counter.py
+  eval | Running: for i in 1 2 3 4 5; do python3 -m pytest -q tests/test_metri
+  eval | Done (6 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t09_thread_safety: OK | 30s | $0.01
+  [18/24] t10_plugin_registry: `export/core.py` dispatches on format strings with if-chains in three places. Refactor
+it into a plugin architecture:
+
+- an `Exporter` base class (or protocol) with `name`, `extension`, `dump(records) -> bytes`
+- a registry with `register(exporter_cls)` usable as a decorator, `get(name)`, `names()`
+- the three existing formats (csv, json, xml) move into `export/formats/` as separate
+  modules, auto-discovered or imported by the package so they are registered on
+  `import export`
+- `export_records(records, fmt)` and `export_to_file(records, fmt, path)` keep their
+  signatures and behaviour
+- unknown format raises `export.UnknownFormat` with the list of known names in the message
+- adding a new format must require no change to `core.py`
+
+Keep the existing tests passing and run them.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Running: cat tests/test_export.py && cat input.yaml && cat .claude/se
+  eval | Running: python3 --version && python3 -m pytest --version; python3 -m
+  eval | Write: registry.py
+  eval | Write: csv_format.py
+  eval | Write: json_format.py
+  eval | Write: xml_format.py
+  eval | Write: __init__.py
+  eval | Write: core.py
+  eval | Write: __init__.py
+  eval | Write: test_registry.py
+  eval | Running: python3 -m pytest -q 2>&1 | tail -15
+  eval | Edit: test_registry.py
+  eval | Edit: test_registry.py
+  eval | Edit: test_registry.py
+  eval | Running: python3 -m pytest -q 2>&1 | tail -3 && python3 -m pytest -q 
+  eval | Running: rm -rf export/__pycache__ tests/__pycache__ .pytest_cache &&
+  eval | Done (18 turns, $0.02)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t10_plugin_registry: OK | 34s | $0.02
+  [19/24] t11_async_migration: Migrate the `fetcher` package from blocking I/O to asyncio while keeping behaviour:
+
+- `fetcher.Client` becomes an async client: `async get(url)`, `async get_many(urls)`,
+  `async with` support, and `close()` becomes `async close()`.
+- Transport is injected: `Client(transport)` where `transport` is an async callable
+  `async (url) -> bytes`. The default transport uses `asyncio.sleep` to simulate latency
+  as the sync one uses `time.sleep`.
+- `get_many` runs requests concurrently with a concurrency limit `max_concurrency`
+  (constructor arg, default 5). Results keep input order. Errors for individual URLs
+  are returned as `FetchError` instances in the result list, not raised.
+- Retries: same policy as today (up to `retries` attempts, exponential backoff using
+  `asyncio.sleep`), retry only on `TransientError`.
+- `aggregate.summarize(client, urls)` becomes `async` and keeps its return shape.
+- Keep a thin sync wrapper `fetcher.sync.fetch_all(urls, transport=None)` that runs the
+  async code with `asyncio.run` for callers that are not async.
+
+Port the existing tests to pytest-asyncio or plain `asyncio.run`, keep them passing, and
+run them.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Running: for f in fetcher/__init__.py fetcher/client.py fetcher/aggre
+  eval | Running: python3 --version && python3 -m pytest --version 2>&1 | tail
+  eval | Write: client.py
+  eval | Write: aggregate.py
+  eval | Write: sync.py
+  eval | Write: __init__.py
+  eval | Write: test_client.py
+  eval | Running: python3 -m pytest -q 2>&1 | tail -25
+  eval | Done (10 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t11_async_migration: OK | 24s | $0.01
+  [20/24] t12_needle_bug: Support ticket: "Invoice totals are sometimes off by one cent compared to the sum of the
+line items shown on the PDF. Happens maybe one invoice in twenty, only when there are
+discounts involved. No errors in logs."
+
+The `billing` package is in this repo. Find the root cause and fix it. Do not change the
+public API. Add a regression test under `tests/`. Run the full test suite.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Running: cat billing/totals.py billing/money.py billing/discounts.py 
+  eval | Running: cat billing/tax.py && echo ---- && cat tests/test_billing.py
+  eval | Edit: test_billing.py
+  eval | Running: python -m pytest -q 2>&1 | tail -15
+  eval | Edit: totals.py
+  eval | Running: python -m pytest -q 2>&1 | tail -4; git status --short; git 
+  eval | Done (8 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t12_needle_bug: OK | 19s | $0.01
+  [21/24] t13_unicode_dedupe: `contacts.dedupe(records)` is supposed to merge records that refer to the same person:
+same email (case-insensitive) or same name (ignoring case, accents and whitespace
+differences). Support reports duplicates still showing up for customers with accented
+names, names typed on a Mac vs. on Windows, and German names with "ß" vs "ss".
+`tests/test_dedupe.py` has one reproduction. Find all root causes, fix them in the
+library (not in the test), keep the first-seen record as the survivor, and run the
+tests.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Running: cat contacts/__init__.py && echo ---- && cat -A contacts/ded
+  eval | Reading: dedupe.py
+  eval | Write: dedupe.py
+  eval | Running: python3 -m pytest -q tests 2>&1 | tail -3 && python3 -I -c "
+  eval | Running: python3 -I -c "
+import sys; sys.path.insert(0, '.')
+from con
+  eval | Done (7 turns, $0.02)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t13_unicode_dedupe: OK | 29s | $0.02
+  [22/24] t14_dep_resolver: Implement `resolver/solve.py` according to `resolver/SPEC.md`: a package dependency
+resolver with version constraints, highest-version preference, backtracking, and cycle
+tolerance. The stub exists. Write your own tests under `tests/` and run them.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: find . -path ./.git -prune -o -type f -print && cat resolver
+  eval | Write: solve.py
+  eval | Write: test_solve.py
+  eval | Edit: test_solve.py
+  eval | Edit: test_solve.py
+  eval | Running: python3 -m unittest discover -s tests -v 2>&1 | tail -40
+  eval | Done (7 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t14_dep_resolver: OK | 49s | $0.01
+  [23/24] t15_perf_regression: Ops ticket: "The nightly usage report used to finish in under a minute. Since last
+week's refactor it runs for over an hour on the same data (about 30k rows) and the ops
+team kills it. Output looks correct when it does finish."
+
+The `reporting` package is in this repo. Find the root cause, fix it without changing
+the output or the public API, and add a regression test under `tests/` that would catch
+it. Run the full test suite.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | I'll start by looking at the reporting package and its tests.
+  eval | Running: git status --short && git log --oneline && find . -path ./.g
+  eval | Running: cat reporting/report.py reporting/aggregate.py reporting/ded
+  eval | Running: cat tests/test_report.py && cat input.yaml | head -40 && git
+  eval | Running: cat > /tmp/bench_dedupe.py <<'EOF'
+import sys, time
+sys.path
+  eval | Edit: dedupe.py
+  eval | Edit: test_report.py
+  eval | Running: git stash push -- reporting/dedupe.py >/dev/null && python3 
+  eval | Done (8 turns, $0.02)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t15_perf_regression: OK | 35s | $0.02
+  [24/24] t16_json_patch: Implement `jsonpatch/core.py` per `jsonpatch/SPEC.md`: JSON Pointer resolution and the
+six JSON Patch operations with atomic apply. The stub exists. Add your own tests under
+`tests/` and run them.
+  hook: Stage the task fixture or repo checkout and run its setup ... OK
+  eval | Running: git status --short && find . -path ./.git -prune -o -type f 
+  eval | Running: cat jsonpatch/__init__.py; echo ----; cat .claude/settings.j
+  eval | Write: core.py
+  eval | Write: test_core.py
+  eval | Running: python3 -m pytest -q tests/test_core.py -p no:cacheprovider 
+  eval | Done (6 turns, $0.01)
+  hook: Copy hidden tests in, run the verifier, write output/tests.json and solution.diff ... OK
+    → t16_json_patch: OK | 39s | $0.01
+EXIT: 0
+DURATION: 1122s wall-clock, 1088s total
+COST: $1.00 total
+CASES: 24 (24 OK, 0 FAIL)

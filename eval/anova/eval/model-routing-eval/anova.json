@@ -1,0 +1,299 @@
+{
+  "anova": {
+    "p_values": {
+      "effort": 0.704727307758285,
+      "model": 0.704727307758285,
+      "effort:model": 0.4214733664424313
+    },
+    "p_adjusted": {
+      "effort": 1.0,
+      "model": 1.0,
+      "effort:model": 1.0
+    },
+    "significant": {
+      "effort": false,
+      "model": false,
+      "effort:model": false
+    },
+    "correction": "holm",
+    "family_size": 3,
+    "coefficients": {
+      "Intercept": 0.953125,
+      "C(effort)[T.medium]": -0.010416666666666704,
+      "C(model)[T.claude-sonnet-5-5]": -0.010416666666666704,
+      "C(effort)[T.medium]:C(model)[T.claude-sonnet-5-5]": 0.03125000000000006
+    },
+    "all_p_values": {
+      "Intercept": 2.460261891069396e-274,
+      "C(effort)[T.medium]": 0.704727307758285,
+      "C(model)[T.claude-sonnet-5-5]": 0.704727307758285,
+      "C(effort)[T.medium]:C(model)[T.claude-sonnet-5-5]": 0.4214733664424314
+    },
+    "method": "Mixed-effects model (statsmodels mixedlm, per-term Wald tests)",
+    "alpha": 0.05,
+    "factors": [
+      "effort",
+      "model"
+    ],
+    "aic": null,
+    "bic": null
+  },
+  "contrasts": {
+    "effort": {
+      "correction": "holm",
+      "family": "pairwise level contrasts within factor 'effort'",
+      "family_size": 1,
+      "contrast_type": "reference-cell",
+      "omnibus_p_adjusted": 1.0,
+      "pairs": [
+        {
+          "a": "low",
+          "b": "medium",
+          "estimate": 0.010416666666666704,
+          "se": 0.027488461078379368,
+          "p_raw": 0.704727307758285,
+          "p_adjusted": 0.704727307758285,
+          "significant": false
+        }
+      ],
+      "note": "Estimates are reference-cell contrasts from the fitted model \u2014 level differences at the other factors' reference levels, NOT marginal means (the model includes interactions)."
+    },
+    "model": {
+      "correction": "holm",
+      "family": "pairwise level contrasts within factor 'model'",
+      "family_size": 1,
+      "contrast_type": "reference-cell",
+      "omnibus_p_adjusted": 1.0,
+      "pairs": [
+        {
+          "a": "claude-haiku-5-5",
+          "b": "claude-sonnet-5-5",
+          "estimate": 0.010416666666666704,
+          "se": 0.027488461078379368,
+          "p_raw": 0.704727307758285,
+          "p_adjusted": 0.704727307758285,
+          "significant": false
+        }
+      ],
+      "note": "Estimates are reference-cell contrasts from the fitted model \u2014 level differences at the other factors' reference levels, NOT marginal means (the model includes interactions)."
+    }
+  },
+  "condition_summaries": [
+    {
+      "condition_id": "5e2eab48db77",
+      "levels": {
+        "effort": "low",
+        "model": "claude-haiku-5-5"
+      },
+      "effort": "low",
+      "model": "claude-haiku-5-5",
+      "mean": 0.953125,
+      "std": 0.16834812272648578,
+      "min": 0.0,
+      "max": 1.0,
+      "n": 48,
+      "cost": 0.96
+    },
+    {
+      "condition_id": "806a54165ff8",
+      "levels": {
+        "effort": "low",
+        "model": "claude-sonnet-5-5"
+      },
+      "effort": "low",
+      "model": "claude-sonnet-5-5",
+      "mean": 0.9427083333333334,
+      "std": 0.17289450212556856,
+      "min": 0.0,
+      "max": 1.0,
+      "n": 48,
+      "cost": 5.615
+    },
+    {
+      "condition_id": "90740b19102e",
+      "levels": {
+        "effort": "medium",
+        "model": "claude-sonnet-5-5"
+      },
+      "effort": "medium",
+      "model": "claude-sonnet-5-5",
+      "mean": 0.9635416666666666,
+      "std": 0.10300773743574415,
+      "min": 0.5,
+      "max": 1.0,
+      "n": 48,
+      "cost": 5.925
+    },
+    {
+      "condition_id": "9f126a4b52a7",
+      "levels": {
+        "effort": "medium",
+        "model": "claude-haiku-5-5"
+      },
+      "effort": "medium",
+      "model": "claude-haiku-5-5",
+      "mean": 0.9427083333333334,
+      "std": 0.17289450212556856,
+      "min": 0.0,
+      "max": 1.0,
+      "n": 48,
+      "cost": 1.475
+    }
+  ],
+  "pareto_frontier": [
+    {
+      "condition_id": "5e2eab48db77",
+      "levels": {
+        "effort": "low",
+        "model": "claude-haiku-5-5"
+      },
+      "effort": "low",
+      "model": "claude-haiku-5-5",
+      "mean": 0.953125,
+      "std": 0.16834812272648578,
+      "min": 0.0,
+      "max": 1.0,
+      "n": 48,
+      "cost": 0.96
+    },
+    {
+      "condition_id": "90740b19102e",
+      "levels": {
+        "effort": "medium",
+        "model": "claude-sonnet-5-5"
+      },
+      "effort": "medium",
+      "model": "claude-sonnet-5-5",
+      "mean": 0.9635416666666666,
+      "std": 0.10300773743574415,
+      "min": 0.5,
+      "max": 1.0,
+      "n": 48,
+      "cost": 5.925
+    }
+  ],
+  "design": {
+    "factors": {
+      "effort": [
+        "low",
+        "medium"
+      ],
+      "model": [
+        "claude-haiku-5-5",
+        "claude-sonnet-5-5"
+      ]
+    },
+    "n_cases": 24,
+    "replications": 2
+  },
+  "per_case": {
+    "effort=low, model=claude-haiku-5-5": {
+      "r01_fromager_distinfo": 0.5,
+      "r01t_fromager_distinfo_ticket": 0.75,
+      "r02_fromager_age_filter": 1.0,
+      "r02t_fromager_age_filter_ticket": 1.0,
+      "r03_fromager_dep_chain": 1.0,
+      "r03t_fromager_dep_chain_ticket": 0.625,
+      "r04_fromager_age_fallback": 1.0,
+      "r05_fromager_version_prebuilt": 1.0,
+      "t01_rename_symbol": 1.0,
+      "t02_ini_to_toml": 1.0,
+      "t03_add_type_hints": 1.0,
+      "t04_lru_cache": 1.0,
+      "t05_cli_json_flag": 1.0,
+      "t06_log_parser": 1.0,
+      "t07_mutable_default": 1.0,
+      "t08_timezone_bug": 1.0,
+      "t09_thread_safety": 1.0,
+      "t10_plugin_registry": 1.0,
+      "t11_async_migration": 1.0,
+      "t12_needle_bug": 1.0,
+      "t13_unicode_dedupe": 1.0,
+      "t14_dep_resolver": 1.0,
+      "t15_perf_regression": 1.0,
+      "t16_json_patch": 1.0
+    },
+    "effort=low, model=claude-sonnet-5-5": {
+      "r01_fromager_distinfo": 1.0,
+      "r01t_fromager_distinfo_ticket": 0.75,
+      "r02_fromager_age_filter": 1.0,
+      "r02t_fromager_age_filter_ticket": 1.0,
+      "r03_fromager_dep_chain": 1.0,
+      "r03t_fromager_dep_chain_ticket": 0.625,
+      "r04_fromager_age_fallback": 1.0,
+      "r05_fromager_version_prebuilt": 0.75,
+      "t01_rename_symbol": 1.0,
+      "t02_ini_to_toml": 1.0,
+      "t03_add_type_hints": 1.0,
+      "t04_lru_cache": 1.0,
+      "t05_cli_json_flag": 1.0,
+      "t06_log_parser": 1.0,
+      "t07_mutable_default": 1.0,
+      "t08_timezone_bug": 1.0,
+      "t09_thread_safety": 1.0,
+      "t10_plugin_registry": 1.0,
+      "t11_async_migration": 1.0,
+      "t12_needle_bug": 1.0,
+      "t13_unicode_dedupe": 1.0,
+      "t14_dep_resolver": 1.0,
+      "t15_perf_regression": 1.0,
+      "t16_json_patch": 0.5
+    },
+    "effort=medium, model=claude-haiku-5-5": {
+      "r01_fromager_distinfo": 1.0,
+      "r01t_fromager_distinfo_ticket": 0.875,
+      "r02_fromager_age_filter": 1.0,
+      "r02t_fromager_age_filter_ticket": 0.75,
+      "r03_fromager_dep_chain": 1.0,
+      "r03t_fromager_dep_chain_ticket": 0.625,
+      "r04_fromager_age_fallback": 1.0,
+      "r05_fromager_version_prebuilt": 0.375,
+      "t01_rename_symbol": 1.0,
+      "t02_ini_to_toml": 1.0,
+      "t03_add_type_hints": 1.0,
+      "t04_lru_cache": 1.0,
+      "t05_cli_json_flag": 1.0,
+      "t06_log_parser": 1.0,
+      "t07_mutable_default": 1.0,
+      "t08_timezone_bug": 1.0,
+      "t09_thread_safety": 1.0,
+      "t10_plugin_registry": 1.0,
+      "t11_async_migration": 1.0,
+      "t12_needle_bug": 1.0,
+      "t13_unicode_dedupe": 1.0,
+      "t14_dep_resolver": 1.0,
+      "t15_perf_regression": 1.0,
+      "t16_json_patch": 1.0
+    },
+    "effort=medium, model=claude-sonnet-5-5": {
+      "r01_fromager_distinfo": 1.0,
+      "r01t_fromager_distinfo_ticket": 0.75,
+      "r02_fromager_age_filter": 1.0,
+      "r02t_fromager_age_filter_ticket": 1.0,
+      "r03_fromager_dep_chain": 1.0,
+      "r03t_fromager_dep_chain_ticket": 0.625,
+      "r04_fromager_age_fallback": 1.0,
+      "r05_fromager_version_prebuilt": 0.75,
+      "t01_rename_symbol": 1.0,
+      "t02_ini_to_toml": 1.0,
+      "t03_add_type_hints": 1.0,
+      "t04_lru_cache": 1.0,
+      "t05_cli_json_flag": 1.0,
+      "t06_log_parser": 1.0,
+      "t07_mutable_default": 1.0,
+      "t08_timezone_bug": 1.0,
+      "t09_thread_safety": 1.0,
+      "t10_plugin_registry": 1.0,
+      "t11_async_migration": 1.0,
+      "t12_needle_bug": 1.0,
+      "t13_unicode_dedupe": 1.0,
+      "t14_dep_resolver": 1.0,
+      "t15_perf_regression": 1.0,
+      "t16_json_patch": 1.0
+    }
+  },
+  "excluded_cases": [],
+  "n_runs": 8,
+  "n_conditions": 4,
+  "generated_at": "2026-10-09T18:08:26+00:00"
+}

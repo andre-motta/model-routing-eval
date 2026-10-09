@@ -1,0 +1,81 @@
+diff --git a/metrics/__pycache__/__init__.cpython-314.pyc b/metrics/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..448062e
+Binary files /dev/null and b/metrics/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/metrics/__pycache__/counter.cpython-314.pyc b/metrics/__pycache__/counter.cpython-314.pyc
+new file mode 100644
+index 0000000..c7d11dd
+Binary files /dev/null and b/metrics/__pycache__/counter.cpython-314.pyc differ
+diff --git a/metrics/counter.py b/metrics/counter.py
+index 72d5d3b..5088138 100644
+--- a/metrics/counter.py
++++ b/metrics/counter.py
+@@ -1,25 +1,56 @@
++import contextlib
++import threading
+ import time
+ 
+ 
+ class Counter:
+-    """Named counters. Intended to be shared across request-handler threads."""
++    """Named counters. Intended to be shared across request-handler threads.
++
++    Each name has its own lock, so updates to different counters do not
++    serialise each other. ``_guard`` protects the dicts themselves and is only
++    held for short, non-blocking sections. Lock order is always name lock
++    first, then ``_guard``, so the two can never deadlock.
++    """
+ 
+     def __init__(self):
++        self._guard = threading.Lock()
+         self._values = {}
++        self._locks = {}
++
++    def _lock_for(self, name):
++        with self._guard:
++            lock = self._locks.get(name)
++            if lock is None:
++                lock = self._locks[name] = threading.Lock()
++            return lock
+ 
+     def incr(self, name, by=1):
+-        current = self._values.get(name, 0)
+-        time.sleep(0)  # yield, simulates real work between read and write
+-        self._values[name] = current + by
++        with self._lock_for(name):
++            current = self._values.get(name, 0)
++            time.sleep(0)  # yield, simulates real work between read and write
++            with self._guard:
++                self._values[name] = current + by
+ 
+     def get(self, name):
+-        return self._values.get(name, 0)
++        with self._guard:
++            return self._values.get(name, 0)
+ 
+     def snapshot(self):
+-        return dict(self._values)
++        with self._guard:
++            return dict(self._values)
+ 
+     def reset(self, name=None):
+         if name is None:
+-            self._values.clear()
++            # Take every per-name lock in a fixed order so no in-flight incr
++            # can write a stale value back after the clear.
++            with self._guard:
++                names = sorted(self._locks)
++                locks = [self._locks[n] for n in names]
++            with contextlib.ExitStack() as stack:
++                for lock in locks:
++                    stack.enter_context(lock)
++                with self._guard:
++                    self._values.clear()
+         else:
+-            self._values.pop(name, None)
++            with self._lock_for(name), self._guard:
++                self._values.pop(name, None)
+diff --git a/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..aca2c19
+Binary files /dev/null and b/tests/__pycache__/test_metrics.cpython-314-pytest-9.1.1.pyc differ

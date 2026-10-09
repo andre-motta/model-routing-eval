@@ -1,0 +1,7 @@
+{
+  "condition_id": "5e2eab48db77",
+  "levels": {
+    "effort": "low",
+    "model": "claude-haiku-5-5"
+  }
+}

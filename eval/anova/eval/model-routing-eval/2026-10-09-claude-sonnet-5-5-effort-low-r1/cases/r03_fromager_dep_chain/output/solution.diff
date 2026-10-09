@@ -1,0 +1,170 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..02ed8a6 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -11,6 +11,7 @@ import shutil
+ import tempfile
+ import typing
+ 
++import resolvelib.resolvers
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
+@@ -1127,6 +1128,26 @@ class Bootstrapper:
+             unsatisfied.add(dep)
+         return unsatisfied
+ 
++    def _dependency_chain_suffix(self, wi: WorkItem) -> str:
++        """Return a message suffix describing the chain leading to ``wi``."""
++        chain = [f"{req.name}=={version}" for _, req, version in wi.why_snapshot]
++        chain.append(str(wi.req))
++        return f" (dependency chain: {' -> '.join(chain)})"
++
++    def _enrich_resolution_error(self, item: Phase, err: Exception) -> Exception:
++        """Append the dependency chain to resolution errors of indirect deps.
++
++        Returns ``err`` unchanged for other phases and top-level requirements.
++        """
++        if not isinstance(item, Resolve) or not item.work_item.why_snapshot:
++            return err
++        message = f"{err}{self._dependency_chain_suffix(item.work_item)}"
++        if isinstance(err, resolvelib.resolvers.ResolverException):
++            return resolvelib.resolvers.ResolverException(message)
++        if isinstance(err, RuntimeError):
++            return RuntimeError(message)
++        return RuntimeError(f"{type(err).__name__}: {message}")
++
+     def _handle_phase_error(
+         self,
+         item: Phase,
+@@ -1138,6 +1159,8 @@ class Bootstrapper:
+         or empty list to skip this item. Raises in normal mode (fail-fast).
+         """
+         wi = item.work_item
++        original = err
++        err = self._enrich_resolution_error(item, original)
+         # Resolution failures: recoverable in test mode and multiple versions mode
+         if isinstance(item, Resolve):
+             if self.test_mode:
+@@ -1158,7 +1181,11 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
+-            raise
++            if err is original:
++                raise
++            # No ``from``: keep __context__ but leave __cause__ unset so the
++            # top-level formatter does not print the message twice.
++            raise err
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+         if self.test_mode:
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 6761bcf..4e8a1f0 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -24,6 +24,7 @@ import typing
+ from unittest.mock import Mock, call, patch
+ 
+ import pytest
++import resolvelib.resolvers
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
+@@ -741,6 +742,96 @@ class TestHandlePhaseError:
+         assert key in bt._failed_versions
+         assert bt._failed_versions[key] is err
+ 
++    # -- Dependency chain enrichment --
++
++    @staticmethod
++    def _chain_item() -> Resolve:
++        return _make_resolve_item(
++            req="flashinfer-python==0.6.8",
++            why_snapshot=[
++                (RequirementType.TOP_LEVEL, Requirement("its-hub"), Version("1.0")),
++                (RequirementType.INSTALL, Requirement("vllm"), Version("0.9")),
++            ],
++        )
++
++    def test_chain_suffix(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = self._chain_item()
++
++        assert bt._dependency_chain_suffix(item.work_item) == (
++            " (dependency chain: its-hub==1.0 -> vllm==0.9 -> flashinfer-python==0.6.8)"
++        )
++
++    @pytest.mark.parametrize(
++        "err,expected_type,prefix",
++        [
++            (resolvelib.resolvers.ResolverException("bad"), resolvelib.resolvers.ResolverException, "bad"),
++            (RuntimeError("bad"), RuntimeError, "bad"),
++            (ValueError("bad"), RuntimeError, "ValueError: bad"),
++        ],
++    )
++    def test_enrich_resolution_error_types(
++        self,
++        tmp_context: WorkContext,
++        err: Exception,
++        expected_type: type[Exception],
++        prefix: str,
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = self._chain_item()
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert type(result) is expected_type
++        assert str(result) == prefix + bt._dependency_chain_suffix(item.work_item)
++
++    def test_enrich_unchanged_for_top_level(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        err = RuntimeError("bad")
++
++        assert bt._enrich_resolution_error(_make_resolve_item(), err) is err
++
++    def test_enrich_unchanged_for_other_phase(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_build_item(phase=BootstrapPhase.PREPARE_SOURCE)
++        item.work_item.why_snapshot = self._chain_item().work_item.why_snapshot
++        err = RuntimeError("bad")
++
++        assert bt._enrich_resolution_error(item, err) is err
++
++    def test_normal_mode_raises_enriched_without_cause(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        err = RuntimeError("bad")
++
++        with pytest.raises(RuntimeError, match="dependency chain: its-hub") as exc:
++            try:
++                raise err
++            except RuntimeError:
++                bt._handle_phase_error(self._chain_item(), err)
++
++        assert exc.value is not err
++        assert exc.value.__cause__ is None
++        assert exc.value.__context__ is err
++
++    def test_test_mode_records_enriched(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, test_mode=True)
++
++        assert bt._handle_phase_error(self._chain_item(), RuntimeError("bad")) == []
++
++        assert "dependency chain: its-hub" in str(bt.failed_packages[0]["exception_message"])
++
++    def test_multiple_versions_records_enriched(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, multiple_versions=True)
++
++        bt._handle_phase_error(self._chain_item(), RuntimeError("bad"))
++
++        recorded = next(iter(bt._failed_versions.values()))
++        assert "dependency chain: its-hub" in str(recorded)
++
+     # -- Build phase errors in test mode --
+ 
+     def test_build_phase_test_mode_fallback_success(

@@ -1,0 +1,203 @@
+diff --git a/src/fromager/bootstrapper/_bootstrapper.py b/src/fromager/bootstrapper/_bootstrapper.py
+index dfec81e..a844413 100644
+--- a/src/fromager/bootstrapper/_bootstrapper.py
++++ b/src/fromager/bootstrapper/_bootstrapper.py
+@@ -14,6 +14,7 @@ import typing
+ from packaging.requirements import Requirement
+ from packaging.utils import NormalizedName, canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from .. import (
+     bootstrap_requirement_resolver,
+@@ -1127,6 +1128,29 @@ class Bootstrapper:
+             unsatisfied.add(dep)
+         return unsatisfied
+ 
++    def _dependency_chain_suffix(self, wi: WorkItem) -> str:
++        """Render the dependency chain leading to *wi* for error messages."""
++        chain = " -> ".join(
++            f"{req.name}=={version}" for _, req, version in wi.why_snapshot
++        )
++        return f" (dependency chain: {chain} -> {wi.req})"
++
++    def _enrich_resolution_error(self, item: Phase, err: Exception) -> Exception:
++        """Append the dependency chain to a resolution error.
++
++        Only RESOLVE items with a non-empty ``why_snapshot`` are changed.
++        Returns *err* itself for every other case.
++        """
++        wi = item.work_item
++        if not isinstance(item, Resolve) or not wi.why_snapshot:
++            return err
++        suffix = self._dependency_chain_suffix(wi)
++        if isinstance(err, ResolverException):
++            return ResolverException(f"{err}{suffix}")
++        if isinstance(err, RuntimeError):
++            return RuntimeError(f"{err}{suffix}")
++        return RuntimeError(f"{type(err).__name__}: {err}{suffix}")
++
+     def _handle_phase_error(
+         self,
+         item: Phase,
+@@ -1140,6 +1164,8 @@ class Bootstrapper:
+         wi = item.work_item
+         # Resolution failures: recoverable in test mode and multiple versions mode
+         if isinstance(item, Resolve):
++            # Enrich before recording so failure reports show the chain too
++            err = self._enrich_resolution_error(item, err)
+             if self.test_mode:
+                 self.record_test_mode_failure(wi.req, None, err, "resolution")
+                 if self.multiple_versions:
+@@ -1158,7 +1184,8 @@ class Bootstrapper:
+                     f"failed during {type(item).phase} phase",
+                 )
+                 return []
+-            raise
++            # No ``from``: __context__ keeps the original, __cause__ stays unset
++            raise err
+ 
+         # Test mode: try prebuilt fallback for build-related phases
+         if self.test_mode:
+diff --git a/tests/test_bootstrapper_iterative.py b/tests/test_bootstrapper_iterative.py
+index 6761bcf..5969cb8 100644
+--- a/tests/test_bootstrapper_iterative.py
++++ b/tests/test_bootstrapper_iterative.py
+@@ -27,6 +27,7 @@ import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
++from resolvelib.resolvers import ResolverException
+ 
+ from fromager import bootstrapper, build_environment
+ from fromager.bootstrapper._build import Build
+@@ -2459,3 +2460,129 @@ class TestCreateUnresolvedWorkItemsReturnType:
+         assert isinstance(items[0], Resolve)
+         assert items[0].work_item.req == Requirement("dep-a")
+         assert items[0].work_item.req_type == RequirementType.INSTALL
++
++
++class TestDependencyChainErrors:
++    """Resolution errors name the dependency chain that led to them."""
++
++    _CHAIN = [
++        (RequirementType.INSTALL, Requirement("its-hub"), Version("2.0")),
++        (RequirementType.INSTALL, Requirement("reward-hub"), Version("1.0")),
++    ]
++    _SUFFIX = " (dependency chain: its-hub==2.0 -> reward-hub==1.0 -> vllm)"
++
++    def test_dependency_chain_suffix_renders_chain(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        wi = _make_work_item(req="vllm", why_snapshot=self._CHAIN)
++
++        suffix = bt._dependency_chain_suffix(wi)
++
++        assert suffix == self._SUFFIX
++
++    def test_enrich_returns_same_error_without_chain(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm")
++        err = RuntimeError("resolution failed")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert result is err
++
++    def test_enrich_returns_same_error_for_non_resolve_phase(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_build_item(phase=BootstrapPhase.BUILD)
++        item.work_item.why_snapshot = list(self._CHAIN)
++        err = RuntimeError("build failed")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert result is err
++
++    def test_enrich_keeps_resolver_exception_type(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = ResolverException("no candidates")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert type(result) is ResolverException
++        assert str(result) == f"no candidates{self._SUFFIX}"
++
++    def test_enrich_keeps_runtime_error_type(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = RuntimeError("no versions")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert type(result) is RuntimeError
++        assert str(result) == f"no versions{self._SUFFIX}"
++
++    def test_enrich_wraps_other_exception_types(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = ValueError("bad specifier")
++
++        result = bt._enrich_resolution_error(item, err)
++
++        assert type(result) is RuntimeError
++        assert str(result) == f"ValueError: bad specifier{self._SUFFIX}"
++
++    def test_normal_mode_raises_enriched_error_with_context(
++        self, tmp_context: WorkContext
++    ) -> None:
++        """Enriched error has no __cause__, so the formatter prints it once."""
++        bt = bootstrapper.Bootstrapper(tmp_context)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = ResolverException("no candidates")
++
++        with pytest.raises(ResolverException) as excinfo:
++            try:
++                raise err
++            except ResolverException:
++                bt._handle_phase_error(item, err)
++
++        assert str(excinfo.value) == f"no candidates{self._SUFFIX}"
++        assert excinfo.value.__context__ is err
++        assert excinfo.value.__cause__ is None
++
++    def test_multiple_versions_records_enriched_error(
++        self, tmp_context: WorkContext
++    ) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, multiple_versions=True)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = ResolverException("no candidates")
++
++        try:
++            raise err
++        except ResolverException:
++            result = bt._handle_phase_error(item, err)
++
++        assert result == []
++        recorded = bt._failed_versions[(canonicalize_name("vllm"), "unresolved")]
++        assert recorded is not err
++        assert str(recorded) == f"no candidates{self._SUFFIX}"
++
++    def test_test_mode_records_enriched_error(self, tmp_context: WorkContext) -> None:
++        bt = bootstrapper.Bootstrapper(tmp_context, test_mode=True)
++        item = _make_resolve_item(req="vllm", why_snapshot=list(self._CHAIN))
++        err = ResolverException("no candidates")
++
++        try:
++            raise err
++        except ResolverException:
++            result = bt._handle_phase_error(item, err)
++
++        assert result == []
++        assert len(bt.failed_packages) == 1
++        assert self._SUFFIX in str(bt.failed_packages[0])

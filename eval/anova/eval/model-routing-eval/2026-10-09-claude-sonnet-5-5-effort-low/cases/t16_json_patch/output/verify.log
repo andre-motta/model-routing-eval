@@ -1,0 +1,19 @@
+.....F
+=================================== FAILURES ===================================
+____________________________ test_test_op_semantics ____________________________
+
+    def test_test_op_semantics():
+        d = {"baz": "qux", "foo": ["a", 2, "c"], "n": 1, "t": True}
+        apply_patch(d, [{"op": "test", "path": "/baz", "value": "qux"}, {"op": "test", "path": "/foo/1", "value": 2}])
+        apply_patch(d, [{"op": "test", "path": "/n", "value": 1.0}])
+        with pytest.raises(PatchError):
+            apply_patch(d, [{"op": "test", "path": "/t", "value": 1}])
+>       with pytest.raises(PatchError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PatchError
+
+hidden/test_patch.py:69: Failed
+=========================== short test summary info ============================
+FAILED hidden/test_patch.py::test_test_op_semantics - Failed: DID NOT RAISE P...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 5 passed in 0.08s

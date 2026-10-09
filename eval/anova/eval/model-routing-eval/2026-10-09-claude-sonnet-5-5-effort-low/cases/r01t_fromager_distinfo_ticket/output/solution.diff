@@ -1,0 +1,119 @@
+diff --git a/src/fromager/candidate.py b/src/fromager/candidate.py
+index 36d5955..4283f3d 100644
+--- a/src/fromager/candidate.py
++++ b/src/fromager/candidate.py
+@@ -3,12 +3,18 @@ import datetime
+ import logging
+ import typing
+ from io import BytesIO
++from urllib.parse import urlparse
+ from zipfile import ZipFile
+ 
+ from packaging.metadata import Metadata
+ from packaging.requirements import Requirement
+-from packaging.utils import BuildTag, canonicalize_name
+-from packaging.version import Version
++from packaging.utils import (
++    BuildTag,
++    NormalizedName,
++    canonicalize_name,
++    parse_wheel_filename,
++)
++from packaging.version import InvalidVersion, Version
+ 
+ from .request_session import session
+ 
+@@ -103,6 +109,16 @@ class Candidate:
+         return str(spec) if spec is not None else None
+ 
+ 
++def _matches_dist_info(dirname: str, name: NormalizedName, version: Version) -> bool:
++    """Check if a ``{name}-{version}.dist-info`` directory is for name and version."""
++    stem = dirname.removesuffix(".dist-info")
++    dist_name, _, dist_version = stem.rpartition("-")
++    try:
++        return canonicalize_name(dist_name) == name and Version(dist_version) == version
++    except InvalidVersion:
++        return False
++
++
+ def get_metadata_for_wheel(
+     url: str, metadata_url: str | None = None, *, validate: bool = True
+ ) -> Metadata:
+@@ -141,12 +157,26 @@ def get_metadata_for_wheel(
+     logger.debug(f"Downloading full wheel to extract metadata: {url}")
+     data = session.get(url).content
+     with ZipFile(BytesIO(data)) as z:
+-        for n in z.namelist():
+-            if n.endswith(".dist-info/METADATA"):
+-                metadata_content = z.read(n)
+-                # Parse metadata directly using packaging.metadata.Metadata
+-                # (avoiding circular import with dependencies module)
+-                return Metadata.from_email(metadata_content, validate=validate)
++        # Only consider root-level dist-info directories. Wheels may bundle
++        # dist-info directories of vendored packages in subdirectories.
++        names = [
++            n
++            for n in z.namelist()
++            if n.endswith(".dist-info/METADATA") and n.count("/") == 1
++        ]
++        if len(names) > 1:
++            wheel_name, wheel_version, _, _ = parse_wheel_filename(
++                urlparse(url).path.rsplit("/", 1)[-1]
++            )
++            names = [
++                n
++                for n in names
++                if _matches_dist_info(n.split("/", 1)[0], wheel_name, wheel_version)
++            ]
++        if names:
++            # Parse metadata directly using packaging.metadata.Metadata
++            # (avoiding circular import with dependencies module)
++            return Metadata.from_email(z.read(names[0]), validate=validate)
+ 
+     # If we didn't find the metadata, raise an error
+     raise ValueError(f"Could not find METADATA file in wheel: {url}")
+diff --git a/tests/test_pep658_support.py b/tests/test_pep658_support.py
+index 3af992c..30c53ee 100644
+--- a/tests/test_pep658_support.py
++++ b/tests/test_pep658_support.py
+@@ -1,6 +1,8 @@
+ """Tests for PEP 658 metadata support."""
+ 
++import io
+ import typing
++import zipfile
+ from unittest.mock import Mock, patch
+ 
+ from packaging.version import Version
+@@ -191,3 +193,30 @@ Requires-Dist: requests >= 2.0.0
+         assert candidate_with_metadata.name == candidate_without_metadata.name
+         assert candidate_with_metadata.version == candidate_without_metadata.version
+         assert candidate_with_metadata.url == candidate_without_metadata.url
++
++
++@patch("fromager.candidate.session")
++def test_get_metadata_ignores_vendored_dist_info(mock_session: typing.Any) -> None:
++    """Metadata comes from the root dist-info, not a vendored package's."""
++    buf = io.BytesIO()
++    with zipfile.ZipFile(buf, "w") as z:
++        z.writestr(
++            "pkg/_vendor/other-2.0.dist-info/METADATA",
++            "Metadata-Version: 2.1\nName: other\nVersion: 2.0\n",
++        )
++        z.writestr(
++            "other-2.0.dist-info/METADATA",
++            "Metadata-Version: 2.1\nName: other\nVersion: 2.0\n",
++        )
++        z.writestr(
++            "test_package-1.0.0.dist-info/METADATA",
++            "Metadata-Version: 2.1\nName: test-package\nVersion: 1.0.0\n",
++        )
++    mock_session.get.return_value = Mock(content=buf.getvalue())
++
++    metadata = get_metadata_for_wheel(
++        "https://pkg.test/test_package-1.0.0-py3-none-any.whl"
++    )
++
++    assert metadata.name == "test-package"
++    assert str(metadata.version) == "1.0.0"

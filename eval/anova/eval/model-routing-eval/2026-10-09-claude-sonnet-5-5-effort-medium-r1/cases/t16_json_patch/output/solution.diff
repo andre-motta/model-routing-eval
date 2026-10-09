@@ -1,0 +1,407 @@
+diff --git a/jsonpatch/__pycache__/__init__.cpython-314.pyc b/jsonpatch/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..529a20e
+Binary files /dev/null and b/jsonpatch/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/jsonpatch/__pycache__/core.cpython-314.pyc b/jsonpatch/__pycache__/core.cpython-314.pyc
+new file mode 100644
+index 0000000..c9e25a4
+Binary files /dev/null and b/jsonpatch/__pycache__/core.cpython-314.pyc differ
+diff --git a/jsonpatch/core.py b/jsonpatch/core.py
+index 7e51a15..6d03a8e 100644
+--- a/jsonpatch/core.py
++++ b/jsonpatch/core.py
+@@ -1,3 +1,7 @@
++import copy
++import re
++
++
+ class PatchError(Exception):
+     pass
+ 
+@@ -6,9 +10,171 @@ class PointerError(PatchError):
+     pass
+ 
+ 
++_INDEX_RE = re.compile(r"(0|[1-9][0-9]*)\Z")
++_OPS = ("add", "remove", "replace", "move", "copy", "test")
++
++
++def _parse_pointer(pointer):
++    if not isinstance(pointer, str):
++        raise PointerError(f"pointer must be a string, got {type(pointer).__name__}")
++    if pointer == "":
++        return []
++    if not pointer.startswith("/"):
++        raise PointerError(f"pointer must be empty or start with '/': {pointer!r}")
++    return [t.replace("~1", "/").replace("~0", "~") for t in pointer[1:].split("/")]
++
++
++def _index(token, container_len, allow_end=False):
++    """Convert an array token to an int index, validating range."""
++    if allow_end and token == "-":
++        return container_len
++    if not _INDEX_RE.match(token):
++        raise PointerError(f"invalid array index: {token!r}")
++    idx = int(token)
++    limit = container_len if allow_end else container_len - 1
++    if idx > limit:
++        raise PointerError(f"array index out of range: {token!r}")
++    return idx
++
++
++def _step(node, token):
++    if isinstance(node, dict):
++        if token not in node:
++            raise PointerError(f"key not found: {token!r}")
++        return node[token]
++    if isinstance(node, list):
++        return node[_index(token, len(node))]
++    raise PointerError(f"cannot descend into {type(node).__name__} with {token!r}")
++
++
++def _walk(doc, tokens):
++    node = doc
++    for token in tokens:
++        node = _step(node, token)
++    return node
++
++
+ def resolve_pointer(doc, pointer):
+-    raise NotImplementedError
++    return _walk(doc, _parse_pointer(pointer))
++
++
++def _equal(a, b):
++    if isinstance(a, bool) or isinstance(b, bool):
++        return isinstance(a, bool) and isinstance(b, bool) and a == b
++    if isinstance(a, dict):
++        return (
++            isinstance(b, dict)
++            and a.keys() == b.keys()
++            and all(_equal(v, b[k]) for k, v in a.items())
++        )
++    if isinstance(a, list):
++        return (
++            isinstance(b, list)
++            and len(a) == len(b)
++            and all(_equal(x, y) for x, y in zip(a, b))
++        )
++    if isinstance(a, (int, float)):
++        return isinstance(b, (int, float)) and a == b
++    return type(a) is type(b) and a == b
++
++
++def _add(doc, tokens, value):
++    """Return the document with value added at tokens (may mutate doc)."""
++    if not tokens:
++        return value
++    parent = _walk(doc, tokens[:-1])
++    last = tokens[-1]
++    if isinstance(parent, dict):
++        parent[last] = value
++    elif isinstance(parent, list):
++        parent.insert(_index(last, len(parent), allow_end=True), value)
++    else:
++        raise PointerError(f"cannot add into {type(parent).__name__}")
++    return doc
++
++
++def _remove(doc, tokens):
++    """Remove the value at tokens, returning (doc, removed)."""
++    if not tokens:
++        raise PatchError("cannot remove the document root")
++    parent = _walk(doc, tokens[:-1])
++    last = tokens[-1]
++    if isinstance(parent, dict):
++        if last not in parent:
++            raise PointerError(f"key not found: {last!r}")
++        return doc, parent.pop(last)
++    if isinstance(parent, list):
++        return doc, parent.pop(_index(last, len(parent)))
++    raise PointerError(f"cannot remove from {type(parent).__name__}")
++
++
++def _replace(doc, tokens, value):
++    if not tokens:
++        return value
++    parent = _walk(doc, tokens[:-1])
++    last = tokens[-1]
++    if isinstance(parent, dict):
++        if last not in parent:
++            raise PointerError(f"key not found: {last!r}")
++        parent[last] = value
++    elif isinstance(parent, list):
++        parent[_index(last, len(parent))] = value
++    else:
++        raise PointerError(f"cannot replace in {type(parent).__name__}")
++    return doc
++
++
++def _require(op, field):
++    if field not in op:
++        raise PatchError(f"operation {op.get('op')!r} missing required field {field!r}")
++    return op[field]
++
++
++def _apply_op(doc, op):
++    if not isinstance(op, dict):
++        raise PatchError(f"operation must be an object, got {type(op).__name__}")
++    name = op.get("op")
++    if not isinstance(name, str) or name not in _OPS:
++        raise PatchError(f"unknown op: {name!r}")
++    path = _parse_pointer(_require(op, "path"))
++
++    if name == "add":
++        return _add(doc, path, copy.deepcopy(_require(op, "value")))
++    if name == "remove":
++        return _remove(doc, path)[0]
++    if name == "replace":
++        _walk(doc, path)
++        return _replace(doc, path, copy.deepcopy(_require(op, "value")))
++    if name == "test":
++        if not _equal(_walk(doc, path), _require(op, "value")):
++            raise PatchError(f"test failed at {op['path']!r}")
++        return doc
++
++    src = _parse_pointer(_require(op, "from"))
++    if name == "copy":
++        return _add(doc, path, copy.deepcopy(_walk(doc, src)))
++    # move
++    _walk(doc, src)
++    if len(src) < len(path) and path[: len(src)] == src:
++        raise PatchError("cannot move a value into one of its own children")
++    if src == path:
++        return doc
++    doc, value = _remove(doc, src)
++    return _add(doc, path, value)
+ 
+ 
+ def apply_patch(doc, patch, in_place=False):
+-    raise NotImplementedError
++    if not isinstance(patch, list):
++        raise PatchError("patch must be a list of operations")
++    work = copy.deepcopy(doc)
++    for op in patch:
++        work = _apply_op(work, op)
++    if in_place:
++        if isinstance(doc, dict) and isinstance(work, dict):
++            doc.clear()
++            doc.update(work)
++            return doc
++        if isinstance(doc, list) and isinstance(work, list):
++            doc[:] = work
++            return doc
++    return work
+diff --git a/tests/__pycache__/test_core.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_core.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..82a0b3a
+Binary files /dev/null and b/tests/__pycache__/test_core.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_core.py b/tests/test_core.py
+new file mode 100644
+index 0000000..2a8a858
+--- /dev/null
++++ b/tests/test_core.py
+@@ -0,0 +1,203 @@
++import copy
++
++import pytest
++
++from jsonpatch import PatchError, PointerError, apply_patch, resolve_pointer
++
++
++# --- pointers ---
++
++def test_pointer_basic():
++    doc = {"a": [10, {"b": 2}], "": 1, "a/b": 3, "m~n": 4}
++    assert resolve_pointer(doc, "") is doc
++    assert resolve_pointer(doc, "/a/0") == 10
++    assert resolve_pointer(doc, "/a/1/b") == 2
++    assert resolve_pointer(doc, "/") == 1
++    assert resolve_pointer(doc, "/a~1b") == 3
++    assert resolve_pointer(doc, "/m~0n") == 4
++
++
++def test_pointer_unescape_order():
++    assert resolve_pointer({"~1": 5}, "/~01") == 5
++
++
++@pytest.mark.parametrize("ptr", ["a", "/a/01", "/a/-", "/a/5", "/a/x", "/a/-1", "/zz", "/a/0/x"])
++def test_pointer_errors(ptr):
++    with pytest.raises(PointerError):
++        resolve_pointer({"a": [1]}, ptr)
++
++
++def test_pointer_non_string():
++    with pytest.raises(PointerError):
++        resolve_pointer({}, None)
++
++
++# --- operations ---
++
++def test_add_object_array_root():
++    assert apply_patch({}, [{"op": "add", "path": "/a", "value": 1}]) == {"a": 1}
++    assert apply_patch([1, 3], [{"op": "add", "path": "/1", "value": 2}]) == [1, 2, 3]
++    assert apply_patch([1], [{"op": "add", "path": "/1", "value": 2}]) == [1, 2]
++    assert apply_patch([1], [{"op": "add", "path": "/-", "value": 2}]) == [1, 2]
++    assert apply_patch({"a": 1}, [{"op": "add", "path": "", "value": [9]}]) == [9]
++
++
++def test_add_errors():
++    for doc, path in [([1], "/3"), ({}, "/a/b"), ([1], "/01"), ([1], "/x"), (5, "/a")]:
++        with pytest.raises(PatchError):
++            apply_patch(doc, [{"op": "add", "path": path, "value": 0}])
++
++
++def test_remove_replace():
++    assert apply_patch({"a": 1, "b": 2}, [{"op": "remove", "path": "/a"}]) == {"b": 2}
++    assert apply_patch([1, 2, 3], [{"op": "remove", "path": "/1"}]) == [1, 3]
++    assert apply_patch([1, 2], [{"op": "replace", "path": "/0", "value": 9}]) == [9, 2]
++    assert apply_patch({"a": 1}, [{"op": "replace", "path": "", "value": 3}]) == 3
++    for op in ("remove", "replace"):
++        for path in ("/nope", "/-"):
++            with pytest.raises(PatchError):
++                apply_patch({"a": 1}, [{"op": op, "path": path, "value": 1}])
++    with pytest.raises(PatchError):
++        apply_patch([1], [{"op": "remove", "path": "/-"}])
++    with pytest.raises(PatchError):
++        apply_patch([1], [{"op": "replace", "path": "/1", "value": 0}])
++
++
++def test_move():
++    assert apply_patch({"a": 1}, [{"op": "move", "from": "/a", "path": "/b"}]) == {"b": 1}
++    assert apply_patch([1, 2, 3], [{"op": "move", "from": "/0", "path": "/2"}]) == [2, 3, 1]
++    assert apply_patch({"a": 1}, [{"op": "move", "from": "/a", "path": "/a"}]) == {"a": 1}
++    # string prefix that is not a token prefix is fine
++    assert apply_patch({"a": 1}, [{"op": "move", "from": "/a", "path": "/ab"}]) == {"ab": 1}
++
++
++def test_move_into_child_and_missing():
++    with pytest.raises(PatchError):
++        apply_patch({"a": {"b": 1}}, [{"op": "move", "from": "/a", "path": "/a/c"}])
++    with pytest.raises(PatchError):
++        apply_patch({"a": 1}, [{"op": "move", "from": "/x", "path": "/b"}])
++
++
++def test_copy_is_deep():
++    out = apply_patch({"a": {"x": [1]}}, [{"op": "copy", "from": "/a", "path": "/b"}])
++    out["b"]["x"].append(2)
++    assert out["a"]["x"] == [1]
++    with pytest.raises(PatchError):
++        apply_patch({}, [{"op": "copy", "from": "/x", "path": "/y"}])
++
++
++def test_add_value_not_aliased():
++    value = {"k": [1]}
++    out = apply_patch({}, [{"op": "add", "path": "/a", "value": value}])
++    out["a"]["k"].append(2)
++    assert value == {"k": [1]}
++
++
++def test_test_op():
++    ok = [
++        ({"a": 1}, "/a", 1.0),
++        ({"a": [1, {"b": 2}]}, "/a", [1.0, {"b": 2}]),
++        ({"a": True}, "/a", True),
++        ({"a": None}, "/a", None),
++        ({"a": "x"}, "/a", "x"),
++    ]
++    for doc, path, val in ok:
++        assert apply_patch(doc, [{"op": "test", "path": path, "value": val}]) == doc
++    bad = [
++        ({"a": True}, "/a", 1),
++        ({"a": 1}, "/a", True),
++        ({"a": False}, "/a", 0),
++        ({"a": [True]}, "/a", [1]),
++        ({"a": {"x": 1}}, "/a", {"x": 1, "y": 2}),
++        ({"a": 1}, "/a", "1"),
++        ({"a": 1}, "/zz", 1),
++    ]
++    for doc, path, val in bad:
++        with pytest.raises(PatchError):
++            apply_patch(doc, [{"op": "test", "path": path, "value": val}])
++
++
++# --- validation ---
++
++@pytest.mark.parametrize("op", [
++    {"op": "bogus", "path": "/a"},
++    {"path": "/a"},
++    {"op": "add", "path": "/a"},
++    {"op": "add", "value": 1},
++    {"op": "replace", "path": "/a"},
++    {"op": "test", "path": "/a"},
++    {"op": "move", "path": "/a"},
++    {"op": "copy", "path": "/a"},
++    {"op": "add", "path": 5, "value": 1},
++    {"op": 5, "path": "/a"},
++    "notadict",
++])
++def test_invalid_ops(op):
++    with pytest.raises(PatchError):
++        apply_patch({"a": 1}, [op])
++
++
++def test_patch_not_list():
++    with pytest.raises(PatchError):
++        apply_patch({}, {"op": "add"})
++
++
++def test_test_value_none_allowed():
++    assert apply_patch({"a": None}, [{"op": "test", "path": "/a", "value": None}]) == {"a": None}
++
++
++# --- atomicity / mutation ---
++
++PATCH = [
++    {"op": "add", "path": "/b", "value": 2},
++    {"op": "remove", "path": "/a/0"},
++    {"op": "remove", "path": "/missing"},
++]
++
++
++@pytest.mark.parametrize("in_place", [False, True])
++def test_atomic_failure(in_place):
++    doc = {"a": [1, 2]}
++    orig = copy.deepcopy(doc)
++    with pytest.raises(PatchError):
++        apply_patch(doc, PATCH, in_place=in_place)
++    assert doc == orig
++
++
++def test_not_in_place_leaves_input():
++    doc = {"a": [1, 2]}
++    out = apply_patch(doc, PATCH[:2])
++    assert doc == {"a": [1, 2]}
++    assert out == {"a": [2], "b": 2}
++
++
++def test_in_place_mutates():
++    doc = {"a": [1, 2]}
++    out = apply_patch(doc, PATCH[:2], in_place=True)
++    assert doc == {"a": [2], "b": 2}
++    assert out is doc
++    lst = [1]
++    assert apply_patch(lst, [{"op": "add", "path": "/-", "value": 2}], in_place=True) is lst
++    assert lst == [1, 2]
++
++
++def test_in_place_root_replace():
++    doc = {"a": 1}
++    out = apply_patch(doc, [{"op": "replace", "path": "", "value": [1]}], in_place=True)
++    assert out == [1]
++
++
++def test_sequential_order():
++    out = apply_patch({}, [
++        {"op": "add", "path": "/a", "value": []},
++        {"op": "add", "path": "/a/-", "value": 1},
++        {"op": "add", "path": "/a/-", "value": 2},
++        {"op": "test", "path": "/a", "value": [1, 2]},
++    ])
++    assert out == {"a": [1, 2]}
++
++
++def test_empty_patch():
++    doc = {"a": 1}
++    out = apply_patch(doc, [])
++    assert out == doc and out is not doc

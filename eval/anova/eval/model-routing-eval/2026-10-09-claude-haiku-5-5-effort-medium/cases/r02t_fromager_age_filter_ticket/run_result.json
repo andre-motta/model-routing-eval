@@ -1,0 +1,49 @@
+{
+  "exit_code": 0,
+  "duration_s": 81.5,
+  "token_usage": {
+    "input": 38,
+    "output": 13285,
+    "cache_read": 1537484,
+    "cache_create": 119851
+  },
+  "cost_usd": 0.12071058000000001,
+  "num_turns": 19,
+  "per_model_usage": {
+    "claude-haiku-5-5": {
+      "input": 38,
+      "output": 13285,
+      "cache_read": 1537484,
+      "cache_create": 119851,
+      "cost_usd": 0.12071058000000001
+    }
+  },
+  "per_model_turns": {
+    "claude-haiku-5-5": 19
+  },
+  "permission_denials": [],
+  "message_ids": [
+    "msg_011CfrxVjJxZc9EPyz3UsbtV",
+    "msg_011CfrxVtRPQEN8yZ5GjXhTJ",
+    "msg_011CfrxVyt3pVLwgSBy2Zoa1",
+    "msg_011CfrxW9wnCac8VfQ2Y7gHP",
+    "msg_011CfrxWTt3ByXXvKXMvD494",
+    "msg_011CfrxWbujjcJPzSMe5C8gR",
+    "msg_011CfrxWqiwqVAMAta7yp1Rm",
+    "msg_011CfrxXaEoZFyhmwySDLenM",
+    "msg_011CfrxYmKqftUa5HSwbCDt4",
+    "msg_011CfrxYvj8Kdick7oYvRttQ",
+    "msg_011CfrxZPRjyWkmyW3xzg9S9",
+    "msg_011CfrxZuDsD8QJ8UDHx58re",
+    "msg_011Cfrxa8dXZPb9LoNk5aGfQ",
+    "msg_011CfrxaKQAp95MVeUNDHCof",
+    "msg_011CfrxaYbg7tvYRzEQjzLGP",
+    "msg_011CfrxajTH7W2jTaWRWJBpT",
+    "msg_011CfrxarNzZK6zh3DbbjvTb",
+    "msg_011Cfrxb6xqS3dQwcjmzH9vn",
+    "msg_011CfrxbHqShZjEVeQ15cvoV"
+  ],
+  "cost_source": "runner:reported",
+  "error_class": null,
+  "budget": null
+}

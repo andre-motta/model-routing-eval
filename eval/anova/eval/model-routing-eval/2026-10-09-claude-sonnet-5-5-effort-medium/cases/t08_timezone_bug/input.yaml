@@ -1,0 +1,14 @@
+task: t08_timezone_bug
+prompt: '`sched.next_run(now, hour, minute, tz)` should return the next wall-clock time at
+
+  `hour:minute` in timezone `tz` that is strictly after `now`, as an aware datetime in that
+
+  zone. Users in Europe/Berlin report it skips a day after 22:00 UTC, and that around the
+
+  DST change in March it returns a time that is off by one hour. `tests/test_sched.py`
+
+  reproduces the first bug. Find the root cause of both, fix the function, keep the
+
+  signature. Run the tests.
+
+  '

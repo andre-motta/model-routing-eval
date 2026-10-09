@@ -1,0 +1,364 @@
+diff --git a/resolver/__pycache__/__init__.cpython-314.pyc b/resolver/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..795e871
+Binary files /dev/null and b/resolver/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/resolver/__pycache__/solve.cpython-314.pyc b/resolver/__pycache__/solve.cpython-314.pyc
+new file mode 100644
+index 0000000..dd99998
+Binary files /dev/null and b/resolver/__pycache__/solve.cpython-314.pyc differ
+diff --git a/resolver/solve.py b/resolver/solve.py
+index 5bcec2a..9d4fde9 100644
+--- a/resolver/solve.py
++++ b/resolver/solve.py
+@@ -1,20 +1,164 @@
++import functools
++import re
++
++
+ class ResolutionError(Exception):
+     pass
+ 
+ 
++_VERSION_RE = re.compile(r"^\d+(\.\d+)*$")
++_NAME_RE = re.compile(r"^\s*([A-Za-z0-9_.\-]+)\s*(.*)$")
++_OP_RE = re.compile(r"^(==|!=|<=|>=|<|>)\s*(\S+)$")
++
++
++@functools.total_ordering
+ class Version:
+     def __init__(self, s):
+-        raise NotImplementedError
++        text = str(s).strip()
++        if not _VERSION_RE.match(text):
++            raise ValueError(f"invalid version: {s!r}")
++        self._text = text
++        parts = [int(p) for p in text.split(".")]
++        # Trailing zeros are insignificant ("1.0" == "1"), so strip them for equality and hashing.
++        while len(parts) > 1 and parts[-1] == 0:
++            parts.pop()
++        self._key = tuple(parts)
++
++    def _cmp(self, other):
++        a, b = self._key, other._key
++        n = max(len(a), len(b))
++        a = a + (0,) * (n - len(a))
++        b = b + (0,) * (n - len(b))
++        return (a > b) - (a < b)
++
++    def __eq__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._key == other._key
++
++    def __lt__(self, other):
++        if not isinstance(other, Version):
++            return NotImplemented
++        return self._cmp(other) < 0
++
++    def __hash__(self):
++        return hash(self._key)
++
++    def __str__(self):
++        return self._text
++
++    def __repr__(self):
++        return f"Version({self._text!r})"
+ 
+ 
+ class Constraint:
++    def __init__(self, name, clauses=()):
++        self.name = name
++        self.clauses = tuple(clauses)  # (op, Version) pairs
++
+     @classmethod
+     def parse(cls, requirement):
+-        raise NotImplementedError
++        m = _NAME_RE.match(requirement)
++        if not m or not m.group(1):
++            raise ValueError(f"invalid requirement: {requirement!r}")
++        name, rest = m.group(1), m.group(2).strip()
++        clauses = []
++        if rest:
++            for piece in rest.split(","):
++                om = _OP_RE.match(piece.strip())
++                if not om:
++                    raise ValueError(f"invalid constraint {piece.strip()!r} in {requirement!r}")
++                clauses.append((om.group(1), Version(om.group(2))))
++        return cls(name, clauses)
+ 
+     def allows(self, version):
+-        raise NotImplementedError
++        if not isinstance(version, Version):
++            version = Version(version)
++        for op, bound in self.clauses:
++            if op == "==":
++                ok = version == bound
++            elif op == "!=":
++                ok = version != bound
++            elif op == "<":
++                ok = version < bound
++            elif op == "<=":
++                ok = version <= bound
++            elif op == ">":
++                ok = version > bound
++            else:  # ">="
++                ok = version >= bound
++            if not ok:
++                return False
++        return True
++
++    def __repr__(self):
++        ops = ",".join(f"{op}{v}" for op, v in self.clauses)
++        return f"Constraint({self.name!r}{', ' + ops if ops else ''})"
+ 
+ 
+ def resolve(roots, index):
+-    raise NotImplementedError
++    # Parse every version once, newest first, so candidate lists come out in preference order.
++    versions = {
++        name: sorted((Version(v) for v in vs), reverse=True)
++        for name, vs in index.items()
++    }
++    requirements = {}  # (name, version_text) -> list of Constraint
++    failure = []  # first package whose constraints could not be met
++
++    def requirements_of(name, version):
++        key = (name, str(version))
++        if key not in requirements:
++            requirements[key] = [Constraint.parse(r) for r in index[name][str(version)]]
++        return requirements[key]
++
++    def candidates(name, cons):
++        return [
++            v for v in versions.get(name, [])
++            if all(c.allows(v) for c in cons)
++        ]
++
++    def search(assigned, cons):
++        pending = [n for n in cons if n not in assigned]
++        if not pending:
++            return assigned
++        name = min(pending)  # alphabetical order: lower names get preference first
++        options = candidates(name, cons[name])
++        if not options:
++            if not failure:
++                failure.append(name)
++            return None
++        for version in options:
++            new_cons = {n: list(c) for n, c in cons.items()}
++            ok = True
++            for req in requirements_of(name, version):
++                if req.name in assigned and not req.allows(assigned[req.name]):
++                    ok = False
++                    break
++                new_cons.setdefault(req.name, []).append(req)
++            if not ok:
++                continue
++            # Forward check: every still-unassigned package must keep at least one candidate.
++            dead = next(
++                (n for n in new_cons
++                 if n not in assigned and n != name and not candidates(n, new_cons[n])),
++                None,
++            )
++            if dead is not None:
++                if not failure:
++                    failure.append(dead)
++                continue
++            result = search({**assigned, name: version}, new_cons)
++            if result is not None:
++                return result
++        return None
++
++    root_cons = {}
++    for r in roots:
++        c = Constraint.parse(r)
++        root_cons.setdefault(c.name, []).append(c)
++
++    solution = search({}, root_cons)
++    if solution is None:
++        name = failure[0] if failure else (roots[0] if roots else "")
++        raise ResolutionError(f"could not satisfy constraints on package {name!r}")
++    return {n: str(v) for n, v in solution.items()}
+diff --git a/tests/test_solve.py b/tests/test_solve.py
+new file mode 100644
+index 0000000..f499fac
+--- /dev/null
++++ b/tests/test_solve.py
+@@ -0,0 +1,177 @@
++import os
++import sys
++import time
++import unittest
++
++sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++
++from resolver import Constraint, ResolutionError, Version, resolve  # noqa: E402
++
++
++SPEC_INDEX = {
++    "app": {"1.0": ["web>=2", "db"]},
++    "web": {"1.0": [], "2.0": ["json<3"], "2.1": ["json>=3"]},
++    "json": {"2.0": [], "3.0": []},
++    "db": {"1.0": ["json<3"]},
++}
++
++
++class VersionTests(unittest.TestCase):
++    def test_trailing_zeros_equal(self):
++        self.assertEqual(Version("1.0"), Version("1"))
++        self.assertEqual(hash(Version("1.0")), hash(Version("1")))
++
++    def test_numeric_comparison(self):
++        self.assertGreater(Version("1.10"), Version("1.9"))
++        self.assertLess(Version("2"), Version("2.0.1"))
++
++    def test_str_preserves_original(self):
++        self.assertEqual(str(Version("1.0")), "1.0")
++
++    def test_invalid(self):
++        with self.assertRaises(ValueError):
++            Version("1.x")
++
++
++class ConstraintTests(unittest.TestCase):
++    def test_parse_bare_name(self):
++        c = Constraint.parse("web")
++        self.assertEqual(c.name, "web")
++        self.assertTrue(c.allows(Version("0.1")))
++
++    def test_parse_range(self):
++        c = Constraint.parse("json>=2,<3")
++        self.assertEqual(c.name, "json")
++        self.assertTrue(c.allows(Version("2")))
++        self.assertTrue(c.allows(Version("2.9")))
++        self.assertFalse(c.allows(Version("3")))
++        self.assertFalse(c.allows(Version("1.9")))
++
++    def test_all_operators(self):
++        self.assertTrue(Constraint.parse("db==1.0").allows(Version("1")))
++        self.assertFalse(Constraint.parse("db==1.0").allows(Version("1.1")))
++        self.assertFalse(Constraint.parse("db!=1.0").allows(Version("1")))
++        self.assertTrue(Constraint.parse("db<=1.0").allows(Version("1")))
++        self.assertFalse(Constraint.parse("db>1.0").allows(Version("1")))
++
++    def test_invalid_requirement(self):
++        with self.assertRaises(ValueError):
++            Constraint.parse("json>=")
++        with self.assertRaises(ValueError):
++            Constraint.parse("json~2")
++
++
++class ResolveTests(unittest.TestCase):
++    def test_spec_example(self):
++        # app needs web>=2 (so 2.1 is preferred, which needs json>=3), and db (which needs json<3).
++        # json is the conflict, so web must drop to 2.0.
++        result = resolve(["app"], SPEC_INDEX)
++        self.assertEqual(result, {"app": "1.0", "db": "1.0", "web": "2.0", "json": "2.0"})
++
++    def test_highest_version_preferred(self):
++        index = {"a": {"1.0": [], "2.0": [], "3.0": []}}
++        self.assertEqual(resolve(["a"], index), {"a": "3.0"})
++
++    def test_alphabetical_preference(self):
++        # "a" is decided first, so it gets its highest version (2.0) even though that forces "b" to 3.0.
++        # With "a" at 1.0, "b" would be limited to <2 and the result would differ.
++        index = {
++            "a": {"1.0": ["b<2"], "2.0": ["b>=2"]},
++            "b": {"1.0": [], "2.0": [], "3.0": []},
++        }
++        result = resolve(["a", "b"], index)
++        self.assertEqual(result, {"a": "2.0", "b": "3.0"})
++
++    def test_backtracking(self):
++        # "leaf" sorts before "mid", so it is decided first and takes 2.0. Both picks are then valid.
++        index = {
++            "top": {"1.0": ["mid", "leaf"]},
++            "mid": {"2.0": ["leaf>=2"], "1.0": ["leaf<2"]},
++            "leaf": {"1.0": [], "2.0": []},
++        }
++        result = resolve(["top"], index)
++        self.assertEqual(result, {"top": "1.0", "mid": "2.0", "leaf": "2.0"})
++
++    def test_backtracking_forced(self):
++        # "leaf" must drop to 1.0 once "mid" forces it below 2, so "mid" must back off to 1.0.
++        index = {
++            "top": {"1.0": ["mid", "leaf"]},
++            "mid": {"2.0": ["leaf>=2"], "1.0": ["leaf<2"]},
++            "leaf": {"1.0": [], "2.0": []},
++        }
++        index["top"]["1.0"] = ["mid", "leaf<2"]
++        result = resolve(["top"], index)
++        self.assertEqual(result, {"top": "1.0", "mid": "1.0", "leaf": "1.0"})
++
++    def test_cycle_tolerated(self):
++        index = {
++            "a": {"1.0": ["b"]},
++            "b": {"1.0": ["a"]},
++        }
++        self.assertEqual(resolve(["a"], index), {"a": "1.0", "b": "1.0"})
++
++    def test_cycle_with_constraint(self):
++        index = {
++            "a": {"1.0": ["b>=2"], "2.0": ["b<2"]},
++            "b": {"1.0": ["a"], "2.0": ["a"]},
++        }
++        # a 2.0 needs b<2, so b drops to 1.0 even though b 2.0 would be preferred otherwise.
++        result = resolve(["a"], index)
++        self.assertEqual(result, {"a": "2.0", "b": "1.0"})
++
++    def test_unreachable_packages_excluded(self):
++        index = {
++            "a": {"1.0": []},
++            "unused": {"1.0": ["a"]},
++        }
++        self.assertEqual(resolve(["a"], index), {"a": "1.0"})
++
++    def test_root_with_constraint(self):
++        index = {"a": {"1.0": [], "2.0": [], "3.0": []}}
++        self.assertEqual(resolve(["a<3"], index), {"a": "2.0"})
++
++    def test_unsatisfiable_names_leaf(self):
++        index = {
++            "a": {"1.0": ["b<1"]},
++            "b": {"1.0": [], "2.0": []},
++        }
++        with self.assertRaises(ResolutionError) as ctx:
++            resolve(["a"], index)
++        self.assertIn("'b'", str(ctx.exception))
++
++    def test_unsatisfiable_root_names_root(self):
++        index = {"a": {"1.0": []}}
++        with self.assertRaises(ResolutionError) as ctx:
++            resolve(["a>=2"], index)
++        self.assertIn("'a'", str(ctx.exception))
++
++    def test_missing_package(self):
++        with self.assertRaises(ResolutionError) as ctx:
++            resolve(["ghost"], {})
++        self.assertIn("'ghost'", str(ctx.exception))
++
++    def test_large_index_is_fast(self):
++        # Many versions per package with a conflict that only resolves at the bottom of the chain.
++        n_layers, n_versions = 6, 200
++        index = {}
++        for layer in range(n_layers):
++            name = f"p{layer}"
++            versions = {}
++            for v in range(1, n_versions + 1):
++                reqs = []
++                if layer + 1 < n_layers:
++                    reqs.append(f"p{layer + 1}")
++                versions[f"{v}.0"] = reqs
++            index[name] = versions
++        index["p%d" % (n_layers - 1)] = {f"{v}.0": [] for v in range(1, n_versions + 1)}
++        index["p0"]["1.0"] = []
++        index["pz"] = {"1.0": ["p0<2"], "2.0": ["p0<2"]}
++        index["root"] = {"1.0": ["pz", "p%d>=%d" % (n_layers - 1, n_versions)]}
++        start = time.time()
++        result = resolve(["root"], index)
++        self.assertLess(time.time() - start, 10)
++        self.assertEqual(result["p%d" % (n_layers - 1)], f"{n_versions}.0")
++
++
++if __name__ == "__main__":
++    unittest.main()

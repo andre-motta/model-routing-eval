@@ -1,0 +1,81 @@
+ns empty."""
+        req = Requirement("testpkg==1.0")
+        with (
+            patch(
+                "fromager.bootstrapper._start.sources.get_source_provider",
+            ) as mock_provider,
+            patch(
+                "fromager.bootstrapper._start.resolver.find_all_matching_from_provider",
+                return_value=[],
+            ),
+        ):
+            mock_provider.return_value = Mock()
+>           result = _re_resolve_url(
+                tmp_context,
+                req,
+                RequirementType.INSTALL,
+                Version("1.0"),
+                pre_built=False,
+                cache_wheel_server_url=None,
+            )
+
+tests/test_bootstrapper_iterative.py:805: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+ctx = <fromager.context.WorkContext object at 0x7f19caed56d0>
+req = <Requirement('testpkg==1.0')>
+req_type = <RequirementType.INSTALL: 'install'>
+resolved_version = <Version('1.0')>, pre_built = False
+cache_wheel_server_url = None
+
+    def _re_resolve_url(
+        ctx: context.WorkContext,
+        req: Requirement,
+        req_type: RequirementType,
+        resolved_version: Version,
+        pre_built: bool,
+        cache_wheel_server_url: str | None,
+    ) -> str | None:
+        """Find the download URL of *resolved_version* as a pre-built wheel or sdist.
+    
+        Used when the version-specific ``pre_built`` setting differs from the one
+        the URL was resolved with. Returns ``None`` if no matching file is found.
+        """
+        pinned = Requirement(f"{req.name}=={Version(resolved_version.public)}")
+        if pre_built:
+            wheel_server_urls = wheels.get_wheel_server_urls(
+                ctx,
+                req,
+                cache_wheel_server_url=cache_wheel_server_url,
+                version=resolved_version,
+            )
+            try:
+                url, _ = wheels.resolve_prebuilt_wheel(
+                    ctx=ctx,
+                    req=pinned,
+                    wheel_server_urls=wheel_server_urls,
+                    req_type=req_type,
+                )
+            except ExceptionGroup:
+                return None
+            return url
+    
+        provider = sources.get_source_provider(
+            ctx=ctx,
+            req=pinned,
+            sdist_server_url=resolver.PYPI_SERVER_URL,
+            req_type=req_type,
+        )
+        try:
+            results = resolver.find_all_matching_from_provider(provider, pinned)
+        except ResolverException:
+            return None
+>       url, _ = results[0]
+                 ^^^^^^^^^^
+E       IndexError: list index out of range
+
+src/fromager/bootstrapper/_start.py:65: IndexError
+=========================== short test summary info ============================
+FAILED tests/test_bootstrapper_iterative.py::TestReResolveUrl::test_source_returns_none_when_no_match
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 138 passed, 1 deselected in 1.05s

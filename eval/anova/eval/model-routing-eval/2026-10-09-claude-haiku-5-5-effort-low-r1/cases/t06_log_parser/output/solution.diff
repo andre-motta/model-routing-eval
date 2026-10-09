@@ -1,0 +1,223 @@
+diff --git a/logstats/__pycache__/__init__.cpython-314.pyc b/logstats/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..7bbf3df
+Binary files /dev/null and b/logstats/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/logstats/__pycache__/parse.cpython-314.pyc b/logstats/__pycache__/parse.cpython-314.pyc
+new file mode 100644
+index 0000000..0e58f37
+Binary files /dev/null and b/logstats/__pycache__/parse.cpython-314.pyc differ
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..f3f54af 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,93 @@
+-"""Implement parse_line and summarize here. See FORMAT.md."""
++"""Parser and summary for the access log format described in FORMAT.md."""
++
++import math
++import re
++from collections import Counter
++from dataclasses import dataclass, field
++from datetime import datetime, timezone
++
++LINE_RE = re.compile(
++    r"(?P<ts>\S+) (?P<method>[A-Z]+) (?P<path>\S+) (?P<status>\d+) "
++    r"(?P<latency>\d+(?:\.\d+)?)(?: (?P<bytes>\d+))?"
++)
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int = 0
++    malformed: int = 0
++    by_status: dict[int, int] = field(default_factory=dict)
++    by_method: dict[str, int] = field(default_factory=dict)
++    p50_latency_ms: float = 0.0
++    p95_latency_ms: float = 0.0
++    bytes_total: int = 0
++    error_rate: float = 0.0
++    top_paths: list[tuple[str, int]] = field(default_factory=list)
++
++
++def parse_line(line: str) -> Record | None:
++    """Return a Record for a well-formed line, or None if the line is malformed."""
++    match = LINE_RE.fullmatch(line.rstrip("\r\n"))
++    if match is None:
++        return None
++    try:
++        ts = datetime.fromisoformat(match["ts"])
++    except ValueError:
++        return None
++    if ts.tzinfo is None:
++        return None
++    return Record(
++        ts=ts.astimezone(timezone.utc),
++        method=match["method"],
++        path=match["path"],
++        status=int(match["status"]),
++        latency_ms=float(match["latency"]),
++        bytes=int(match["bytes"] or 0),
++    )
++
++
++def _nearest_rank(sorted_values: list[float], pct: float) -> float:
++    if not sorted_values:
++        return 0.0
++    rank = math.ceil(pct / 100 * len(sorted_values))
++    return sorted_values[max(rank, 1) - 1]
++
++
++def summarize(lines) -> Summary:
++    """Parse an iterable of log lines into a Summary, counting malformed lines."""
++    records: list[Record] = []
++    malformed = 0
++    for line in lines:
++        record = parse_line(line)
++        if record is None:
++            malformed += 1
++        else:
++            records.append(record)
++
++    latencies = sorted(r.latency_ms for r in records)
++    by_status = Counter(r.status for r in records)
++    by_method = Counter(r.method for r in records)
++    paths = Counter(r.path for r in records)
++    server_errors = sum(1 for r in records if r.status >= 500)
++
++    return Summary(
++        total=len(records),
++        malformed=malformed,
++        by_status=dict(by_status),
++        by_method=dict(by_method),
++        p50_latency_ms=_nearest_rank(latencies, 50),
++        p95_latency_ms=_nearest_rank(latencies, 95),
++        bytes_total=sum(r.bytes for r in records),
++        error_rate=server_errors / len(records) if records else 0.0,
++        top_paths=sorted(paths.items(), key=lambda kv: (-kv[1], kv[0]))[:5],
++    )
+diff --git a/tests/__pycache__/test_parse.cpython-314.pyc b/tests/__pycache__/test_parse.cpython-314.pyc
+new file mode 100644
+index 0000000..6791c58
+Binary files /dev/null and b/tests/__pycache__/test_parse.cpython-314.pyc differ
+diff --git a/tests/test_parse.py b/tests/test_parse.py
+new file mode 100644
+index 0000000..0d2bbf4
+--- /dev/null
++++ b/tests/test_parse.py
+@@ -0,0 +1,106 @@
++import unittest
++from datetime import datetime, timedelta, timezone
++from pathlib import Path
++
++from logstats.parse import parse_line, summarize
++
++SAMPLE = Path(__file__).resolve().parent.parent / "sample.log"
++
++
++class ParseLineTests(unittest.TestCase):
++    def test_full_line(self):
++        r = parse_line("2026-10-01T12:00:00Z GET /api/users 200 12.5 843")
++        self.assertEqual(r.ts, datetime(2026, 10, 1, 12, 0, 0, tzinfo=timezone.utc))
++        self.assertEqual(r.method, "GET")
++        self.assertEqual(r.path, "/api/users")
++        self.assertEqual(r.status, 200)
++        self.assertEqual(r.latency_ms, 12.5)
++        self.assertEqual(r.bytes, 843)
++
++    def test_missing_bytes_defaults_to_zero(self):
++        r = parse_line("2026-10-01T12:00:02Z GET /api/users/7 404 3.1")
++        self.assertEqual(r.bytes, 0)
++        self.assertEqual(r.status, 404)
++
++    def test_integer_latency(self):
++        r = parse_line("2026-10-01T12:00:01Z POST /api/users 201 40 120")
++        self.assertEqual(r.latency_ms, 40.0)
++
++    def test_offset_timestamp_converted_to_utc(self):
++        r = parse_line("2026-10-01T14:00:00+02:00 GET / 200 1 0")
++        self.assertEqual(r.ts.utcoffset(), timedelta(0))
++        self.assertEqual(r.ts.hour, 12)
++
++    def test_malformed_lines(self):
++        bad = [
++            "",
++            "garbage line here",
++            "2026-10-01T12:00:00Z GET /x 200",  # missing latency
++            "2026-10-01T12:00:00Z GET /x abc 1.0",  # non-int status
++            "2026-10-01T12:00:00Z GET /x 200 fast",  # non-float latency
++            "2026-10-01T12:00:00Z GET /x 200 1.0 12 extra",  # trailing junk
++            "2026-10-01T12:00:00 GET /x 200 1.0",  # no timezone
++            "not-a-date GET /x 200 1.0",  # bad timestamp
++        ]
++        for line in bad:
++            with self.subTest(line=line):
++                self.assertIsNone(parse_line(line))
++
++
++class SummarizeTests(unittest.TestCase):
++    def test_sample_log(self):
++        with SAMPLE.open() as fh:
++            s = summarize(fh)
++        self.assertEqual(s.total, 5)
++        self.assertEqual(s.malformed, 1)
++        self.assertEqual(s.by_status, {200: 2, 201: 1, 404: 1, 500: 1})
++        self.assertEqual(s.by_method, {"GET": 4, "POST": 1})
++        self.assertEqual(s.bytes_total, 963)
++        self.assertAlmostEqual(s.error_rate, 0.2)
++        # sorted latencies: 0.4, 3.1, 12.5, 40, 120.0
++        self.assertEqual(s.p50_latency_ms, 12.5)
++        self.assertEqual(s.p95_latency_ms, 120.0)
++        self.assertEqual(
++            s.top_paths,
++            [("/api/users", 3), ("/api/users/7", 1), ("/health", 1)],
++        )
++
++    def test_empty_input(self):
++        s = summarize([])
++        self.assertEqual(s.total, 0)
++        self.assertEqual(s.malformed, 0)
++        self.assertEqual(s.p50_latency_ms, 0.0)
++        self.assertEqual(s.p95_latency_ms, 0.0)
++        self.assertEqual(s.error_rate, 0.0)
++        self.assertEqual(s.top_paths, [])
++
++    def test_all_malformed(self):
++        s = summarize(["junk", "more junk"])
++        self.assertEqual(s.total, 0)
++        self.assertEqual(s.malformed, 2)
++        self.assertEqual(s.by_status, {})
++
++    def test_nearest_rank_percentiles(self):
++        lines = [
++            f"2026-10-01T12:00:00Z GET /p 200 {ms} 0" for ms in range(1, 101)
++        ]
++        s = summarize(lines)
++        self.assertEqual(s.p50_latency_ms, 50.0)
++        self.assertEqual(s.p95_latency_ms, 95.0)
++
++    def test_top_paths_tie_broken_by_path_and_capped_at_five(self):
++        paths = ["/c", "/a", "/b", "/d", "/e", "/f"]
++        lines = [f"2026-10-01T12:00:00Z GET {p} 200 1 0" for p in paths]
++        s = summarize(lines)
++        self.assertEqual(s.top_paths, [("/a", 1), ("/b", 1), ("/c", 1), ("/d", 1), ("/e", 1)])
++
++    def test_error_rate_counts_5xx_only(self):
++        lines = [
++            "2026-10-01T12:00:00Z GET /a 503 1 0",
++            "2026-10-01T12:00:00Z GET /a 499 1 0",
++        ]
++        self.assertEqual(summarize(lines).error_rate, 0.5)
++
++
++if __name__ == "__main__":
++    unittest.main()

@@ -1,0 +1,289 @@
+diff --git a/src/fromager/bootstrap_requirement_resolver.py b/src/fromager/bootstrap_requirement_resolver.py
+index 9e2bcfb..770b1aa 100644
+--- a/src/fromager/bootstrap_requirement_resolver.py
++++ b/src/fromager/bootstrap_requirement_resolver.py
+@@ -203,7 +203,13 @@ class BootstrapRequirementResolver:
+                 provider,
+                 req,
+                 max_age_cutoff=max_age_cutoff,
+-                fallback_on_empty_age_filter=not self.multiple_versions,
++                # In multi-version mode, build the newest version when nothing is
++                # inside the age window to avoid cascading failures in dependents.
++                age_fallback=(
++                    resolver.AgeFallback.NEWEST
++                    if self.multiple_versions
++                    else resolver.AgeFallback.ALL
++                ),
+             )
+ 
+             if not results and self.multiple_versions and self.cache_wheel_server_url:
+diff --git a/src/fromager/resolver.py b/src/fromager/resolver.py
+index 574c013..1b37cfc 100644
+--- a/src/fromager/resolver.py
++++ b/src/fromager/resolver.py
+@@ -6,6 +6,7 @@
+ from __future__ import annotations
+ 
+ import datetime
++import enum
+ import functools
+ import logging
+ import os
+@@ -233,11 +234,33 @@ class LogReporter(resolvelib.BaseReporter):
+         self._report("successfully resolved %r", self.req)
+ 
+ 
++class AgeFallback(enum.Enum):
++    """What to keep when max-release-age filtering removes every candidate."""
++
++    ALL = "all"
++    """Keep every candidate and log a warning."""
++
++    NEWEST = "newest"
++    """Keep only the newest candidate."""
++
++    NONE = "none"
++    """Return an empty list."""
++
++
++def _is_pinned(provider: BaseProvider, req: Requirement) -> bool:
++    """Return True if the provider's constraint pins an exact version (``==``)."""
++    constraint = provider.constraints.get_constraint(req.name)
++    if constraint is None:
++        return False
++    specs = list(constraint.specifier)
++    return len(specs) == 1 and specs[0].operator == "=="
++
++
+ def find_all_matching_from_provider(
+     provider: BaseProvider,
+     req: Requirement,
+     max_age_cutoff: datetime.datetime | None = None,
+-    fallback_on_empty_age_filter: bool = True,
++    age_fallback: AgeFallback = AgeFallback.ALL,
+ ) -> list[tuple[str, Version]]:
+     """Find all matching candidates from provider without full dependency resolution.
+ 
+@@ -248,12 +271,13 @@ def find_all_matching_from_provider(
+         provider: The provider to query for candidates.
+         req: The requirement to match.
+         max_age_cutoff: If set, reject candidates published before this time.
+-            If all candidates are older than the cutoff, all are kept and
+-            a warning is emitted to avoid empty resolution.
+-        fallback_on_empty_age_filter: If ``True`` (default), keep all
+-            candidates when age filtering would produce an empty result.
+-            If ``False``, return an empty list instead, allowing the
+-            caller to implement its own fallback strategy.
++            Packages whose constraint pins an exact version (``==``) skip
++            age filtering, since a pin is explicit user intent.
++        age_fallback: What to keep when age filtering removes every
++            candidate. ``AgeFallback.ALL`` (default) keeps all candidates
++            and warns, ``AgeFallback.NEWEST`` keeps only the newest one, and
++            ``AgeFallback.NONE`` returns an empty list so the caller can
++            implement its own fallback strategy.
+ 
+     Returns list of (url, version) tuples sorted by version (highest first).
+ 
+@@ -290,7 +314,13 @@ def find_all_matching_from_provider(
+     # Materialize candidates so we can iterate more than once if filtering
+     candidates_list = list(candidates)
+ 
+-    if max_age_cutoff is not None:
++    if max_age_cutoff is not None and _is_pinned(provider, req):
++        logger.info(
++            "%s: skipping age filter for pinned constraint (%d candidate(s))",
++            req.name,
++            len(candidates_list),
++        )
++    elif max_age_cutoff is not None:
+         logger.info(
+             "%s: found %d candidate(s) matching %s",
+             req.name,
+@@ -314,7 +344,7 @@ def find_all_matching_from_provider(
+             )
+         if filtered:
+             candidates_list = filtered
+-        elif fallback_on_empty_age_filter:
++        elif age_fallback is AgeFallback.ALL:
+             logger.warning(
+                 "%s: all %d candidate(s) of %s are older than %d days, "
+                 "keeping all to avoid empty resolution",
+@@ -323,6 +353,19 @@ def find_all_matching_from_provider(
+                 req,
+                 max_age_days,
+             )
++        elif age_fallback is AgeFallback.NEWEST:
++            # candidates are sorted by version, highest first
++            newest = candidates_list[:1]
++            logger.info(
++                "%s: all %d candidate(s) of %s are older than %d days, "
++                "falling back to newest version %s",
++                req.name,
++                len(candidates_list),
++                req,
++                max_age_days,
++                newest[0].version if newest else None,
++            )
++            candidates_list = newest
+         else:
+             logger.info(
+                 "%s: all %d candidate(s) of %s are older than %d days",
+diff --git a/tests/test_bootstrap_requirement_resolver.py b/tests/test_bootstrap_requirement_resolver.py
+index e2a349d..6bb42e8 100644
+--- a/tests/test_bootstrap_requirement_resolver.py
++++ b/tests/test_bootstrap_requirement_resolver.py
+@@ -2,11 +2,13 @@
+ 
+ from unittest.mock import MagicMock, patch
+ 
++import pytest
+ from packaging.requirements import Requirement
+ from packaging.utils import canonicalize_name
+ from packaging.version import Version
+ 
+ from fromager.bootstrap_requirement_resolver import BootstrapRequirementResolver
++from fromager import resolver
+ from fromager.context import WorkContext
+ from fromager.dependency_graph import DependencyGraph
+ from fromager.requirements_file import RequirementType
+@@ -824,3 +826,37 @@ class TestResolveFromCacheServer:
+             )
+ 
+         mock_cache.assert_not_called()
++
++
++@pytest.mark.parametrize(
++    "multiple_versions,expected",
++    [
++        (True, resolver.AgeFallback.NEWEST),
++        (False, resolver.AgeFallback.ALL),
++    ],
++)
++def test_resolve_passes_age_fallback(
++    tmp_context: WorkContext,
++    multiple_versions: bool,
++    expected: resolver.AgeFallback,
++) -> None:
++    """Multi-version mode falls back to the newest version, single keeps all."""
++    brr = BootstrapRequirementResolver(tmp_context, multiple_versions=multiple_versions)
++
++    with (
++        patch.object(brr, "_resolve_from_graph", return_value=None),
++        patch("fromager.bootstrap_requirement_resolver.sources.get_source_provider"),
++        patch(
++            "fromager.bootstrap_requirement_resolver.resolver"
++            ".find_all_matching_from_provider",
++            return_value=[("url", Version("1.0"))],
++        ) as mock_find,
++    ):
++        brr.resolve(
++            Requirement("testpkg"),
++            RequirementType.INSTALL,
++            parent_req=None,
++            pre_built=False,
++        )
++
++    assert mock_find.call_args.kwargs["age_fallback"] is expected
+diff --git a/tests/test_cooldown.py b/tests/test_cooldown.py
+index 0d47cc5..6cdea5e 100644
+--- a/tests/test_cooldown.py
++++ b/tests/test_cooldown.py
+@@ -19,6 +19,7 @@ from packaging.requirements import Requirement
+ from packaging.version import Version
+ 
+ from fromager import candidate, context, packagesettings, resolver, sources, wheels
++from fromager.constraints import Constraints
+ from fromager.requirements_file import RequirementType
+ 
+ _BOOTSTRAP_TIME = datetime.datetime(2026, 3, 26, 0, 0, 0, tzinfo=datetime.UTC)
+@@ -813,13 +814,89 @@ def test_max_release_age_all_too_old_returns_empty_when_fallback_disabled(
+                 provider,
+                 Requirement("test-pkg"),
+                 max_age_cutoff=max_age_cutoff,
+-                fallback_on_empty_age_filter=False,
++                age_fallback=resolver.AgeFallback.NONE,
+             )
+     assert results == []
+     assert "all 3 candidate(s)" in caplog.text
+     assert "keeping all to avoid empty resolution" not in caplog.text
+ 
+ 
++def test_max_release_age_all_too_old_newest_fallback(
++    caplog: pytest.LogCaptureFixture,
++) -> None:
++    """AgeFallback.NEWEST keeps only the newest candidate and logs at INFO."""
++    max_age_cutoff = _BOOTSTRAP_TIME + datetime.timedelta(days=1)
++    with requests_mock.Mocker() as r:
++        r.get(
++            "https://pypi.org/simple/test-pkg/",
++            json=_cooldown_json_response,
++            headers={"Content-Type": _PYPI_SIMPLE_JSON_CONTENT_TYPE},
++        )
++        provider = resolver.PyPIProvider(include_sdists=True)
++        with caplog.at_level(logging.INFO, logger="fromager.resolver"):
++            results = resolver.find_all_matching_from_provider(
++                provider,
++                Requirement("test-pkg"),
++                max_age_cutoff=max_age_cutoff,
++                age_fallback=resolver.AgeFallback.NEWEST,
++            )
++    assert [str(v) for _, v in results] == ["2.0.0"]
++    assert "falling back to newest version 2.0.0" in caplog.text
++    assert "keeping all to avoid empty resolution" not in caplog.text
++
++
++def _pinned_provider(constraint: str) -> resolver.PyPIProvider:
++    constraints = Constraints()
++    constraints.add_constraint(constraint)
++    return resolver.PyPIProvider(include_sdists=True, constraints=constraints)
++
++
++def test_max_release_age_pinned_constraint_skips_age_filter(
++    caplog: pytest.LogCaptureFixture,
++) -> None:
++    """An exact ``==`` pin older than the window is kept, with no warning."""
++    max_age_cutoff = _BOOTSTRAP_TIME + datetime.timedelta(days=1)
++    with requests_mock.Mocker() as r:
++        r.get(
++            "https://pypi.org/simple/test-pkg/",
++            json=_cooldown_json_response,
++            headers={"Content-Type": _PYPI_SIMPLE_JSON_CONTENT_TYPE},
++        )
++        provider = _pinned_provider("test-pkg==1.2.2")
++        with caplog.at_level(logging.INFO, logger="fromager.resolver"):
++            results = resolver.find_all_matching_from_provider(
++                provider,
++                Requirement("test-pkg"),
++                max_age_cutoff=max_age_cutoff,
++                age_fallback=resolver.AgeFallback.NONE,
++            )
++    assert [str(v) for _, v in results] == ["1.2.2"]
++    assert (
++        "test-pkg: skipping age filter for pinned constraint (1 candidate(s))"
++        in caplog.text
++    )
++    assert "keeping all to avoid empty resolution" not in caplog.text
++
++
++def test_max_release_age_range_constraint_is_still_filtered() -> None:
++    """Range constraints are age-filtered like unconstrained packages."""
++    max_age_cutoff = _BOOTSTRAP_TIME + datetime.timedelta(days=1)
++    with requests_mock.Mocker() as r:
++        r.get(
++            "https://pypi.org/simple/test-pkg/",
++            json=_cooldown_json_response,
++            headers={"Content-Type": _PYPI_SIMPLE_JSON_CONTENT_TYPE},
++        )
++        provider = _pinned_provider("test-pkg<2.0")
++        results = resolver.find_all_matching_from_provider(
++            provider,
++            Requirement("test-pkg"),
++            max_age_cutoff=max_age_cutoff,
++            age_fallback=resolver.AgeFallback.NONE,
++        )
++    assert results == []
++
++
+ def test_max_release_age_candidates_without_upload_time_pass_through() -> None:
+     """Candidates without upload_time are not filtered out by max-release-age."""
+     no_timestamp_response = {
