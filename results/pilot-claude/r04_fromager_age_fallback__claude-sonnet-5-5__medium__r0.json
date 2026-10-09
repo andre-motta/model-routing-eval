@@ -1,0 +1,24 @@
+{
+ "task": "r04_fromager_age_fallback",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "...............................................................          [100%]\n63 passed in 0.36s\n",
+ "ts": "2026-10-09T09:49:40",
+ "wall_s": 71.1028687953949,
+ "tokens": {
+  "input": 18,
+  "cached": 346777,
+  "cache_write": 38861,
+  "output": 6566,
+  "reasoning": 389
+ },
+ "turns": 10,
+ "cost_usd": 0.2904954,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

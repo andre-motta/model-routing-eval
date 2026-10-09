@@ -1,1 +1,2 @@
-run  r04_fromager_age_fallback__claude-sonnet-5-5__medium__r0 ...
+run  r04_fromager_age_fallback__claude-sonnet-5-5__medium__r0 ... FAIL  $0.297  57s  turns=11
+run  r05_fromager_version_prebuilt__claude-sonnet-5-5__medium__r0 ... FAIL  $0.571  136s  turns=35

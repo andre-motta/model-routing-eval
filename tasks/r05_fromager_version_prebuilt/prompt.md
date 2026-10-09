@@ -17,7 +17,9 @@ Make this work end to end:
    - `is_pre_built(version)` and `get_wheel_server_url(version)` strip the local version
      segment before the version-specific lookup (use `Version(version.public)`), like
      `get_changelog` and `get_patches` already do.
-   - `is_pre_built` consults the `is_pre_built` override hook through
+   - `is_pre_built(version)` consults the `is_pre_built` override hook only when a version
+     is given (the version-specific path); with no version it returns the variant default
+     without calling the hook. It calls the hook through
      `overrides.find_and_invoke(self.package, "is_pre_built", _default_is_pre_built,
      version=version, variant=self.variant)` where the module-level
      `_default_is_pre_built(*, version, variant)` returns `None` (defer to YAML). A

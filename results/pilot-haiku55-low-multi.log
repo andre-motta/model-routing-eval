@@ -1,2 +1,2 @@
 run  r04_fromager_age_fallback__claude-haiku-5-5__low__r0 ... FAIL  $0.023  60s  turns=20
-run  r05_fromager_version_prebuilt__claude-haiku-5-5__low__r0 ...
+run  r05_fromager_version_prebuilt__claude-haiku-5-5__low__r0 ... PASS  $0.058  181s  turns=41
