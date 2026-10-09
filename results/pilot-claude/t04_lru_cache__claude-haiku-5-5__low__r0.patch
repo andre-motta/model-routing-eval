@@ -1,0 +1,90 @@
+diff --git a/cachelib/lru.py b/cachelib/lru.py
+index 783e3e0..21e96c8 100644
+--- a/cachelib/lru.py
++++ b/cachelib/lru.py
+@@ -1,24 +1,78 @@
+ import time
++from collections import OrderedDict
+ 
+ 
+ class LRUCache:
+     def __init__(self, capacity, ttl=None, clock=time.monotonic):
+-        raise NotImplementedError
++        if capacity <= 0:
++            raise ValueError("capacity must be positive")
++        self._capacity = capacity
++        self._ttl = ttl
++        self._clock = clock
++        # key -> (value, expires_at); expires_at is None when ttl is None.
++        # Order is least to most recently used.
++        self._data = OrderedDict()
++        self._hits = 0
++        self._misses = 0
++        self._evictions = 0
++        self._expirations = 0
++
++    def _expires_at(self):
++        if self._ttl is None:
++            return None
++        return self._clock() + self._ttl
++
++    def _is_expired(self, expires_at, now):
++        return expires_at is not None and now >= expires_at
+ 
+     def get(self, key, default=None):
+-        raise NotImplementedError
++        entry = self._data.get(key)
++        if entry is None:
++            self._misses += 1
++            return default
++        value, expires_at = entry
++        if self._is_expired(expires_at, self._clock()):
++            del self._data[key]
++            self._expirations += 1
++            self._misses += 1
++            return default
++        self._data.move_to_end(key)
++        self._hits += 1
++        return value
+ 
+     def put(self, key, value):
+-        raise NotImplementedError
++        self._data[key] = (value, self._expires_at())
++        self._data.move_to_end(key)
++        now = self._clock()
++        while len(self._data) > self._capacity:
++            _, (_, expires_at) = self._data.popitem(last=False)
++            if self._is_expired(expires_at, now):
++                self._expirations += 1
++            else:
++                self._evictions += 1
+ 
+     def delete(self, key):
+-        raise NotImplementedError
++        return self._data.pop(key, None) is not None
+ 
+     def stats(self):
+-        raise NotImplementedError
++        return {
++            "hits": self._hits,
++            "misses": self._misses,
++            "evictions": self._evictions,
++            "expirations": self._expirations,
++        }
+ 
+     def __len__(self):
+-        raise NotImplementedError
++        # O(1): counts expired entries not yet touched by get/contains.
++        return len(self._data)
+ 
+     def __contains__(self, key):
+-        raise NotImplementedError
++        entry = self._data.get(key)
++        if entry is None:
++            return False
++        _, expires_at = entry
++        if self._is_expired(expires_at, self._clock()):
++            del self._data[key]
++            self._expirations += 1
++            return False
++        return True

@@ -1,0 +1,6 @@
+diff --git a/billing/__pycache__/totals.cpython-314.pyc b/billing/__pycache__/totals.cpython-314.pyc
+index 858e67e..87782a3 100644
+Binary files a/billing/__pycache__/totals.cpython-314.pyc and b/billing/__pycache__/totals.cpython-314.pyc differ
+diff --git a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc
+index 6f56133..9088b06 100644
+Binary files a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc differ

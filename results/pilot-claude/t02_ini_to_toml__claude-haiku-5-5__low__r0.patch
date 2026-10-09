@@ -1,0 +1,53 @@
+diff --git a/app/config.py b/app/config.py
+index 94daf71..81b2b80 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -1,7 +1,6 @@
+-import configparser
++import tomllib
+ 
+ 
+-def load_config(path="config.ini"):
+-    cp = configparser.ConfigParser()
+-    cp.read(path)
+-    return {section: dict(cp[section]) for section in cp.sections()}
++def load_config(path="config.toml"):
++    with open(path, "rb") as f:
++        return tomllib.load(f)
+diff --git a/config.ini b/config.ini
+deleted file mode 100644
+index 5942898..0000000
+--- a/config.ini
++++ /dev/null
+@@ -1,13 +0,0 @@
+-[server]
+-host = 0.0.0.0
+-port = 8080
+-debug = false
+-
+-[database]
+-url = postgresql://localhost/app
+-pool_size = 5
+-timeout = 2.5
+-
+-[features]
+-beta = true
+-max_upload_mb = 25
+diff --git a/tests/test_config.py b/tests/test_config.py
+index 000c1be..b5d428f 100644
+--- a/tests/test_config.py
++++ b/tests/test_config.py
+@@ -5,3 +5,13 @@ def test_sections():
+     cfg = load_config()
+     assert set(cfg) == {"server", "database", "features"}
+     assert cfg["server"]["host"] == "0.0.0.0"
++
++
++def test_types():
++    cfg = load_config()
++    assert cfg["server"]["port"] == 8080 and isinstance(cfg["server"]["port"], int)
++    assert cfg["server"]["debug"] is False
++    assert cfg["database"]["pool_size"] == 5 and isinstance(cfg["database"]["pool_size"], int)
++    assert cfg["database"]["timeout"] == 2.5 and isinstance(cfg["database"]["timeout"], float)
++    assert cfg["features"]["beta"] is True
++    assert cfg["features"]["max_upload_mb"] == 25 and isinstance(cfg["features"]["max_upload_mb"], int)

@@ -1,0 +1,3 @@
+Implement `resolver/solve.py` according to `resolver/SPEC.md`: a package dependency
+resolver with version constraints, highest-version preference, backtracking, and cycle
+tolerance. The stub exists. Write your own tests under `tests/` and run them.

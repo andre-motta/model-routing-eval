@@ -20,7 +20,7 @@ PROMPT = "Reply with exactly: OK"
 def claude(model, effort, cwd):
     p = subprocess.run(["claude", "-p", PROMPT, "--model", model, "--effort", effort, "--output-format", "json",
                         "--max-turns", "1", "--permission-mode", "plan", "--no-session-persistence"],
-                       cwd=cwd, capture_output=True, text=True, timeout=300)
+                       cwd=cwd, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300)
     d = json.loads(p.stdout)
     u = d["usage"]
     tokens = dict(input=u.get("input_tokens", 0), cached=u.get("cache_read_input_tokens", 0),
@@ -31,7 +31,7 @@ def claude(model, effort, cwd):
 def codex(model, effort, cwd):
     p = subprocess.run(["codex", "exec", "--json", "--ephemeral", "--skip-git-repo-check", "-C", cwd, "-s", "read-only",
                         "-m", model, "-c", f'model_reasoning_effort="{effort}"', PROMPT],
-                       capture_output=True, text=True, timeout=300)
+                       stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=300)
     tokens = dict(input=0, cached=0, cache_write=0, output=0)
     for line in p.stdout.splitlines():
         try:

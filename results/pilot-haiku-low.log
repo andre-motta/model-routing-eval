@@ -4,4 +4,6 @@ run  t06_log_parser__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.151  77s  t
 run  t07_mutable_default__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.068  28s  turns=10
 run  t08_timezone_bug__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.193  131s  turns=20
 run  t09_thread_safety__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.054  30s  turns=8
-run  t10_plugin_registry__claude-haiku-4-5-20251001__low__r0 ...
+run  t10_plugin_registry__claude-haiku-4-5-20251001__low__r0 ... FAIL  $0.114  54s  turns=19
+run  t11_async_migration__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.146  68s  turns=22
+run  t12_needle_bug__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.172  88s  turns=25

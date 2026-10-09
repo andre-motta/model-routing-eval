@@ -62,7 +62,7 @@ def run_codex(prompt, work, model, effort, timeout):
            "-C", str(work), "-s", "workspace-write", "-c", 'approval_policy="never"',
            "-m", model, "-c", f'model_reasoning_effort="{effort}"', prompt]
     t0 = time.time()
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    p = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
     wall = time.time() - t0
     tokens = dict(input=0, cached=0, cache_write=0, output=0, reasoning=0)
     turns, errors, commands = 0, [], 0
@@ -97,7 +97,7 @@ def run_claude(prompt, work, model, effort, timeout):
            "--permission-mode", "acceptEdits", "--allowedTools", "Bash,Read,Edit,Write,MultiEdit,Glob,Grep",
            "--max-turns", "80", "--no-session-persistence"]
     t0 = time.time()
-    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=timeout)
+    p = subprocess.run(cmd, cwd=work, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
     wall = time.time() - t0
     tokens = dict(input=0, cached=0, cache_write=0, output=0, reasoning=0)
     cost, turns, err = None, 0, None
@@ -133,7 +133,7 @@ def verify(task, work):
         cmd = ["bash", str(custom)]
     else:
         cmd = [sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider", "hidden"]
-    p = subprocess.run(cmd, cwd=work, capture_output=True, text=True, timeout=600)
+    p = subprocess.run(cmd, cwd=work, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=600)
     return p.returncode == 0, (p.stdout + p.stderr)[-3000:]
 
 
@@ -189,7 +189,8 @@ def main():
             except subprocess.TimeoutExpired:
                 r = dict(wall_s=args.timeout, tokens={}, turns=0, cost_usd=None, error="timeout", exit_code=None, stderr_tail="")
             passed, vout = verify(t, work)
-            diff = subprocess.run(["git", "diff", "--", ".", ":!hidden"], cwd=work, capture_output=True, text=True).stdout
+            subprocess.run(["git", "add", "-A", "--", ".", ":!hidden"], cwd=work, capture_output=True)
+            diff = subprocess.run(["git", "diff", "--cached", "--", ".", ":!hidden"], cwd=work, capture_output=True, text=True).stdout
             (out / f"{name}.patch").write_text(diff)
             rec = dict(task=t["id"], tier=t["tier"], backend=args.backend, model=model, effort=args.effort, rep=rep,
                        passed=passed, verify_tail=vout[-1500:], ts=time.strftime("%Y-%m-%dT%H:%M:%S"), **r)

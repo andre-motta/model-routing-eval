@@ -1,0 +1,76 @@
+diff --git a/tests/test_cli.py b/tests/test_cli.py
+index f3451ff..bf96463 100644
+--- a/tests/test_cli.py
++++ b/tests/test_cli.py
+@@ -1,3 +1,5 @@
++import json
++
+ from wc.cli import main
+ 
+ 
+@@ -5,3 +7,28 @@ def test_text(tmp_path, capsys):
+     p = tmp_path / "a.txt"; p.write_text("hello world\nbye\n")
+     assert main([str(p)]) == 0
+     assert capsys.readouterr().out == f"       2       3      16 {p}\n"
++
++
++def test_json(tmp_path, capsys):
++    a = tmp_path / "a.txt"; a.write_text("hello world\nbye\n")
++    b = tmp_path / "b.txt"; b.write_text("one two\n")
++    assert main(["--json", str(a), str(b)]) == 0
++    out = json.loads(capsys.readouterr().out)
++    assert out == {
++        "files": [
++            {"path": str(a), "lines": 2, "words": 3, "chars": 16},
++            {"path": str(b), "lines": 1, "words": 2, "chars": 8},
++        ],
++        "total": {"lines": 3, "words": 5, "chars": 24},
++    }
++
++
++def test_json_missing_file(tmp_path, capsys):
++    a = tmp_path / "a.txt"; a.write_text("hi\n")
++    missing = tmp_path / "nope.txt"
++    assert main(["--json", str(a), str(missing)]) == 1
++    cap = capsys.readouterr()
++    out = json.loads(cap.out)
++    assert [f["path"] for f in out["files"]] == [str(a)]
++    assert out["total"] == {"lines": 1, "words": 1, "chars": 3}
++    assert f"wc: {missing}:" in cap.err
+diff --git a/wc/cli.py b/wc/cli.py
+index 9bb48d5..b453f9b 100644
+--- a/wc/cli.py
++++ b/wc/cli.py
+@@ -1,4 +1,5 @@
+ import argparse
++import json
+ import sys
+ 
+ 
+@@ -11,8 +12,10 @@ def count(path):
+ def main(argv=None):
+     ap = argparse.ArgumentParser(prog="wc")
+     ap.add_argument("files", nargs="+")
++    ap.add_argument("--json", action="store_true", help="print results as one JSON object")
+     args = ap.parse_args(argv)
+     total = {"lines": 0, "words": 0, "chars": 0}
++    files = []
+     rc = 0
+     for path in args.files:
+         try:
+@@ -21,9 +24,13 @@ def main(argv=None):
+             print(f"wc: {path}: {e.strerror}", file=sys.stderr)
+             rc = 1
+             continue
+-        print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
++        if not args.json:
++            print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
++        files.append({"path": path, **c})
+         for k in total:
+             total[k] += c[k]
+-    if len(args.files) > 1:
++    if args.json:
++        print(json.dumps({"files": files, "total": total}))
++    elif len(args.files) > 1:
+         print(f"{total['lines']:>8}{total['words']:>8}{total['chars']:>8} total")
+     return rc

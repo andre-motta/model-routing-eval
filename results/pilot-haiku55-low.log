@@ -1,0 +1,6 @@
+run  t01_rename_symbol__claude-haiku-5-5__low__r0 ... PASS  $0.009  13s  turns=15
+run  t02_ini_to_toml__claude-haiku-5-5__low__r0 ... PASS  $0.006  11s  turns=7
+run  t03_add_type_hints__claude-haiku-5-5__low__r0 ... PASS  $0.005  10s  turns=3
+run  t04_lru_cache__claude-haiku-5-5__low__r0 ... PASS  $0.011  29s  turns=10
+run  t05_cli_json_flag__claude-haiku-5-5__low__r0 ... PASS  $0.006  12s  turns=4
+run  t06_log_parser__claude-haiku-5-5__low__r0 ...

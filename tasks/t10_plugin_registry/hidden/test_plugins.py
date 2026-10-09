@@ -25,7 +25,10 @@ def test_registry_api_and_discovery():
     assert reg.get("csv").extension == ".csv"
     pkg = pathlib.Path(export.__file__).parent
     assert (pkg / "formats").is_dir()
-    assert {p.stem for p in (pkg / "formats").glob("*.py")} >= {"csv", "json", "xml"}
+    mods = [p.stem for p in (pkg / "formats").glob("*.py") if p.stem != "__init__"]
+    assert len(mods) >= 3, f"expected one module per format under formats/, found {mods}"
+    for fmt in ("csv", "json", "xml"):
+        assert any(fmt in m for m in mods), f"no module for {fmt} under formats/: {mods}"
 
 
 def test_unknown_lists_known():
@@ -57,22 +60,32 @@ def test_new_format_without_touching_core():
         assert f'"{fmt}"' not in core_src and f"'{fmt}'" not in core_src, f"core.py still hardcodes {fmt}"
 
 
+def _usable(obj):
+    """A registry is anything (instance, or class with classmethods) whose names() works without self."""
+    if obj is None or not all(hasattr(obj, a) for a in ("register", "get", "names")):
+        return False
+    try:
+        obj.names()
+    except TypeError:
+        return False
+    return True
+
+
 def _registry():
-    for name in ("registry", "REGISTRY", "Registry"):
-        obj = getattr(export, name, None)
-        if obj is not None and hasattr(obj, "register") and hasattr(obj, "names"):
-            return obj
-    for modname in ("export.registry", "export.core", "export.plugins"):
+    seen = []
+    for modname in ("export", "export.registry", "export.core", "export.plugins", "export.base", "export.exporters"):
         try:
             m = importlib.import_module(modname)
         except ImportError:
             continue
-        for name in ("registry", "REGISTRY", "Registry"):
-            obj = getattr(m, name, None)
-            if obj is not None and hasattr(obj, "register") and hasattr(obj, "names"):
-                return obj
+        seen.append(m)
+    for m in seen:
+        for name in ("registry", "REGISTRY", "Registry", "exporters", "EXPORTERS"):
+            if _usable(getattr(m, name, None)):
+                return getattr(m, name)
+    for m in seen:
         for _, obj in inspect.getmembers(m):
-            if not inspect.isclass(obj) and hasattr(obj, "register") and hasattr(obj, "names") and hasattr(obj, "get"):
+            if _usable(obj):
                 return obj
     raise AssertionError("no registry object found with register/get/names")
 
