@@ -9,7 +9,7 @@ Sources (checked 2026-10-09):
 PRICES = {
     # model id:        input, cached input, cache write, output
     "gpt-6-astra":     dict(input=10.00, cached=1.00, cache_write=12.50, output=50.00),
-    "gpt-6.1-sol":     dict(input=2.00,  cached=0.20, cache_write=2.50,  output=10.00),
+    "gpt-6.1-sol":     dict(input=2.00,  cached=0.10, cache_write=2.50,  output=10.00),  # 6.1 halved cache reads
     "gpt-6-sol":       dict(input=2.00,  cached=0.20, cache_write=2.50,  output=10.00),
     "gpt-6-luna":      dict(input=0.10,  cached=0.01, cache_write=0.125, output=0.50),
     "gpt-5.6-sol":     dict(input=4.00,  cached=0.40, cache_write=5.00,  output=20.00),
