@@ -29,7 +29,8 @@ def load(root: Path) -> pd.DataFrame:
     if not rows:
         raise SystemExit(f"no records under {root}")
     df = pd.DataFrame(rows)
-    df["config"] = df["model"].str.replace("claude-", "").str.replace("-20251001", "") + "@" + df["effort"]
+    df["config"] = (df["model"].str.replace("claude-", "").str.replace("-20251001", "").str.replace("rits/zai-org/", "")
+                    + "@" + df["effort"])
     return df
 
 
