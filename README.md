@@ -9,6 +9,12 @@ Twenty-one coding tasks in six difficulty tiers, run headlessly through a real
 coding agent (OpenAI Codex CLI or Claude Code), verified by hidden tests,
 with tokens, cost and wall time recorded per run.
 
+## Results
+
+Browse every run, the per-case judge rationales and the eval-anova comparison report at
+**https://alustos.us/model-routing-eval/**. Rebuild and publish with `./publish_site.sh`
+(writes `site/` and force-pushes it to the `gh-pages` branch).
+
 ## Layout
 
 ```
