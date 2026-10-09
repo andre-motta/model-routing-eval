@@ -21,5 +21,10 @@ for m in f["model"]:
     for e in f["effort"]:
         print(m, e)
 PY
-  RUN_ID="$(date +%Y-%m-%d)-$model-effort-$effort-$REP" ./run_eval.sh "$model" "$effort" "$CONFIG"
+  id="$(date +%Y-%m-%d)-$model-effort-$effort"
+  RUN_ID="$id-$REP" ./run_eval.sh "$model" "$effort" "$CONFIG"
+  # Runs sharing the same factor levels are treated as replications by eval-anova; reuse the
+  # first pass's condition.json so the analyzer groups this run with its sibling.
+  src=eval/runs/model-routing-eval/$id/condition.json
+  [ -f "$src" ] && cp "$src" "eval/runs/model-routing-eval/$id-$REP/condition.json" && echo "condition.json copied for $id-$REP"
 done
