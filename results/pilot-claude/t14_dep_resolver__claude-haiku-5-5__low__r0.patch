@@ -1,0 +1,151 @@
+diff --git a/resolver/solve.py b/resolver/solve.py
+index 5bcec2a..7fa7115 100644
+--- a/resolver/solve.py
++++ b/resolver/solve.py
+@@ -1,20 +1,142 @@
++import operator
++import re
++from functools import total_ordering
++
++
+ class ResolutionError(Exception):
+     pass
+ 
+ 
++@total_ordering
+ class Version:
+     def __init__(self, s):
+-        raise NotImplementedError
++        text = str(s).strip()
++        if not re.fullmatch(r"\d+(\.\d+)*", text):
++            raise ValueError(f"invalid version: {s!r}")
++        parts = [int(p) for p in text.split(".")]
++        # Trailing zeros carry no meaning ("1.0" == "1"), so strip them for comparison.
++        while parts and parts[-1] == 0:
++            parts.pop()
++        self._text = text
++        self._key = tuple(parts)
++
++    def __eq__(self, other):
++        return isinstance(other, Version) and self._key == other._key
++
++    def __lt__(self, other):
++        return self._key < other._key
++
++    def __hash__(self):
++        return hash(self._key)
++
++    def __str__(self):
++        return self._text
++
++    def __repr__(self):
++        return f"Version({self._text!r})"
++
++
++_OPS = {
++    "==": operator.eq,
++    "!=": operator.ne,
++    "<": operator.lt,
++    "<=": operator.le,
++    ">": operator.gt,
++    ">=": operator.ge,
++}
+ 
+ 
+ class Constraint:
++    def __init__(self, name, checks=()):
++        self.name = name
++        self.checks = tuple(checks)  # tuple of (op text, Version)
++
+     @classmethod
+     def parse(cls, requirement):
+-        raise NotImplementedError
++        m = re.fullmatch(r"\s*([A-Za-z0-9_.\-]+)\s*(.*)", requirement)
++        if not m:
++            raise ValueError(f"invalid requirement: {requirement!r}")
++        name, rest = m.groups()
++        checks = []
++        if rest.strip():
++            for part in rest.split(","):
++                cm = re.fullmatch(r"\s*(==|!=|<=|>=|<|>)\s*([0-9.]+)\s*", part)
++                if not cm:
++                    raise ValueError(f"invalid requirement: {requirement!r}")
++                op, ver = cm.groups()
++                checks.append((op, Version(ver)))
++        return cls(name, checks)
+ 
+     def allows(self, version):
+-        raise NotImplementedError
++        return all(_OPS[op](version, v) for op, v in self.checks)
++
++    def __repr__(self):
++        return f"Constraint({self.name!r}, {self.checks!r})"
+ 
+ 
+ def resolve(roots, index):
+-    raise NotImplementedError
++    catalog = {
++        name: {Version(v): [Constraint.parse(r) for r in reqs] for v, reqs in releases.items()}
++        for name, releases in index.items()
++    }
++    # Candidate versions per package, highest first. Packages absent from the index
++    # have no entry, so any constraint on them empties the domain.
++    domains = {name: sorted(releases, reverse=True) for name, releases in catalog.items()}
++    # Deepest dead end seen so far: the package whose domain emptied there is reported.
++    blame = {"depth": -1, "name": None}
++
++    def note_dead_end(name, depth):
++        if depth >= blame["depth"]:
++            blame["depth"] = depth
++            blame["name"] = name
++
++    def narrow(domains, chosen, reqs, depth):
++        """Apply requirements to domains and chosen versions. None on conflict."""
++        domains = dict(domains)
++        for c in reqs:
++            if c.name in chosen:
++                if not c.allows(chosen[c.name]):
++                    note_dead_end(c.name, depth)
++                    return None
++                continue
++            dom = [v for v in domains.get(c.name, ()) if c.allows(v)]
++            if not dom:
++                note_dead_end(c.name, depth)
++                return None
++            domains[c.name] = dom
++        return domains
++
++    def search(domains, chosen, required, depth):
++        pending = sorted(n for n in required if n not in chosen)
++        if not pending:
++            return dict(chosen)
++        # Decide the alphabetically first unresolved package; its domain is narrowed
++        # by everything chosen so far, so forward checking keeps dead ends shallow.
++        name = pending[0]
++        dom = domains.get(name, [])
++        if not dom:
++            note_dead_end(name, depth)
++            return None
++        for v in dom:
++            release = catalog[name][v]
++            nchosen = {**chosen, name: v}
++            ndomains = narrow(domains, nchosen, release, depth + 1)
++            if ndomains is None:
++                continue
++            nrequired = required | {c.name for c in release}
++            result = search(ndomains, nchosen, nrequired, depth + 1)
++            if result is not None:
++                return result
++        return None
++
++    root_reqs = [Constraint.parse(r) for r in roots]
++    start = narrow(domains, {}, root_reqs, 0)
++    result = None
++    if start is not None:
++        required = frozenset(c.name for c in root_reqs)
++        result = search(start, {}, required, 0)
++    if result is None:
++        raise ResolutionError(
++            f"cannot satisfy constraints on {blame['name'] or ', '.join(roots)}"
++        )
++    return {name: str(v) for name, v in result.items()}

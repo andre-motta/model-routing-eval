@@ -1,0 +1,24 @@
+{
+ "task": "t10_plugin_registry",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "....                                                                     [100%]\n4 passed in 0.06s\n",
+ "ts": "2026-10-09T09:28:43",
+ "wall_s": 26.459959506988525,
+ "tokens": {
+  "input": 14,
+  "cached": 207916,
+  "cache_write": 24893,
+  "output": 5258,
+  "reasoning": 795
+ },
+ "turns": 16,
+ "cost_usd": 0.009688160000000001,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

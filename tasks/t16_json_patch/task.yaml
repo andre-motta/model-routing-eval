@@ -1,0 +1,3 @@
+tier: 4
+title: Implement RFC 6901 JSON Pointer and RFC 6902 JSON Patch
+timeout: 1500

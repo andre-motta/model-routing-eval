@@ -5,7 +5,7 @@ Small, reproducible experiment behind the Red Hat AI Enablement session
 
 > What is the cheapest (model, reasoning effort) pair that still gets this task right?
 
-Fourteen coding tasks in five difficulty tiers, run headlessly through a real
+Sixteen coding tasks in five difficulty tiers, run headlessly through a real
 coding agent (OpenAI Codex CLI or Claude Code), verified by hidden tests,
 with tokens, cost and wall time recorded per run.
 
@@ -29,8 +29,8 @@ results/                 raw records (committed for the talk)
 | 1 | Mechanical | rename symbol, ini to toml, add type hints |
 | 2 | Bounded implementation | LRU cache, CLI json flag, log parser |
 | 3 | Debugging | mutable default, timezone, thread safety, unicode dedupe |
-| 4 | Architecture | plugin registry refactor, sync to async migration, backtracking dependency resolver |
-| 5 | Long context | one-cent rounding bug hidden in a 40-module package |
+| 4 | Architecture | plugin registry refactor, sync to async migration, backtracking dependency resolver, JSON Patch |
+| 5 | Long context | one-cent rounding bug and a quadratic regression, each hidden in a 40-module package |
 
 ## Run
 

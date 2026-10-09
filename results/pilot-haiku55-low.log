@@ -7,4 +7,8 @@ run  t06_log_parser__claude-haiku-5-5__low__r0 ... PASS  $0.009  24s  turns=8
 run  t07_mutable_default__claude-haiku-5-5__low__r0 ... PASS  $0.006  12s  turns=5
 run  t08_timezone_bug__claude-haiku-5-5__low__r0 ... PASS  $0.007  17s  turns=6
 run  t09_thread_safety__claude-haiku-5-5__low__r0 ... PASS  $0.008  28s  turns=6
-run  t10_plugin_registry__claude-haiku-5-5__low__r0 ...
+run  t10_plugin_registry__claude-haiku-5-5__low__r0 ... PASS  $0.010  26s  turns=16
+run  t11_async_migration__claude-haiku-5-5__low__r0 ... PASS  $0.008  21s  turns=9
+run  t12_needle_bug__claude-haiku-5-5__low__r0 ... PASS  $0.008  20s  turns=10
+run  t13_unicode_dedupe__claude-haiku-5-5__low__r0 ... PASS  $0.006  16s  turns=4
+run  t14_dep_resolver__claude-haiku-5-5__low__r0 ... PASS  $0.015  76s  turns=9

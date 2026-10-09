@@ -1,0 +1,3 @@
+Implement `jsonpatch/core.py` per `jsonpatch/SPEC.md`: JSON Pointer resolution and the
+six JSON Patch operations with atomic apply. The stub exists. Add your own tests under
+`tests/` and run them.
