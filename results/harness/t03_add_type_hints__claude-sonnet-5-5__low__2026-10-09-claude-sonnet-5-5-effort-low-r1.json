@@ -1,0 +1,23 @@
+{
+ "task": "t03_add_type_hints",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 11.3,
+ "tokens": {
+  "input": 6,
+  "cached": 55430,
+  "cache_write": 16868,
+  "output": 1072,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.08929,
+ "error": null
+}

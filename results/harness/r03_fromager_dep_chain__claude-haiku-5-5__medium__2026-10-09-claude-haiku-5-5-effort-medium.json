@@ -1,0 +1,23 @@
+{
+ "task": "r03_fromager_dep_chain",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium",
+ "wall_s": 70.2,
+ "tokens": {
+  "input": 34,
+  "cached": 1166589,
+  "cache_write": 95593,
+  "output": 13275,
+  "reasoning": 0
+ },
+ "turns": 17,
+ "cost_usd": 0.054011790000000004,
+ "error": null
+}

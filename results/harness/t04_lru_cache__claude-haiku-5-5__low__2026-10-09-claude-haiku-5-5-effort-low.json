@@ -1,0 +1,23 @@
+{
+ "task": "t04_lru_cache",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low",
+ "wall_s": 24.8,
+ "tokens": {
+  "input": 8,
+  "cached": 121218,
+  "cache_write": 45170,
+  "output": 4765,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.01262948,
+ "error": null
+}

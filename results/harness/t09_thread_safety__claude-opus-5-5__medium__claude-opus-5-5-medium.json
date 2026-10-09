@@ -1,0 +1,23 @@
+{
+ "task": "t09_thread_safety",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 66.0,
+ "tokens": {
+  "input": 8,
+  "cached": 81874,
+  "cache_write": 16651,
+  "output": 2813,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.2058748,
+ "error": null
+}

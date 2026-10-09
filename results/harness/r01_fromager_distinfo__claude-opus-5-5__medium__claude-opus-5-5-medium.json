@@ -1,0 +1,23 @@
+{
+ "task": "r01_fromager_distinfo",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 82.3,
+ "tokens": {
+  "input": 22,
+  "cached": 653707,
+  "cache_write": 93384,
+  "output": 8514,
+  "reasoning": 0
+ },
+ "turns": 11,
+ "cost_usd": 1.0481814,
+ "error": null
+}

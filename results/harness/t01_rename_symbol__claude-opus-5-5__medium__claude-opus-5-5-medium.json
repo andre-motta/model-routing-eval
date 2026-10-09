@@ -1,0 +1,23 @@
+{
+ "task": "t01_rename_symbol",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 11.3,
+ "tokens": {
+  "input": 6,
+  "cached": 64608,
+  "cache_write": 23215,
+  "output": 789,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.2144456,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "r01_fromager_distinfo",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low",
+ "wall_s": 55.0,
+ "tokens": {
+  "input": 14,
+  "cached": 239043,
+  "cache_write": 48043,
+  "output": 4537,
+  "reasoning": 0
+ },
+ "turns": 7,
+ "cost_usd": 0.2853786,
+ "error": null
+}

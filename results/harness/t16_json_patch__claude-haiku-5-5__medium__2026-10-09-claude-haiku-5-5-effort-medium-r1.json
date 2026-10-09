@@ -1,0 +1,23 @@
+{
+ "task": "t16_json_patch",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium-r1",
+ "wall_s": 59.3,
+ "tokens": {
+  "input": 14,
+  "cached": 253641,
+  "cache_write": 50172,
+  "output": 14123,
+  "reasoning": 0
+ },
+ "turns": 7,
+ "cost_usd": 0.019633710000000002,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "t14_dep_resolver",
+ "tier": 4,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh",
+ "wall_s": 312.0,
+ "tokens": {
+  "input": 34949,
+  "cached": 459008,
+  "cache_write": 0,
+  "output": 16109,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.012645,
+ "error": null
+}

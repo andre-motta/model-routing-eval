@@ -1,0 +1,23 @@
+{
+ "task": "r03_fromager_dep_chain",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 115.8,
+ "tokens": {
+  "input": 30,
+  "cached": 793301,
+  "cache_write": 84241,
+  "output": 9913,
+  "reasoning": 0
+ },
+ "turns": 15,
+ "cost_usd": 1.0309682,
+ "error": null
+}

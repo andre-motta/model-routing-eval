@@ -1,0 +1,23 @@
+{
+ "task": "r03t_fromager_dep_chain_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": 4,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low",
+ "wall_s": 108.5,
+ "tokens": {
+  "input": 50,
+  "cached": 1762291,
+  "cache_write": 109870,
+  "output": 8176,
+  "reasoning": 0
+ },
+ "turns": 25,
+ "cost_usd": 0.8737982000000002,
+ "error": null
+}

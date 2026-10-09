@@ -1,0 +1,23 @@
+{
+ "task": "t05_cli_json_flag",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low",
+ "wall_s": 22.1,
+ "tokens": {
+  "input": 12,
+  "cached": 167202,
+  "cache_write": 37649,
+  "output": 3149,
+  "reasoning": 0
+ },
+ "turns": 6,
+ "cost_usd": 0.010777519999999999,
+ "error": null
+}

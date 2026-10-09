@@ -1,0 +1,23 @@
+{
+ "task": "t16_json_patch",
+ "tier": 4,
+ "backend": "codex",
+ "model": "gpt-5.6-terra",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "gpt-5.6-terra-medium-hard",
+ "wall_s": 258.8,
+ "tokens": {
+  "input": 31111,
+  "cached": 261632,
+  "cache_write": 0,
+  "output": 9735,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.169146,
+ "error": null
+}

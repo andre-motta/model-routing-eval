@@ -1,0 +1,23 @@
+{
+ "task": "t06_log_parser",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-medium",
+ "wall_s": 40.1,
+ "tokens": {
+  "input": 8,
+  "cached": 91663,
+  "cache_write": 25186,
+  "output": 3357,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.1526626,
+ "error": null
+}

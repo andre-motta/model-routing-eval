@@ -1,0 +1,23 @@
+{
+ "task": "t12_needle_bug",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 16.5,
+ "tokens": {
+  "input": 8,
+  "cached": 116273,
+  "cache_write": 44132,
+  "output": 1300,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.2127986,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "t04_lru_cache",
+ "tier": 2,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low",
+ "wall_s": 96.3,
+ "tokens": {
+  "input": 28937,
+  "cached": 281344,
+  "cache_write": 0,
+  "output": 3127,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.004377,
+ "error": null
+}

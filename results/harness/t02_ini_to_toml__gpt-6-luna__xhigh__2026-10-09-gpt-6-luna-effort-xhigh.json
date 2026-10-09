@@ -1,0 +1,23 @@
+{
+ "task": "t02_ini_to_toml",
+ "tier": 1,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh",
+ "wall_s": 113.7,
+ "tokens": {
+  "input": 27978,
+  "cached": 225792,
+  "cache_write": 0,
+  "output": 5181,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.004848,
+ "error": null
+}

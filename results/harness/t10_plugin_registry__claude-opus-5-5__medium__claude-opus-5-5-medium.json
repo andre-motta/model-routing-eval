@@ -1,0 +1,23 @@
+{
+ "task": "t10_plugin_registry",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 35.5,
+ "tokens": {
+  "input": 10,
+  "cached": 140943,
+  "cache_write": 35526,
+  "output": 3955,
+  "reasoning": 0
+ },
+ "turns": 5,
+ "cost_usd": 0.3915366,
+ "error": null
+}

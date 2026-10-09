@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-medium",
+ "wall_s": 33.8,
+ "tokens": {
+  "input": 16,
+  "cached": 402425,
+  "cache_write": 80365,
+  "output": 2877,
+  "reasoning": 0
+ },
+ "turns": 8,
+ "cost_usd": 0.430747,
+ "error": null
+}

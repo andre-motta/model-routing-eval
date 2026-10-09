@@ -61,7 +61,8 @@ def main():
                        tokens=dict(input=tk.get("input", 0), cached=tk.get("cache_read", 0),
                                    cache_write=tk.get("cache_create", 0), output=tk.get("output", 0), reasoning=0),
                        turns=c.get("num_turns", 0), cost_usd=c.get("cost_usd"), error=c.get("error_class"))
-            (out / f"{case_id}__{model}__{effort}__{run.name}.json").write_text(json.dumps(rec, indent=1))
+            safe = (model or "unknown").replace("/", "_")
+            (out / f"{case_id}__{safe}__{effort}__{run.name}.json").write_text(json.dumps(rec, indent=1))
             n += 1
     print(f"imported {n} case records into {out}")
 

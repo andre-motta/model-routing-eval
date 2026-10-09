@@ -1,0 +1,23 @@
+{
+ "task": "r01_fromager_distinfo",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium",
+ "wall_s": 160.8,
+ "tokens": {
+  "input": 54,
+  "cached": 2823724,
+  "cache_write": 158312,
+  "output": 33989,
+  "reasoning": 0
+ },
+ "turns": 27,
+ "cost_usd": 0.27517810000000004,
+ "error": null
+}

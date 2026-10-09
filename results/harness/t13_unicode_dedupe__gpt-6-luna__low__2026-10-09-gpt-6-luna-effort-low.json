@@ -1,0 +1,23 @@
+{
+ "task": "t13_unicode_dedupe",
+ "tier": 3,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low",
+ "wall_s": 37.0,
+ "tokens": {
+  "input": 37055,
+  "cached": 99840,
+  "cache_write": 0,
+  "output": 1241,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.001619,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "r03t_fromager_dep_chain_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": 4,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium-r1",
+ "wall_s": 182.7,
+ "tokens": {
+  "input": 66,
+  "cached": 3439668,
+  "cache_write": 174515,
+  "output": 35117,
+  "reasoning": 0
+ },
+ "turns": 33,
+ "cost_usd": 0.31723097999999994,
+ "error": null
+}

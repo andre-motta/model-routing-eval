@@ -1,0 +1,23 @@
+{
+ "task": "t13_unicode_dedupe",
+ "tier": 3,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-low-r1",
+ "wall_s": 59.0,
+ "tokens": {
+  "input": 16083,
+  "cached": 132480,
+  "cache_write": 0,
+  "output": 1818,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.031428,
+ "error": null
+}

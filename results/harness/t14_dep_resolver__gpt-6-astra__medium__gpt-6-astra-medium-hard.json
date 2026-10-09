@@ -1,0 +1,23 @@
+{
+ "task": "t14_dep_resolver",
+ "tier": 4,
+ "backend": "codex",
+ "model": "gpt-6-astra",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "gpt-6-astra-medium-hard",
+ "wall_s": 157.6,
+ "tokens": {
+  "input": 23540,
+  "cached": 198144,
+  "cache_write": 0,
+  "output": 5900,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.493144,
+ "error": null
+}

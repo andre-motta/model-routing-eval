@@ -1,0 +1,23 @@
+{
+ "task": "r04_fromager_age_fallback",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low",
+ "wall_s": 115.3,
+ "tokens": {
+  "input": 69401,
+  "cached": 742656,
+  "cache_write": 0,
+  "output": 4422,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.009638,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "r01_fromager_distinfo",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-5.6-terra",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "gpt-5.6-terra-medium-hard",
+ "wall_s": 319.6,
+ "tokens": {
+  "input": 75385,
+  "cached": 1053440,
+  "cache_write": 0,
+  "output": 10396,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.33544,
+ "error": null
+}

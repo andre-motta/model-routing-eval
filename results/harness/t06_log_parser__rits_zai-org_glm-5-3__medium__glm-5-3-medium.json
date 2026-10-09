@@ -1,0 +1,23 @@
+{
+ "task": "t06_log_parser",
+ "tier": 2,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 157.3,
+ "tokens": {
+  "input": 26070,
+  "cached": 531968,
+  "cache_write": 0,
+  "output": 5882,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}

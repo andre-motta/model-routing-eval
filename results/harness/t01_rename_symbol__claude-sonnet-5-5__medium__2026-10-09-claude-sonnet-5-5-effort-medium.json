@@ -1,0 +1,23 @@
+{
+ "task": "t01_rename_symbol",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-medium",
+ "wall_s": 8.3,
+ "tokens": {
+  "input": 6,
+  "cached": 58318,
+  "cache_write": 16531,
+  "output": 433,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.08212960000000001,
+ "error": null
+}

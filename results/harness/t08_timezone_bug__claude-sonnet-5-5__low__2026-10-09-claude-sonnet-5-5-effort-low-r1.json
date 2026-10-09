@@ -1,0 +1,23 @@
+{
+ "task": "t08_timezone_bug",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 18.8,
+ "tokens": {
+  "input": 10,
+  "cached": 121317,
+  "cache_write": 30212,
+  "output": 1660,
+  "reasoning": 0
+ },
+ "turns": 5,
+ "cost_usd": 0.16173140000000003,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "t11_async_migration",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-medium",
+ "wall_s": 21.8,
+ "tokens": {
+  "input": 6,
+  "cached": 66392,
+  "cache_write": 28298,
+  "output": 2833,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.1548124,
+ "error": null
+}

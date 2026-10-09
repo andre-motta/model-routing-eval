@@ -1,0 +1,23 @@
+{
+ "task": "r03t_fromager_dep_chain_ticket",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "low",
+ "rep": 0,
+ "passed": false,
+ "quality": null,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-low",
+ "wall_s": 103.5,
+ "tokens": {
+  "input": 48930,
+  "cached": 465408,
+  "cache_write": 0,
+  "output": 2144,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.067981,
+ "error": null
+}

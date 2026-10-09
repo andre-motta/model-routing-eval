@@ -1,0 +1,23 @@
+{
+ "task": "t10_plugin_registry",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium-r1",
+ "wall_s": 52.1,
+ "tokens": {
+  "input": 26,
+  "cached": 473623,
+  "cache_write": 46598,
+  "output": 10790,
+  "reasoning": 0
+ },
+ "turns": 13,
+ "cost_usd": 0.01945343,
+ "error": null
+}

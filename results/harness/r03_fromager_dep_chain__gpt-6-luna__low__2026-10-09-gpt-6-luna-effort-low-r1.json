@@ -1,0 +1,23 @@
+{
+ "task": "r03_fromager_dep_chain",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low-r1",
+ "wall_s": 244.5,
+ "tokens": {
+  "input": 52523,
+  "cached": 1351168,
+  "cache_write": 0,
+  "output": 4339,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.015681,
+ "error": null
+}

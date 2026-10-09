@@ -1,0 +1,23 @@
+{
+ "task": "r01t_fromager_distinfo_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium-r1",
+ "wall_s": 64.1,
+ "tokens": {
+  "input": 32,
+  "cached": 940033,
+  "cache_write": 91920,
+  "output": 12355,
+  "reasoning": 0
+ },
+ "turns": 16,
+ "cost_usd": 0.04330187,
+ "error": null
+}

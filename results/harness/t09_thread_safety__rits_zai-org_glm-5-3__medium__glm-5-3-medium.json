@@ -1,0 +1,23 @@
+{
+ "task": "t09_thread_safety",
+ "tier": 3,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 241.2,
+ "tokens": {
+  "input": 86780,
+  "cached": 592896,
+  "cache_write": 0,
+  "output": 8853,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}

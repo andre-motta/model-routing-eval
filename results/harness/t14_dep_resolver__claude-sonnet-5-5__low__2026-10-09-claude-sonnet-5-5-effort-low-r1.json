@@ -1,0 +1,23 @@
+{
+ "task": "t14_dep_resolver",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 30.7,
+ "tokens": {
+  "input": 6,
+  "cached": 58591,
+  "cache_write": 22487,
+  "output": 3925,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.1409282,
+ "error": null
+}

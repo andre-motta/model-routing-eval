@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low-r1",
+ "wall_s": 50.9,
+ "tokens": {
+  "input": 34,
+  "cached": 972047,
+  "cache_write": 75094,
+  "output": 8765,
+  "reasoning": 0
+ },
+ "turns": 17,
+ "cost_usd": 0.02912517,
+ "error": null
+}

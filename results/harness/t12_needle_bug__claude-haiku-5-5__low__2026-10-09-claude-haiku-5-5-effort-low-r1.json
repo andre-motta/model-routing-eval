@@ -1,0 +1,23 @@
+{
+ "task": "t12_needle_bug",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low-r1",
+ "wall_s": 19.2,
+ "tokens": {
+  "input": 12,
+  "cached": 214502,
+  "cache_write": 46332,
+  "output": 3173,
+  "reasoning": 0
+ },
+ "turns": 6,
+ "cost_usd": 0.01299912,
+ "error": null
+}

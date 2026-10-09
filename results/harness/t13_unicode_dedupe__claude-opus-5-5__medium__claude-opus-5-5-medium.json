@@ -1,0 +1,23 @@
+{
+ "task": "t13_unicode_dedupe",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 34.7,
+ "tokens": {
+  "input": 10,
+  "cached": 121880,
+  "cache_write": 26805,
+  "output": 3137,
+  "reasoning": 0
+ },
+ "turns": 5,
+ "cost_usd": 0.30159600000000003,
+ "error": null
+}

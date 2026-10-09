@@ -1,0 +1,23 @@
+{
+ "task": "t12_needle_bug",
+ "tier": 5,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh",
+ "wall_s": 79.1,
+ "tokens": {
+  "input": 25847,
+  "cached": 151808,
+  "cache_write": 0,
+  "output": 3571,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.003304,
+ "error": null
+}

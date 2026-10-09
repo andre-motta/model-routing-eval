@@ -1,0 +1,23 @@
+{
+ "task": "r05_fromager_version_prebuilt",
+ "tier": 6,
+ "backend": "codex",
+ "model": "gpt-6-astra",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "gpt-6-astra-medium-hard",
+ "wall_s": 245.3,
+ "tokens": {
+  "input": 69157,
+  "cached": 715520,
+  "cache_write": 0,
+  "output": 8547,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 1.14287,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "t07_mutable_default",
+ "tier": 3,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 135.3,
+ "tokens": {
+  "input": 37614,
+  "cached": 513024,
+  "cache_write": 0,
+  "output": 4251,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}

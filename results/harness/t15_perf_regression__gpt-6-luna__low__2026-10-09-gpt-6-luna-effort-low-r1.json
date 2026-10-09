@@ -1,0 +1,23 @@
+{
+ "task": "t15_perf_regression",
+ "tier": 5,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 1,
+ "passed": false,
+ "quality": null,
+ "verify_tail": "hidden tests failed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low-r1",
+ "wall_s": 19.4,
+ "tokens": {
+  "input": 38562,
+  "cached": 48384,
+  "cache_write": 0,
+  "output": 380,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.000674,
+ "error": null
+}

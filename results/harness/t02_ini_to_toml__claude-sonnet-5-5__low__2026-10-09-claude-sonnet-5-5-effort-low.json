@@ -1,0 +1,23 @@
+{
+ "task": "t02_ini_to_toml",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low",
+ "wall_s": 20.5,
+ "tokens": {
+  "input": 8,
+  "cached": 102640,
+  "cache_write": 31452,
+  "output": 942,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.155772,
+ "error": null
+}

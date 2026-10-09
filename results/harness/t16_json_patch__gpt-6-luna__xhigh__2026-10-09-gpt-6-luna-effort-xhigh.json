@@ -1,0 +1,23 @@
+{
+ "task": "t16_json_patch",
+ "tier": 4,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh",
+ "wall_s": 315.0,
+ "tokens": {
+  "input": 36174,
+  "cached": 465152,
+  "cache_write": 0,
+  "output": 16293,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.012798,
+ "error": null
+}

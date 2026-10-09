@@ -1,0 +1,23 @@
+{
+ "task": "r04_fromager_age_fallback",
+ "tier": 6,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 409.8,
+ "tokens": {
+  "input": 109548,
+  "cached": 2670592,
+  "cache_write": 0,
+  "output": 10657,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}

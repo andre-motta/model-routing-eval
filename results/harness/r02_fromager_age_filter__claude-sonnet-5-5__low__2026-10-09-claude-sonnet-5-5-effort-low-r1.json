@@ -1,0 +1,23 @@
+{
+ "task": "r02_fromager_age_filter",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 21.6,
+ "tokens": {
+  "input": 8,
+  "cached": 99616,
+  "cache_write": 26688,
+  "output": 2395,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.1506412,
+ "error": null
+}

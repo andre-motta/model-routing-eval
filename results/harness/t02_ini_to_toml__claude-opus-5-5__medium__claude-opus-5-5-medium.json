@@ -1,0 +1,23 @@
+{
+ "task": "t02_ini_to_toml",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 16.6,
+ "tokens": {
+  "input": 8,
+  "cached": 85696,
+  "cache_write": 23756,
+  "output": 1232,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.2318592,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "t01_rename_symbol",
+ "tier": 1,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-low-r1",
+ "wall_s": 38.7,
+ "tokens": {
+  "input": 22205,
+  "cached": 182016,
+  "cache_write": 0,
+  "output": 1061,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.002351,
+ "error": null
+}

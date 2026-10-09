@@ -1,0 +1,23 @@
+{
+ "task": "t09_thread_safety",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low-r1",
+ "wall_s": 30.3,
+ "tokens": {
+  "input": 8,
+  "cached": 94395,
+  "cache_write": 27436,
+  "output": 4272,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.008567950000000001,
+ "error": null
+}

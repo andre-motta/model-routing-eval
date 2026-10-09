@@ -1,0 +1,23 @@
+{
+ "task": "t13_unicode_dedupe",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low",
+ "wall_s": 21.9,
+ "tokens": {
+  "input": 10,
+  "cached": 120649,
+  "cache_write": 26974,
+  "output": 3757,
+  "reasoning": 0
+ },
+ "turns": 5,
+ "cost_usd": 0.00848079,
+ "error": null
+}

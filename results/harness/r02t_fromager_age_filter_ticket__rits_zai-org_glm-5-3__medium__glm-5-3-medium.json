@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": false,
+ "quality": null,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 364.8,
+ "tokens": {
+  "input": 97780,
+  "cached": 1734656,
+  "cache_write": 0,
+  "output": 8469,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}

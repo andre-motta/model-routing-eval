@@ -1,0 +1,23 @@
+{
+ "task": "r02_fromager_age_filter",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-medium",
+ "wall_s": 104.9,
+ "tokens": {
+  "input": 24,
+  "cached": 677028,
+  "cache_write": 81748,
+  "output": 9715,
+  "reasoning": 0
+ },
+ "turns": 12,
+ "cost_usd": 0.02797978,
+ "error": null
+}

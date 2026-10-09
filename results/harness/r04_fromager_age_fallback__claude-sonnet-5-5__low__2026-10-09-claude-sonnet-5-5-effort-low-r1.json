@@ -1,0 +1,23 @@
+{
+ "task": "r04_fromager_age_fallback",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 39.3,
+ "tokens": {
+  "input": 12,
+  "cached": 209072,
+  "cache_write": 47682,
+  "output": 4810,
+  "reasoning": 0
+ },
+ "turns": 6,
+ "cost_usd": 0.2806664,
+ "error": null
+}

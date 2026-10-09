@@ -1,0 +1,23 @@
+{
+ "task": "t15_perf_regression",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low",
+ "wall_s": 19.8,
+ "tokens": {
+  "input": 8,
+  "cached": 91418,
+  "cache_write": 24526,
+  "output": 1118,
+  "reasoning": 0
+ },
+ "turns": 4,
+ "cost_usd": 0.12758360000000002,
+ "error": null
+}

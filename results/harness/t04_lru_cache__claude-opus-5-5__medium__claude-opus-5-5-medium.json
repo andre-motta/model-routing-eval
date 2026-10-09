@@ -1,0 +1,23 @@
+{
+ "task": "t04_lru_cache",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 38.4,
+ "tokens": {
+  "input": 6,
+  "cached": 56563,
+  "cache_write": 24554,
+  "output": 4330,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.2943686,
+ "error": null
+}

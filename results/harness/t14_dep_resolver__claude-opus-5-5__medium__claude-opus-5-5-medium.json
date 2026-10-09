@@ -1,0 +1,23 @@
+{
+ "task": "t14_dep_resolver",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 903.1,
+ "tokens": {
+  "input": 54,
+  "cached": 2423883,
+  "cache_write": 170544,
+  "output": 40786,
+  "reasoning": 0
+ },
+ "turns": 27,
+ "cost_usd": 2.6650646,
+ "error": null
+}

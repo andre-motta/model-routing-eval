@@ -1,0 +1,23 @@
+{
+ "task": "t16_json_patch",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-sonnet-5-5-effort-low-r1",
+ "wall_s": 31.8,
+ "tokens": {
+  "input": 6,
+  "cached": 59914,
+  "cache_write": 25768,
+  "output": 4365,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.1587168,
+ "error": null
+}

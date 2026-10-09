@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 55.1,
+ "tokens": {
+  "input": 20,
+  "cached": 496961,
+  "cache_write": 71433,
+  "output": 4891,
+  "reasoning": 0
+ },
+ "turns": 10,
+ "cost_usd": 0.7687562000000001,
+ "error": null
+}

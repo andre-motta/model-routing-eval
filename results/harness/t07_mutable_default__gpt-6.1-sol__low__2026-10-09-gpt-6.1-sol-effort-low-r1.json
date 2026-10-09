@@ -1,0 +1,23 @@
+{
+ "task": "t07_mutable_default",
+ "tier": 3,
+ "backend": "codex",
+ "model": "gpt-6.1-sol",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6.1-sol-effort-low-r1",
+ "wall_s": 45.4,
+ "tokens": {
+  "input": 20745,
+  "cached": 125568,
+  "cache_write": 0,
+  "output": 1315,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.025707,
+ "error": null
+}

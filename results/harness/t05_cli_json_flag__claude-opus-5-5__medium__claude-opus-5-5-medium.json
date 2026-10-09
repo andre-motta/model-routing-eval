@@ -1,0 +1,23 @@
+{
+ "task": "t05_cli_json_flag",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "claude-opus-5-5-medium",
+ "wall_s": 15.9,
+ "tokens": {
+  "input": 6,
+  "cached": 59890,
+  "cache_write": 29491,
+  "output": 1524,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.27841,
+ "error": null
+}

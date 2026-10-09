@@ -1,0 +1,23 @@
+{
+ "task": "t11_async_migration",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-claude-haiku-5-5-effort-low-r1",
+ "wall_s": 24.2,
+ "tokens": {
+  "input": 12,
+  "cached": 189618,
+  "cache_write": 35147,
+  "output": 5209,
+  "reasoning": 0
+ },
+ "turns": 6,
+ "cost_usd": 0.011531280000000001,
+ "error": null
+}

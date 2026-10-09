@@ -1,0 +1,23 @@
+{
+ "task": "t11_async_migration",
+ "tier": 4,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "xhigh",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "2026-10-09-gpt-6-luna-effort-xhigh",
+ "wall_s": 144.1,
+ "tokens": {
+  "input": 21051,
+  "cached": 263680,
+  "cache_write": 0,
+  "output": 7099,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.006186,
+ "error": null
+}

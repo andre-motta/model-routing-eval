@@ -1,0 +1,23 @@
+{
+ "task": "t10_plugin_registry",
+ "tier": 4,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "glm-5-3-medium",
+ "wall_s": 212.2,
+ "tokens": {
+  "input": 42989,
+  "cached": 526848,
+  "cache_write": 0,
+  "output": 9796,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.0,
+ "error": null
+}
