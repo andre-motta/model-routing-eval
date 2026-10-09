@@ -1,0 +1,291 @@
+"""Tests for PEP 658 metadata support."""
+
+import typing
+from io import BytesIO
+from unittest.mock import Mock, patch
+from zipfile import ZipFile
+
+import pytest
+from packaging.version import Version
+
+from fromager.candidate import (
+    Candidate,
+    _wheel_metadata_path,
+    get_metadata_for_wheel,
+)
+from fromager.pkgmetadata.pep376 import dist_info_name
+
+
+class TestPEP658Support:
+    """Test PEP 658 metadata support in fromager."""
+
+    def test_candidate_with_metadata_url(self) -> None:
+        """Test that Candidate can be created with a metadata URL."""
+        candidate = Candidate(
+            name="test-package",
+            version=Version("1.0.0"),
+            url="https://example.com/test-package-1.0.0-py3-none-any.whl",
+            has_metadata=True,
+        )
+
+        assert (
+            candidate.metadata_url
+            == "https://example.com/test-package-1.0.0-py3-none-any.whl.metadata"
+        )
+
+    def test_candidate_without_metadata_url(self) -> None:
+        """Test that Candidate works without metadata URL (legacy behavior)."""
+        candidate = Candidate(
+            name="test-package",
+            version=Version("1.0.0"),
+            url="https://example.com/test-package-1.0.0-py3-none-any.whl",
+        )
+
+        assert candidate.metadata_url is None
+
+    @patch("fromager.candidate.session")
+    def test_get_metadata_with_pep658_success(self, mock_session: typing.Any) -> None:
+        """Test successful metadata retrieval via PEP 658 endpoint."""
+        # Mock the metadata response
+        mock_response = Mock()
+        mock_response.content = b"""Metadata-Version: 2.1
+Name: test-package
+Version: 1.0.0
+Summary: A test package
+Requires-Dist: requests >= 2.0.0
+"""
+        mock_response.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_response
+
+        wheel_url = "https://example.com/test-package-1.0.0-py3-none-any.whl"
+        metadata_url = (
+            "https://example.com/test-package-1.0.0-py3-none-any.whl.metadata"
+        )
+
+        metadata = get_metadata_for_wheel(wheel_url, metadata_url)
+
+        # Verify the metadata was parsed correctly
+        assert metadata.name == "test-package"
+        assert str(metadata.version) == "1.0.0"
+        assert metadata.summary == "A test package"
+        assert metadata.requires_dist is not None
+        assert any(str(req) == "requests>=2.0.0" for req in metadata.requires_dist)
+
+        # Verify only the metadata URL was called, not the wheel URL
+        mock_session.get.assert_called_once_with(metadata_url)
+
+    @patch("fromager.candidate.session")
+    def test_get_metadata_pep658_fallback_behavior(
+        self, mock_session: typing.Any
+    ) -> None:
+        """Test that PEP 658 is tried first, then falls back to wheel download."""
+        # Mock that metadata URL fails, then wheel URL succeeds
+        responses = []
+
+        def side_effect(url: str) -> typing.Any:
+            if url.endswith(".metadata"):
+                # First call - metadata request fails
+                mock_response = Mock()
+                mock_response.raise_for_status.side_effect = Exception("404 Not Found")
+                responses.append(("metadata", url))
+                return mock_response
+            else:
+                # Second call - wheel request
+                responses.append(("wheel", url))
+                raise Exception("Wheel parsing intentionally mocked to fail")
+
+        mock_session.get.side_effect = side_effect
+
+        wheel_url = "https://example.com/test-package-1.0.0-py3-none-any.whl"
+        metadata_url = (
+            "https://example.com/test-package-1.0.0-py3-none-any.whl.metadata"
+        )
+
+        # This should raise an exception during wheel parsing, but we can verify the order
+        try:
+            get_metadata_for_wheel(wheel_url, metadata_url)
+        except Exception:
+            pass  # Expected to fail during wheel parsing mock
+
+        # Verify that both URLs were called in the correct order
+        assert len(responses) == 2
+        assert responses[0] == ("metadata", metadata_url)
+        assert responses[1] == ("wheel", wheel_url)
+        assert mock_session.get.call_count == 2
+
+    @patch("fromager.candidate.session")
+    def test_get_metadata_without_pep658_behavior(
+        self, mock_session: typing.Any
+    ) -> None:
+        """Test that without PEP 658 metadata URL, only wheel URL is called."""
+        # Mock wheel request
+        responses = []
+
+        def side_effect(url: str) -> typing.Any:
+            responses.append(("wheel", url))
+            raise Exception("Wheel parsing intentionally mocked to fail")
+
+        mock_session.get.side_effect = side_effect
+
+        wheel_url = "https://example.com/test-package-1.0.0-py3-none-any.whl"
+
+        # This should raise an exception during wheel parsing, but we can verify the behavior
+        try:
+            get_metadata_for_wheel(wheel_url, metadata_url=None)
+        except Exception:
+            pass  # Expected to fail during wheel parsing mock
+
+        # Verify that only the wheel URL was called
+        assert len(responses) == 1
+        assert responses[0] == ("wheel", wheel_url)
+        mock_session.get.assert_called_once_with(wheel_url)
+
+    def test_candidate_repr_with_metadata_url(self) -> None:
+        """Test that Candidate representation includes metadata URL info."""
+        candidate = Candidate(
+            name="test-package",
+            version=Version("1.0.0"),
+            url="https://example.com/test-package-1.0.0-py3-none-any.whl",
+            has_metadata=True,
+        )
+
+        # The candidate should have the metadata URL attribute
+        assert hasattr(candidate, "metadata_url")
+        assert (
+            candidate.metadata_url
+            == "https://example.com/test-package-1.0.0-py3-none-any.whl.metadata"
+        )
+
+    def test_metadata_url_construction(self) -> None:
+        """Test that metadata URLs are constructed correctly."""
+        base_url = (
+            "https://pypi.org/simple/test-package/test-package-1.0.0-py3-none-any.whl"
+        )
+        expected_metadata_url = base_url + ".metadata"
+
+        # This tests the expected pattern for PEP 658 metadata URLs
+        assert expected_metadata_url.endswith(".whl.metadata")
+        assert expected_metadata_url.startswith("https://")
+
+    def test_pep658_integration_with_resolver(self) -> None:
+        """Test that PEP 658 metadata URLs are properly handled by the candidate system."""
+        # Test the basic integration of metadata URLs with candidates
+        candidate_with_metadata = Candidate(
+            name="test-package",
+            version=Version("1.0.0"),
+            url="https://example.com/test.whl",
+            has_metadata=True,
+        )
+
+        candidate_without_metadata = Candidate(
+            name="test-package",
+            version=Version("1.0.0"),
+            url="https://example.com/test.whl",
+        )
+
+        assert (
+            candidate_with_metadata.metadata_url
+            == "https://example.com/test.whl.metadata"
+        )
+
+        # Verify PEP 658 metadata URL handling
+        assert (
+            candidate_with_metadata.metadata_url
+            == "https://example.com/test.whl.metadata"
+        )
+        assert candidate_without_metadata.metadata_url is None
+
+        # Both should have the same basic properties
+        assert candidate_with_metadata.name == candidate_without_metadata.name
+        assert candidate_with_metadata.version == candidate_without_metadata.version
+        assert candidate_with_metadata.url == candidate_without_metadata.url
+
+
+class TestDistInfoName:
+    """Test dist_info_name — single source of truth for dist-info directory names."""
+
+    def test_standard_wheel(self) -> None:
+        assert (
+            dist_info_name("test_package-1.0.0-py3-none-any.whl")
+            == "test_package-1.0.0.dist-info"
+        )
+
+    def test_preserves_verbatim_casing(self) -> None:
+        assert (
+            dist_info_name("MarkupSafe-2.1.0-cp311-cp311-linux_x86_64.whl")
+            == "MarkupSafe-2.1.0.dist-info"
+        )
+
+    def test_non_wheel_extension_raises(self) -> None:
+        with pytest.raises(ValueError, match="Invalid wheel filename"):
+            dist_info_name("pkg-1.0.tar.gz")
+
+    def test_malformed_wheel_filename_raises(self) -> None:
+        with pytest.raises(ValueError, match="Invalid wheel filename"):
+            dist_info_name("pkg-1.0-bad.whl")
+
+
+class TestWheelMetadataPath:
+    """Test _wheel_metadata_path — URL to METADATA zip path."""
+
+    def test_simple_wheel_url(self) -> None:
+        url = "https://pkg.test/simple/test_package-1.0.0-py3-none-any.whl"
+        assert _wheel_metadata_path(url) == "test_package-1.0.0.dist-info/METADATA"
+
+    def test_preserves_original_casing(self) -> None:
+        url = "https://pkg.test/simple/MarkupSafe-2.1.0-cp311-cp311-linux_x86_64.whl"
+        assert _wheel_metadata_path(url) == "MarkupSafe-2.1.0.dist-info/METADATA"
+
+    def test_url_with_path_segments(self) -> None:
+        url = "https://pkg.test/packages/ab/cd/my_pkg-0.9-py3-none-any.whl"
+        assert _wheel_metadata_path(url) == "my_pkg-0.9.dist-info/METADATA"
+
+    def test_url_with_fragment(self) -> None:
+        url = "https://pkg.test/simple/pkg-1.0-py3-none-any.whl#sha256=abc123"
+        assert _wheel_metadata_path(url) == "pkg-1.0.dist-info/METADATA"
+
+    @patch("fromager.candidate.session")
+    def test_fallback_selects_correct_distinfo(self, mock_session: typing.Any) -> None:
+        """Wheels with vendored dist-info directories must not confuse extraction."""
+        # Build a wheel zip with a vendored dist-info AND the real one
+        buf = BytesIO()
+        with ZipFile(buf, "w") as zf:
+            zf.writestr(
+                "vendored/six-1.16.0.dist-info/METADATA",
+                "Metadata-Version: 2.1\nName: six\nVersion: 1.16.0\n",
+            )
+            zf.writestr(
+                "my_pkg-1.0.0.dist-info/METADATA",
+                (
+                    "Metadata-Version: 2.1\n"
+                    "Name: my-pkg\n"
+                    "Version: 1.0.0\n"
+                    "Summary: The real package\n"
+                ),
+            )
+
+        mock_response = Mock()
+        mock_response.content = buf.getvalue()
+        mock_session.get.return_value = mock_response
+
+        wheel_url = "https://pkg.test/simple/my_pkg-1.0.0-py3-none-any.whl"
+        metadata = get_metadata_for_wheel(wheel_url, metadata_url=None)
+
+        assert metadata.name == "my-pkg"
+        assert str(metadata.version) == "1.0.0"
+        assert metadata.summary == "The real package"
+
+    @patch("fromager.candidate.session")
+    def test_fallback_missing_metadata_raises(self, mock_session: typing.Any) -> None:
+        """A wheel without the expected dist-info/METADATA raises ValueError."""
+        buf = BytesIO()
+        with ZipFile(buf, "w") as zf:
+            zf.writestr("some_other_file.txt", "hello")
+
+        mock_response = Mock()
+        mock_response.content = buf.getvalue()
+        mock_session.get.return_value = mock_response
+
+        wheel_url = "https://pkg.test/simple/my_pkg-1.0.0-py3-none-any.whl"
+        with pytest.raises(ValueError, match="Could not find"):
+            get_metadata_for_wheel(wheel_url, metadata_url=None)

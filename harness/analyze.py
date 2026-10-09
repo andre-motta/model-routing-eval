@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
 
-TIER_NAMES = {1: "Mechanical", 2: "Bounded impl", 3: "Debugging", 4: "Architecture", 5: "Long context"}
+TIER_NAMES = {1: "Mechanical", 2: "Bounded impl", 3: "Debugging", 4: "Architecture", 5: "Long context", 6: "Real repo"}
 
 
 def load(root: Path) -> pd.DataFrame:

@@ -5,7 +5,7 @@ Small, reproducible experiment behind the Red Hat AI Enablement session
 
 > What is the cheapest (model, reasoning effort) pair that still gets this task right?
 
-Sixteen coding tasks in five difficulty tiers, run headlessly through a real
+Nineteen coding tasks in six difficulty tiers, run headlessly through a real
 coding agent (OpenAI Codex CLI or Claude Code), verified by hidden tests,
 with tokens, cost and wall time recorded per run.
 
@@ -31,6 +31,7 @@ results/                 raw records (committed for the talk)
 | 3 | Debugging | mutable default, timezone, thread safety, unicode dedupe |
 | 4 | Architecture | plugin registry refactor, sync to async migration, backtracking dependency resolver, JSON Patch |
 | 5 | Long context | one-cent rounding bug and a quadratic regression, each hidden in a 40-module package |
+| 6 | Real repository | three fromager bug fixes (#1146, age filter bypass, #1214), hidden tests are the real PR's tests |
 
 ## Run
 
@@ -55,6 +56,20 @@ Backends:
 Each run gets a fresh copy of the fixture in a temp dir with `git init`, so
 the agent cannot see hidden tests or other runs. The diff the agent produced
 is saved next to the record.
+
+## Real-repository tasks
+
+Tier 6 tasks have no `fixture/`. `task.yaml` names a `source` repo and commit (the parent
+of the real fix), `setup` commands that run before the agent starts (here: create
+`.venv` and install the project), `hidden_dest` (where the real PR's test file is
+dropped after the agent finishes) and a `verify` command. The repo is cloned once as a
+bare mirror under `.cache/repos/` and materialized with `git archive` per run.
+
+Validate any task with:
+
+```bash
+python harness/validate_task.py r01_fromager_distinfo --good-commit 3914e3e
+```
 
 ## Verification
 

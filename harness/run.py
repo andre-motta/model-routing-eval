@@ -48,12 +48,38 @@ def git(cwd, *a):
                         "GIT_COMMITTER_NAME": "eval", "GIT_COMMITTER_EMAIL": "eval@example.com"})
 
 
+CACHE = ROOT / ".cache" / "repos"
+
+
+def materialize_source(task, work):
+    """task.yaml `source: {repo: <url>, commit: <sha>}` checks out that commit into work (no history)."""
+    src = task["source"]
+    CACHE.mkdir(parents=True, exist_ok=True)
+    name = src["repo"].rstrip("/").split("/")[-1].removesuffix(".git")
+    cache = CACHE / name
+    if not cache.exists():
+        subprocess.run(["git", "clone", "-q", "--bare", src["repo"], str(cache)], check=True)
+    have = subprocess.run(["git", "-C", str(cache), "cat-file", "-e", src["commit"] + "^{commit}"], capture_output=True)
+    if have.returncode != 0:
+        subprocess.run(["git", "-C", str(cache), "fetch", "-q", "origin", "+refs/heads/*:refs/heads/*"], check=True)
+    tar = subprocess.run(["git", "-C", str(cache), "archive", src["commit"]], capture_output=True, check=True).stdout
+    subprocess.run(["tar", "-x", "-C", str(work)], input=tar, check=True)
+
+
 def prepare_workdir(task, keep_root):
     work = Path(tempfile.mkdtemp(prefix=f"{task['id']}_", dir=keep_root))
-    shutil.copytree(task["dir"] / "fixture", work, dirs_exist_ok=True)
+    if task.get("source"):
+        materialize_source(task, work)
+    if (task["dir"] / "fixture").exists():
+        shutil.copytree(task["dir"] / "fixture", work, dirs_exist_ok=True)
+    for cmd in task.get("setup", []):
+        r = subprocess.run(cmd, shell=True, cwd=work, capture_output=True, text=True, timeout=1200)
+        if r.returncode != 0:
+            raise RuntimeError(f"setup failed for {task['id']}: {cmd}\n{r.stderr[-800:]}")
     git(work, "init", "-q")
+    (work / ".git" / "info" / "exclude").write_text(".venv/\nhidden/\n")
     git(work, "add", "-A")
-    git(work, "commit", "-q", "-m", "fixture")
+    git(work, "commit", "-q", "-m", "fixture", "--allow-empty")
     return work
 
 
@@ -123,17 +149,23 @@ BACKENDS = {"codex": run_codex, "claude": run_claude}
 
 
 def verify(task, work):
+    """Copy hidden/ into `hidden_dest` (default hidden/), then run `verify` from task.yaml or pytest on hidden/."""
     hidden = task["dir"] / "hidden"
-    dest = work / "hidden"
-    if dest.exists():
-        shutil.rmtree(dest)
-    shutil.copytree(hidden, dest)
-    custom = task["dir"] / "verify.sh"
-    if custom.exists():
-        cmd = ["bash", str(custom)]
+    dest = work / task.get("hidden_dest", "hidden")
+    if task.get("hidden_dest"):
+        shutil.copytree(hidden, dest, dirs_exist_ok=True)
     else:
-        cmd = [sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider", "hidden"]
-    p = subprocess.run(cmd, cwd=work, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=600)
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(hidden, dest)
+    custom = task["dir"] / "verify.sh"
+    if task.get("verify"):
+        cmd, shell = task["verify"], True
+    elif custom.exists():
+        cmd, shell = ["bash", str(custom)], False
+    else:
+        cmd, shell = [sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider", "hidden"], False
+    p = subprocess.run(cmd, cwd=work, shell=shell, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=1200)
     return p.returncode == 0, (p.stdout + p.stderr)[-3000:]
 
 
