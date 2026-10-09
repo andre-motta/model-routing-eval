@@ -6,3 +6,4 @@ results/**/work/
 .cache/
 eval/runs/
 tmp/
+.deps/

@@ -65,6 +65,10 @@ hooks:
       description: "Copy hidden tests in, run the verifier, write output/tests.json and solution.diff"
       timeout: 1200
       on_failure: continue
+  before_scoring:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/price_runs.py"
+      description: "Re-price Codex cases from harness/pricing.py list prices (LiteLLM-independent)"
+      on_failure: continue
 
 outputs:
   - path: output

@@ -1,0 +1,77 @@
+From 1ed2f9bb0f4d67700ab908b0f9c4f53224ca5b4b Mon Sep 17 00:00:00 2001
+From: Andre Lustosa <alustosa@redhat.com>
+Date: Fri, 9 Oct 2026 10:31:25 -0400
+Subject: [PATCH] fix(codex): price models LiteLLM lists only under a provider
+ prefix
+
+New OpenAI models can sit in LiteLLM's pricing table as openai/<id> or
+azure/<id> (same list price) before the bare id is added, which left
+cost_usd null for every Codex run on gpt-6-luna and gpt-6.1-sol. Try
+those two keys after the existing candidates; the bare id still wins
+when present.
+
+Co-Authored-By: Claude Opus <noreply@anthropic.com>
+Signed-off-by: Andre Lustosa <alustosa@redhat.com>
+---
+ agent_eval/agent/codex.py  | 12 ++++++++----
+ tests/test_codex_runner.py | 21 +++++++++++++++++++++
+ 2 files changed, 29 insertions(+), 4 deletions(-)
+
+diff --git a/agent_eval/agent/codex.py b/agent_eval/agent/codex.py
+index 79d1e95..1e8dc83 100644
+--- a/agent_eval/agent/codex.py
++++ b/agent_eval/agent/codex.py
+@@ -586,10 +586,14 @@ def _estimate_cost_usd(events: list[dict], model: Optional[str]) -> Optional[flo
+         return None
+     # Candidate order mirrors Harbor (full name, then everything after the
+     # first slash); the bare last segment is a final fallback for
+-    # multi-segment identifiers like provider/region/model.
+-    key = next((k for k in (model, model.split("/", 1)[-1],
+-                            model.rsplit("/", 1)[-1])
+-                if litellm.model_cost.get(k)), None)
++    # multi-segment identifiers like provider/region/model. Newer OpenAI
++    # models can be listed in LiteLLM only under a provider prefix
++    # (``openai/`` or ``azure/``, same list price) before the bare id lands,
++    # so those are tried last.
++    bare = model.rsplit("/", 1)[-1]
++    candidates = (model, model.split("/", 1)[-1], bare,
++                  f"openai/{bare}", f"azure/{bare}")
++    key = next((k for k in candidates if litellm.model_cost.get(k)), None)
+     if key is None:
+         return None
+     total = 0.0
+diff --git a/tests/test_codex_runner.py b/tests/test_codex_runner.py
+index 30a08d6..4300655 100644
+--- a/tests/test_codex_runner.py
++++ b/tests/test_codex_runner.py
+@@ -445,6 +445,27 @@ def test_estimate_cost_prices_each_turn_with_harbor_field_mapping(monkeypatch):
+         events[:1], "azure/openai/gpt-5.6-luna") is not None
+ 
+ 
++def test_estimate_cost_falls_back_to_provider_prefixed_key(monkeypatch):
++    """A bare id missing from LiteLLM but listed under openai/ or azure/ (same
++    list price) is still priced, so a fresh OpenAI model does not report
++    cost_usd=null until the bare key lands."""
++    from agent_eval.agent.codex import _estimate_cost_usd
++    events = [{"type": "turn.completed", "usage": {
++        "input_tokens": 100, "cached_input_tokens": 0, "output_tokens": 10}}]
++
++    calls = _fake_litellm(monkeypatch, {"azure/gpt-6-luna"})
++    assert _estimate_cost_usd(events, "gpt-6-luna") == pytest.approx(110 * 0.001)
++    assert calls[0]["model"] == "azure/gpt-6-luna"
++
++    calls = _fake_litellm(monkeypatch, {"openai/gpt-6-luna", "azure/gpt-6-luna"})
++    _estimate_cost_usd(events, "gpt-6-luna")
++    assert calls[0]["model"] == "openai/gpt-6-luna"  # openai/ wins over azure/
++
++    calls = _fake_litellm(monkeypatch, {"gpt-6-luna", "openai/gpt-6-luna"})
++    _estimate_cost_usd(events, "gpt-6-luna")
++    assert calls[0]["model"] == "gpt-6-luna"  # the bare key still wins when present
++
++
+ def test_estimate_cost_degrades_to_none(monkeypatch):
+     from agent_eval.agent.codex import _estimate_cost_usd
+     events = [{"type": "turn.completed", "usage": {"input_tokens": 5}}]
+-- 
+2.55.0
+

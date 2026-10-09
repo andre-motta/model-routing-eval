@@ -43,8 +43,7 @@ hook copies the hidden tests in and writes `output/tests.json`. Judges: `tests_p
 the merged PR diff in `annotations.yaml`).
 
 ```bash
-uv venv && uv pip install -e . -e "../opendatahub-io/agent-eval-harness[mlflow,anova]"
-python harness/export_cases.py                       # tasks/ -> eval/cases/
+./setup.sh                                           # venv, harness pinned + patched, cases exported
 ./run_eval.sh claude-haiku-5-5 low                   # one configuration, all cases
 ./run_eval.sh gpt-6-luna xhigh eval-codex.yaml t04_lru_cache   # Codex, one case
 # full model x effort matrix with ANOVA and a comparison report
@@ -54,6 +53,15 @@ python ../opendatahub-io/agent-eval-harness/skills/eval-anova/scripts/orchestrat
 Inside Claude Code with the plugin installed, the same thing is `/eval-run --model
 claude-haiku-5-5 --effort low`, `/eval-anova`, and `/eval-compare eval/runs/model-routing-eval`.
 Reports land under `eval/runs/model-routing-eval/<run-id>/report.html`.
+
+`setup.sh` clones agent-eval-harness into `.deps/` at the commit in `HARNESS_COMMIT`, applies
+every `patches/*.patch` that upstream does not yet contain, and installs it into `.venv`.
+Set `HARNESS_DIR=/path/to/your/clone` to use an existing checkout instead. Current patch:
+Codex cost lookup for models LiteLLM lists only under `openai/` or `azure/` keys (PR pending).
+Independently of that, the `before_scoring` hook (`harness/price_runs.py`) re-prices every
+Codex case from `harness/pricing.py`, so reported costs follow the list prices in this repo
+even for a model LiteLLM has never heard of. LiteLLM also double-counts Codex's cached tokens
+(Codex reports them inside `input_tokens`), which the hook corrects.
 
 Ticket-only variants (`r01t_*`, `r02t_*`, `r03t_*`) give the agent only the original issue
 text. Their hidden tests reference names the agent cannot know, so they are scored by the

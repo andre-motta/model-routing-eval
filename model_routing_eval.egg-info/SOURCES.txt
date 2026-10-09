@@ -2,8 +2,15 @@ README.md
 pyproject.toml
 harness/__init__.py
 harness/analyze.py
+harness/case_prepare.py
+harness/case_verify.py
+harness/export_cases.py
+harness/import_runs.py
+harness/overhead.py
+harness/price_runs.py
 harness/pricing.py
 harness/run.py
+harness/validate_task.py
 model_routing_eval.egg-info/PKG-INFO
 model_routing_eval.egg-info/SOURCES.txt
 model_routing_eval.egg-info/dependency_links.txt
