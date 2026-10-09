@@ -24,9 +24,11 @@ Implement the following change to the resolver's max-release-age handling
    foo) its newest version is built instead of failing, which avoids cascading failures
    in the dependent package.
 
-2. Packages that have an explicit constraint (the provider's `constraints` object returns
-   a constraint for the requirement name) skip age filtering entirely. A constraint is
-   explicit user intent and must not be overridden by the age heuristic. Log at INFO on the
+2. Packages whose constraint pins an exact version (the provider's `constraints` object
+   returns a constraint for the requirement name and that constraint is a single `==`
+   specifier) skip age filtering entirely. A pin is explicit user intent and must not be
+   overridden by the age heuristic. Range constraints (`>=`, `<`, `!=`, ...) are still
+   age-filtered like unconstrained packages. Log at INFO on the
    `fromager.resolver` logger: `"%s: skipping age filter for pinned constraint (%d candidate(s))"`.
    Previously, in multi-version mode a constrained package pinned to a version older than
    the window lost every candidate and resolution failed silently; in single-version mode

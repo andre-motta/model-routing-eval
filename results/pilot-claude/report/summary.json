@@ -1,6 +1,6 @@
 {
- "n_runs": 43,
- "n_tasks": 21,
+ "n_runs": 45,
+ "n_tasks": 20,
  "configs": [
   "haiku-4-5@low",
   "haiku-5-5@low",
@@ -90,6 +90,14 @@
   },
   {
    "tier": 4,
+   "config": "sonnet-5-5@medium",
+   "pass_rate": 1.0,
+   "mean_cost": 0.2515431,
+   "mean_wall": 185.84120070934296,
+   "n": 2
+  },
+  {
+   "tier": 4,
    "config": "sonnet-5@medium",
    "pass_rate": 1.0,
    "mean_cost": 0.2247374,
@@ -114,6 +122,14 @@
   },
   {
    "tier": 5,
+   "config": "sonnet-5-5@medium",
+   "pass_rate": 1.0,
+   "mean_cost": 0.11991580000000002,
+   "mean_wall": 24.380073308944702,
+   "n": 1
+  },
+  {
+   "tier": 5,
    "config": "sonnet-5@medium",
    "pass_rate": 1.0,
    "mean_cost": 0.29521200000000003,
@@ -123,10 +139,10 @@
   {
    "tier": 6,
    "config": "haiku-5-5@low",
-   "pass_rate": 0.6,
-   "mean_cost": 0.014357900000000002,
-   "mean_wall": 44.5150372505188,
-   "n": 5
+   "pass_rate": 0.75,
+   "mean_cost": 0.0169654375,
+   "mean_wall": 47.93307167291641,
+   "n": 4
   },
   {
    "tier": 6,
@@ -164,11 +180,6 @@
   },
   {
    "task": "r04_fromager_age_fallback",
-   "tier": 6,
-   "cheapest": null
-  },
-  {
-   "task": "r05_fromager_version_prebuilt",
    "tier": 6,
    "cheapest": null
   },
@@ -281,29 +292,29 @@
    "tier": 4,
    "cheapest": "haiku-5-5@low",
    "cheapest_cost": 0.0149861,
-   "priciest": "haiku-5-5@low",
-   "priciest_cost": 0.0149861
+   "priciest": "sonnet-5-5@medium",
+   "priciest_cost": 0.3093158
   },
   {
    "task": "t15_perf_regression",
    "tier": 5,
    "cheapest": "haiku-5-5@low",
    "cheapest_cost": 0.01009868,
-   "priciest": "haiku-5-5@low",
-   "priciest_cost": 0.01009868
+   "priciest": "sonnet-5-5@medium",
+   "priciest_cost": 0.11991580000000002
   },
   {
    "task": "t16_json_patch",
    "tier": 4,
    "cheapest": "haiku-5-5@low",
    "cheapest_cost": 0.01116106,
-   "priciest": "haiku-5-5@low",
-   "priciest_cost": 0.01116106
+   "priciest": "sonnet-5-5@medium",
+   "priciest_cost": 0.1937704
   }
  ],
  "routing": {
   "priciest": "sonnet-5-5@medium",
-  "all_on_priciest_cost": 0.7616522000000001,
+  "all_on_priciest_cost": 1.3846542000000002,
   "all_on_priciest_pass": 1.0,
   "routed_cost": 0.17963494000000002,
   "routed_passing": 19
@@ -1007,6 +1018,57 @@
    "config": "haiku-5-5@low"
   },
   {
+   "task": "t14_dep_resolver",
+   "tier": 4,
+   "backend": "claude",
+   "model": "claude-sonnet-5-5",
+   "effort": "medium",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.3093158,
+   "wall": 318.97409319877625,
+   "turns": 14,
+   "tok_in": 20,
+   "tok_cached": 355199,
+   "tok_out": 10942,
+   "tok_reason": 3883,
+   "config": "sonnet-5-5@medium"
+  },
+  {
+   "task": "t15_perf_regression",
+   "tier": 5,
+   "backend": "claude",
+   "model": "claude-sonnet-5-5",
+   "effort": "medium",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.11991580000000002,
+   "wall": 24.380073308944702,
+   "turns": 5,
+   "tok_in": 10,
+   "tok_cached": 133049,
+   "tok_out": 1253,
+   "tok_reason": 43,
+   "config": "sonnet-5-5@medium"
+  },
+  {
+   "task": "t16_json_patch",
+   "tier": 4,
+   "backend": "claude",
+   "model": "claude-sonnet-5-5",
+   "effort": "medium",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.1937704,
+   "wall": 52.70830821990967,
+   "turns": 9,
+   "tok_in": 8,
+   "tok_cached": 102592,
+   "tok_out": 7190,
+   "tok_reason": 638,
+   "config": "sonnet-5-5@medium"
+  },
+  {
    "task": "r04_fromager_age_fallback",
    "tier": 6,
    "backend": "claude",
@@ -1014,30 +1076,13 @@
    "effort": "low",
    "rep": 0,
    "passed": false,
-   "cost": 0.026896279999999998,
-   "wall": 59.93026828765869,
-   "turns": 26,
-   "tok_in": 34,
-   "tok_cached": 887948,
-   "tok_out": 13610,
-   "tok_reason": 2663,
-   "config": "haiku-5-5@low"
-  },
-  {
-   "task": "r05_fromager_version_prebuilt",
-   "tier": 6,
-   "backend": "claude",
-   "model": "claude-haiku-5-5",
-   "effort": "low",
-   "rep": 0,
-   "passed": false,
-   "cost": 0.0,
-   "wall": 30.698912858963013,
-   "turns": 0,
-   "tok_in": 0,
-   "tok_cached": 0,
-   "tok_out": 0,
-   "tok_reason": 0,
+   "cost": 0.02296853,
+   "wall": 59.78628158569336,
+   "turns": 20,
+   "tok_in": 32,
+   "tok_cached": 775483,
+   "tok_out": 10581,
+   "tok_reason": 1548,
    "config": "haiku-5-5@low"
   }
  ]

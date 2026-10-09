@@ -40,5 +40,7 @@ r03_fromager_dep_chain,6,claude,claude-haiku-5-5,low,0,True,0.0185198,63.8220875
 r03_fromager_dep_chain,6,claude,claude-sonnet-5-5,medium,0,True,0.23020659999999998,47.324453353881836,11,16,275543,4817,403,,sonnet-5-5@medium
 t15_perf_regression,5,claude,claude-haiku-5-5,low,0,True,0.01009868,36.94415998458862,10,20,313178,3805,969,,haiku-5-5@low
 t16_json_patch,4,claude,claude-haiku-5-5,low,0,True,0.01116106,34.65650486946106,5,10,148356,8529,1147,,haiku-5-5@low
-r04_fromager_age_fallback,6,claude,claude-haiku-5-5,low,0,False,0.026896279999999998,59.93026828765869,26,34,887948,13610,2663,,haiku-5-5@low
-r05_fromager_version_prebuilt,6,claude,claude-haiku-5-5,low,0,False,0.0,30.698912858963013,0,0,0,0,0,unparseable output:  ,haiku-5-5@low
+t14_dep_resolver,4,claude,claude-sonnet-5-5,medium,0,True,0.3093158,318.97409319877625,14,20,355199,10942,3883,,sonnet-5-5@medium
+t15_perf_regression,5,claude,claude-sonnet-5-5,medium,0,True,0.11991580000000002,24.380073308944702,5,10,133049,1253,43,,sonnet-5-5@medium
+t16_json_patch,4,claude,claude-sonnet-5-5,medium,0,True,0.1937704,52.70830821990967,9,8,102592,7190,638,,sonnet-5-5@medium
+r04_fromager_age_fallback,6,claude,claude-haiku-5-5,low,0,False,0.02296853,59.78628158569336,20,32,775483,10581,1548,,haiku-5-5@low

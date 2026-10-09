@@ -1,6 +1,6 @@
 # Results
 
-43 runs, 21 tasks, 4 configs
+45 runs, 20 tasks, 4 configs
 
 ## Pass rate and mean cost per config, by tier
 
@@ -34,12 +34,14 @@
 | haiku-5-5@low | 100% | $0.011 | 40 | 4 |
 | haiku-4-5@low | 100% | $0.146 | 68 | 1 |
 | sonnet-5@medium | 100% | $0.225 | 47 | 1 |
+| sonnet-5-5@medium | 100% | $0.252 | 186 | 2 |
 
 ### Tier 5: Long context
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
 | haiku-5-5@low | 100% | $0.009 | 28 | 2 |
+| sonnet-5-5@medium | 100% | $0.120 | 24 | 1 |
 | haiku-4-5@low | 100% | $0.172 | 88 | 1 |
 | sonnet-5@medium | 100% | $0.295 | 73 | 1 |
 
@@ -47,7 +49,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| haiku-5-5@low | 60% | $0.014 | 45 | 5 |
+| haiku-5-5@low | 75% | $0.017 | 48 | 4 |
 | sonnet-5-5@medium | 100% | $0.254 | 50 | 3 |
 
 ## Cheapest config that passed every repetition, per task
@@ -58,7 +60,6 @@
 | r02_fromager_age_filter | 6 | haiku-5-5@low | $0.012 | sonnet-5-5@medium | $0.214 | 95% |
 | r03_fromager_dep_chain | 6 | haiku-5-5@low | $0.019 | sonnet-5-5@medium | $0.230 | 92% |
 | r04_fromager_age_fallback | 6 | none passed | | | | |
-| r05_fromager_version_prebuilt | 6 | none passed | | | | |
 | t01_rename_symbol | 1 | haiku-5-5@low | $0.009 | haiku-4-5@low | $0.095 | 91% |
 | t02_ini_to_toml | 1 | haiku-5-5@low | $0.006 | haiku-4-5@low | $0.058 | 90% |
 | t03_add_type_hints | 1 | haiku-5-5@low | $0.005 | haiku-4-5@low | $0.066 | 92% |
@@ -72,11 +73,11 @@
 | t11_async_migration | 4 | haiku-5-5@low | $0.008 | sonnet-5@medium | $0.225 | 96% |
 | t12_needle_bug | 5 | haiku-5-5@low | $0.008 | sonnet-5@medium | $0.295 | 97% |
 | t13_unicode_dedupe | 3 | haiku-5-5@low | $0.006 | haiku-5-5@low | $0.006 | 0% |
-| t14_dep_resolver | 4 | haiku-5-5@low | $0.015 | haiku-5-5@low | $0.015 | 0% |
-| t15_perf_regression | 5 | haiku-5-5@low | $0.010 | haiku-5-5@low | $0.010 | 0% |
-| t16_json_patch | 4 | haiku-5-5@low | $0.011 | haiku-5-5@low | $0.011 | 0% |
+| t14_dep_resolver | 4 | haiku-5-5@low | $0.015 | sonnet-5-5@medium | $0.309 | 95% |
+| t15_perf_regression | 5 | haiku-5-5@low | $0.010 | sonnet-5-5@medium | $0.120 | 92% |
+| t16_json_patch | 4 | haiku-5-5@low | $0.011 | sonnet-5-5@medium | $0.194 | 94% |
 
 ## Routing scenario
 
-Everything on `sonnet-5-5@medium`: $0.76 for 100% pass rate (3 runs).
+Everything on `sonnet-5-5@medium`: $1.38 for 100% pass rate (6 runs).
 Routed per tier to the cheapest fully-passing config: $0.18 for 19 passing tasks.
