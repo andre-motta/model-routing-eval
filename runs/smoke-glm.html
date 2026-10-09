@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>model-routing-eval — smoke-glm</title>
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('eval-report-theme');
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = stored || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
+<style>
+:root {
+  --bg: #cbd1da;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --surface-3: #e2e8f0;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --text-soft: #475569;
+  --accent: #2563eb;
+  --accent-strong: #1e3a8a;
+  --accent-soft: #dbeafe;
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --success-border: #86efac;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --danger-border: #fca5a5;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --warning-border: #fcd34d;
+  --neutral-soft: #f1f5f9;
+  --neutral-border: #cbd5e1;
+  --code-bg: #eef2f7;
+  --shadow: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --shadow-strong: 0 4px 12px rgba(15,23,42,.08), 0 1px 3px rgba(15,23,42,.05);
+  --diff-add-bg: #e6ffec;
+  --diff-add-strong: #acf2bd;
+  --diff-del-bg: #ffeef0;
+  --diff-del-strong: #fdb8c0;
+  --diff-hdr-bg: #f0f0f0;
+  --case-pass-accent: #16a34a;
+  --case-fail-accent: #dc2626;
+  --case-pw-a-accent: #16a34a;
+  --case-pw-b-accent: #dc2626;
+  --case-pw-tie-accent: #d97706;
+  --case-pw-error-accent: #94a3b8;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #0f1729;
+  --surface-2: #162033;
+  --surface-3: #1e293b;
+  --border: #1e2c44;
+  --border-strong: #334155;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-soft: #cbd5e1;
+  --accent: #60a5fa;
+  --accent-strong: #93c5fd;
+  --accent-soft: #1e3a8a;
+  --success: #4ade80;
+  --success-soft: #14532d;
+  --success-border: #166534;
+  --danger: #f87171;
+  --danger-soft: #7f1d1d;
+  --danger-border: #991b1b;
+  --warning: #fbbf24;
+  --warning-soft: #78350f;
+  --warning-border: #92400e;
+  --neutral-soft: #1e293b;
+  --neutral-border: #334155;
+  --code-bg: #1e293b;
+  --shadow: 0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-strong: 0 4px 14px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.35);
+  --diff-add-bg: rgba(74,222,128,.08);
+  --diff-add-strong: rgba(74,222,128,.28);
+  --diff-del-bg: rgba(248,113,113,.08);
+  --diff-del-strong: rgba(248,113,113,.28);
+  --diff-hdr-bg: #1e293b;
+  --case-pass-accent: #4ade80;
+  --case-fail-accent: #f87171;
+  --case-pw-a-accent: #4ade80;
+  --case-pw-b-accent: #f87171;
+  --case-pw-tie-accent: #fbbf24;
+  --case-pw-error-accent: #64748b;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 15px; line-height: 1.55; max-width: 1200px; margin: 0 auto; padding: 1.5em 1.5em 4em; color: var(--text); background: var(--bg); transition: background-color .15s ease, color .15s ease; }
+h1 { padding-bottom: 0; margin: 0 0 0.55em; font-size: 1.9em; letter-spacing: -0.015em; font-weight: 700; color: var(--accent-strong); }
+.report-header { margin: 0 0 1.6em; padding-bottom: 1.1em; border-bottom: 2px solid var(--border-strong); }
+.header-meta { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+.meta-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 999px; padding: 5px 13px 5px 12px; font-size: 0.95em; color: var(--text); box-shadow: var(--shadow); line-height: 1.4; }
+.meta-chip .meta-label { font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; }
+.meta-chip code { background: var(--code-bg); padding: 1px 7px; border-radius: 4px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.92em; color: var(--text); }
+h2 { margin-top: 1.5em; letter-spacing: -0.005em; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; margin: 1em 0; font-variant-numeric: tabular-nums; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+th, td { border-bottom: 1px solid var(--border); padding: 9px 12px; text-align: left; }
+tr:last-child td { border-bottom: none; }
+th { background: var(--surface-2); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 50%, transparent); }
+tbody tr:hover td { background: var(--accent-soft); }
+.pass, .fail, .warn, .skip { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.85em; font-weight: 600; line-height: 1.4; border: 1px solid transparent; }
+.pass { color: var(--success); background: var(--success-soft); border-color: var(--success-border); }
+.fail { color: var(--danger); background: var(--danger-soft); border-color: var(--danger-border); }
+.warn { color: var(--warning); background: var(--warning-soft); border-color: var(--warning-border); }
+.skip { color: var(--text-muted); background: var(--neutral-soft); border-color: var(--neutral-border); font-weight: 500; }
+.metric-row td:last-child { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.judge-type { font-size: 0.85em; color: var(--text-muted); }
+.subsection-heading { margin-top: 1.4em; font-size: 0.95em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.model-heading { margin: 1.2em 0 0.4em; font-size: 0.92em; font-weight: 600; color: var(--text-soft); }
+.model-heading code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.95em; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); }
+.config-table { table-layout: fixed; }
+.config-table th:first-child, .config-table td:first-child { width: 22%; }
+.config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.9em 1.6em; margin: 0.4em 0 0.8em; padding: 0; }
+.kv { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.kv dt { font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; margin: 0; }
+.kv dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; word-break: break-word; line-height: 1.35; color: var(--text); }
+.kv dd.bl { color: var(--text-muted); font-size: 0.85em; font-weight: 400; }
+.kv dd.bl::before { content: "vs "; opacity: 0.7; }
+.kv dd.bl .delta { font-weight: 600; font-size: 0.95em; padding-left: 4px; }
+details.eval-params { margin: 1.2em 0 0; padding: 0; }
+details.eval-params > summary { cursor: pointer; padding: 6px 0; list-style: none; display: flex; align-items: center; gap: 8px; user-select: none; min-width: 0; }
+details.eval-params > summary::-webkit-details-marker { display: none; }
+details.eval-params > summary::before { content: "▸"; font-size: 0.9em; transition: transform .15s ease; display: inline-block; color: var(--text-muted); flex-shrink: 0; }
+details.eval-params[open] > summary::before { transform: rotate(90deg); }
+details.eval-params > summary:hover .eval-params-label { color: var(--accent); }
+.eval-params-label { font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+.eval-params-preview { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.85em; color: var(--text-soft); padding-left: 8px; border-left: 1px solid var(--border-strong); margin-left: 2px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+details.eval-params[open] .eval-params-preview { display: none; }
+details.eval-params > .config-grid { margin-top: 0.5em; }
+details.eval-params > .run-command { margin: 0.6em 0 0; }
+.run-command { margin: 0.4em 0 1em; }
+.run-command-label { display: block; font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+.run-command pre { margin: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; overflow-x: auto; font-size: 0.85em; line-height: 1.4; }
+.run-command code { background: transparent; padding: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); white-space: pre; }
+.usage-table th code { background: var(--code-bg); padding: 2px 7px; border-radius: 4px; font-size: 0.95em; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); text-transform: none; letter-spacing: 0; font-weight: 500; }
+.usage-table td { font-variant-numeric: tabular-nums; }
+.usage-table .cur-val { display: block; font-weight: 500; }
+.usage-table .bl-val { display: block; font-size: 0.82em; color: var(--text-muted); margin-top: 1px; }
+.usage-table .bl-val::before { content: "vs "; opacity: 0.7; }
+.usage-table .delta { font-weight: 600; font-size: 0.9em; padding-left: 4px; }
+.delta-good { color: var(--success); }
+.delta-bad { color: var(--danger); }
+.delta-flat { color: var(--text-muted); font-weight: 500; }
+.baseline-row td { background: var(--surface-2); font-style: italic; color: var(--text-muted); }
+.rationale { font-size: 0.88em; color: var(--text-soft); }
+.rationale p { margin: 0 0 0.5em; line-height: 1.5; }
+.rationale p:last-child { margin-bottom: 0; }
+.rationale ul, .rationale ol { margin: 0.3em 0 0.5em 1.2em; padding: 0; }
+.rationale li { margin: 0.2em 0; }
+.rationale code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.rationale strong { color: var(--text); }
+details.case { margin: 1em 0; border: 1px solid var(--border); border-left-width: 4px; border-radius: 8px; padding: 1em 1.2em; background: var(--surface); box-shadow: var(--shadow); }
+details.case.case-pass { border-left-color: var(--case-pass-accent); }
+details.case.case-fail { border-left-color: var(--case-fail-accent); }
+details.case.case-pw-a { border-left-color: var(--case-pw-a-accent); }
+details.case.case-pw-b { border-left-color: var(--case-pw-b-accent); }
+details.case.case-pw-tie { border-left-color: var(--case-pw-tie-accent); }
+details.case.case-pw-error { border-left-color: var(--case-pw-error-accent); }
+details.case > summary { cursor: pointer; font-weight: 600; padding: 0.2em 0; font-size: 1.02em; list-style: none; display: flex; align-items: center; gap: 0.6em; }
+details.case > summary::-webkit-details-marker { display: none; }
+details.case > summary::before { content: "▸"; color: var(--text-muted); transition: transform .15s ease; display: inline-block; }
+details.case[open] > summary::before { transform: rotate(90deg); }
+details.case > summary:hover { color: var(--accent); }
+.info-box { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 6px; padding: 0.8em 1em; margin: 0.6em 0; font-size: 0.9em; }
+.feedback-box { background: var(--warning-soft); border: 1px solid var(--warning-border); border-radius: 6px; padding: 0.8em 1em; margin: 0.6em 0; font-size: 0.9em; color: var(--text); }
+.file-badge { display: inline-block; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82em; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 5px; padding: 3px 10px; margin: 1em 0 0.5em 0; color: var(--text-soft); }
+details.file-entry { margin: 1em 0 0.5em 0; }
+details.file-entry > summary { cursor: pointer; list-style: none; user-select: none; }
+details.file-entry > summary::-webkit-details-marker { display: none; }
+details.file-entry > summary::before { content: "\25B8"; margin-right: 0.4em; color: var(--text-muted); }
+details.file-entry[open] > summary::before { content: "\25BE"; }
+details.file-entry > summary .file-name { display: inline-block; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82em; background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: 5px; padding: 3px 10px; color: var(--text-soft); }
+details.file-entry[open] > summary { margin-bottom: 0.5em; }
+details.file-entry > summary .file-meta { color: var(--text-muted); font-size: 0.9em; margin-left: 0.6em; }
+details.file-entry > summary .fm-chip, .file-badge .fm-chip { display: inline-block; font-size: 0.82em; padding: 1px 7px; margin-left: 0.4em; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); border: 1px solid var(--border); vertical-align: middle; }
+.file-badge .file-meta { color: var(--text-muted); font-weight: 400; margin-left: 0.4em; }
+/* Input vs Output group accents */
+details.io-group { border-left: 3px solid var(--border-strong); padding-left: 0.8em; margin: 0.8em 0; }
+details.io-group > summary { cursor: pointer; font-weight: 600; list-style: none; }
+details.io-group > summary::-webkit-details-marker { display: none; }
+details.io-group > summary::before { content: "▸"; color: var(--text-muted); display: inline-block; margin-right: 0.4em; }
+details.io-group[open] > summary::before { content: "▾"; }
+details.io-input { border-left-color: var(--text-muted); }
+details.io-output { border-left-color: var(--accent); }
+details.io-diff { border-left-color: var(--warning); }
+/* the raw/rendered toggle flips [hidden]; keep it authoritative over display rules */
+[hidden] { display: none !important; }
+/* Line-number gutter (copy-safe: the number column is not selectable). The
+   WRAPPER is the single scroll box, so the gutter and content scroll together
+   and stay aligned - the gutter can't run past the content's scroll viewport. */
+.numwrap { display: flex; align-items: stretch; max-height: 480px; overflow: auto; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); }
+.numwrap .lncol { flex: 0 0 auto; margin: 0; padding: 0.9em 0.6em; border: none; border-right: 1px solid var(--border); border-radius: 0; background: var(--surface-3); color: var(--text-muted); text-align: right; user-select: none; font-size: 0.88em; line-height: 1.5; font-family: ui-monospace, "SF Mono", Menlo, monospace; white-space: pre; }
+.numwrap pre.output { margin: 0; padding: 0.9em 1em; border: none; border-radius: 0; background: transparent; flex: 1 0 auto; line-height: 1.5; white-space: pre; overflow: visible; max-height: none; }
+.md-toggle { font-size: 0.78em; padding: 2px 9px; margin-bottom: 0.5em; border-radius: 5px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text-soft); cursor: pointer; }
+.md-rendered { border: 1px solid var(--border); border-radius: 6px; padding: 0.6em 1em; background: var(--surface); max-height: 520px; overflow-y: auto; }
+.diff-stat { font-size: 0.82em; font-weight: 600; color: var(--text-muted); margin-left: 0.4em; }
+.pw-badge { display: inline-block; font-size: 0.78em; font-weight: 700; padding: 2px 9px; border-radius: 999px; margin-left: 8px; border: 1px solid transparent; letter-spacing: 0.04em; }
+.pw-win { background: var(--success-soft); color: var(--success); border-color: var(--success-border); }
+.pw-loss { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-border); }
+.pw-tie { background: var(--warning-soft); color: var(--warning); border-color: var(--warning-border); }
+.pw-error { background: var(--neutral-soft); color: var(--text-muted); border-color: var(--neutral-border); }
+.stab-wrap { display: inline-flex; align-items: center; gap: 5px; }
+.stab-bar { vertical-align: middle; }
+.stab-label { font-size: 0.8em; color: var(--text-muted); }
+.ascii-range { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.85em; letter-spacing: 1px; color: var(--text-muted); margin-left: 6px; white-space: pre; }
+.ascii-range .med { color: var(--accent); font-weight: 700; }
+.sample-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 0.5em; }
+.sample-tab { padding: 3px 10px; font-size: 0.82em; cursor: pointer; border: 1px solid transparent; border-bottom: none; border-radius: 4px 4px 0 0; color: var(--text-muted); background: none; }
+.sample-tab:hover { background: var(--surface-2); }
+.sample-tab[aria-selected="true"] { color: var(--text); background: var(--surface); border-color: var(--border); border-bottom: 2px solid var(--surface); margin-bottom: -2px; font-weight: 600; }
+.sample-tab .tab-score { font-weight: 700; margin-right: 4px; }
+.sample-panel { display: none; }
+.sample-panel.active { display: block; }
+.diff-table { width: 100%; border-collapse: collapse; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82em; table-layout: fixed; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.diff-table td { padding: 1px 6px; vertical-align: top; white-space: pre-wrap; word-wrap: break-word; border: 1px solid var(--border); }
+.diff-table .ln { width: 35px; min-width: 35px; color: var(--text-muted); text-align: right; background: var(--surface-2); user-select: none; white-space: nowrap; }
+.diff-table .left, .diff-table .right { width: calc(50% - 35px); background: var(--surface); }
+.diff-table .sep { width: 1px; padding: 0; background: var(--border-strong); }
+.diff-table tr.mod .left { background: var(--diff-del-bg); }
+.diff-table tr.mod .right { background: var(--diff-add-bg); }
+.diff-table tr.add .right { background: var(--diff-add-bg); }
+.diff-table tr.add .left { background: var(--surface-2); }
+.diff-table tr.del .left { background: var(--diff-del-bg); }
+.diff-table tr.del .right { background: var(--surface-2); }
+.diff-table tr.hdr td { background: var(--diff-hdr-bg); color: var(--text-muted); font-weight: 600; }
+.diff-table .wdel { background: var(--diff-del-strong); border-radius: 2px; padding: 0 2px; }
+.diff-table .wadd { background: var(--diff-add-strong); border-radius: 2px; padding: 0 2px; }
+pre.output { background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 0.9em 1em; font-size: 0.88em; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word; color: var(--text); font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.html-preview { width: 100%; height: 80vh; max-height: 2000px; border: 1px solid var(--border-strong); border-radius: 6px; margin: 0.5em 0; background: #fff; color-scheme: light; }
+.section, .analysis { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1.3em 1.6em 1.4em; margin: 1.5em 0; box-shadow: var(--shadow); }
+.section > h2:first-child, h2.section-heading { margin: 0 0 0.7em; padding: 0; border: none; font-size: 1.3em; color: var(--accent-strong); letter-spacing: -0.005em; }
+h2.section-heading { margin: 1.8em 0 0.8em; }
+.section-intro { color: var(--text-muted); margin: 0 0 1em; font-size: 0.92em; }
+.section > table:last-child, .section > details:last-child { margin-bottom: 0; }
+.analysis { border-left-width: 5px; margin-bottom: 2em; box-shadow: var(--shadow-strong); }
+.analysis-banner { display: flex; align-items: center; gap: 0.7em; margin-bottom: 0.3em; }
+.analysis-banner h2 { margin: 0; padding: 0; border: none; font-size: 1.4em; color: var(--accent-strong); letter-spacing: -0.005em; }
+.analysis-body h2 { margin-top: 1.6em; padding-bottom: 0.35em; font-size: 1.1em; color: var(--accent-strong); border-bottom: 1px solid var(--border); }
+.analysis-body h2:first-of-type { margin-top: 0; font-size: 1.2em; border-bottom-width: 2px; padding-bottom: 0.4em; border-bottom-color: var(--accent); }
+.analysis-body h3 { margin-top: 1em; color: var(--text-soft); font-size: 1em; }
+.analysis-body li { margin: 0.3em 0; line-height: 1.55; }
+.analysis-body p { line-height: 1.6; }
+.analysis-body code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 0.88em; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--text); }
+.analysis-body table { font-size: 0.92em; }
+.analysis-body hr { border: none; border-top: 1px dashed var(--border-strong); margin: 1.4em 0; }
+.section-intro code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; font-size: 0.92em; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+#theme-toggle { position: fixed; top: 16px; right: 16px; z-index: 1000; background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); border-radius: 999px; width: 38px; height: 38px; padding: 0; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); transition: background-color .15s ease, transform .15s ease, border-color .15s ease; }
+#theme-toggle:hover { background: var(--surface-2); border-color: var(--accent); transform: scale(1.05); }
+#theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media print {
+  :root { color-scheme: light; --bg: #fff; --surface: #fff; --text: #000; --text-muted: #444; }
+  #theme-toggle { display: none; }
+  .section, .analysis, details.case { box-shadow: none; break-inside: avoid; }
+}
+
+/* Image artifacts */
+.img-artifact { margin: 0.5em 0; }
+.img-artifact img { max-width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+.img-label { display: inline-block; font-size: 0.78em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 9px; border-radius: 999px; margin-bottom: 6px; }
+.img-label-gen { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent); }
+.img-label-ref { background: var(--success-soft); color: var(--success); border: 1px solid var(--success-border); }
+.img-label-bl { background: var(--warning-soft); color: var(--warning); border: 1px solid var(--warning-border); }
+
+/* Comparison widget */
+.img-compare { margin: 0.8em 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.img-compare-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.img-compare-tab { padding: 7px 16px; font-size: 0.85em; font-weight: 600; color: var(--text-muted); background: transparent; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: color .15s, border-color .15s; }
+.img-compare-tab:hover { color: var(--text); }
+.img-compare-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.img-compare-panel { display: none; padding: 1em; }
+.img-compare-panel.active { display: block; }
+
+/* Side-by-side */
+.img-compare-sbs { display: flex; gap: 1em; }
+.img-compare-sbs > div { flex: 1; min-width: 0; }
+.img-compare-sbs img { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 4px; background: #fff; }
+
+/* Swipe */
+.img-compare-swipe-imgs { display: grid; border: 1px solid var(--border); border-radius: 4px; background: #fff; overflow: hidden; }
+.img-compare-swipe-imgs > img { grid-area: 1/1; display: block; width: 100%; height: auto; }
+.img-compare-swipe-imgs .swipe-ref { grid-area: 1/1; z-index: 1; background: #fff; clip-path: inset(0 50% 0 0); }
+.img-compare-swipe-imgs .swipe-ref img { display: block; width: 100%; height: auto; }
+.img-compare-swipe-imgs .swipe-line { grid-area: 1/1; z-index: 2; justify-self: start; width: 3px; background: var(--accent); pointer-events: none; margin-left: 50%; }
+.img-compare-swipe input[type="range"] { display: block; width: 100%; margin: 8px 0 0; accent-color: var(--accent); }
+.img-compare-swipe-labels { display: flex; justify-content: space-between; padding: 4px 1em; font-size: 0.82em; color: var(--text-muted); }
+
+/* Onion */
+.img-compare-onion-wrap { display: grid; border: 1px solid var(--border); border-radius: 4px; background: #fff; overflow: hidden; }
+.img-compare-onion-wrap > img { grid-area: 1/1; display: block; width: 100%; height: auto; }
+.img-compare-onion-wrap .onion-top { grid-area: 1/1; background: #fff; }
+.img-compare-onion-wrap .onion-top img { display: block; width: 100%; height: auto; }
+.img-compare-onion input[type="range"] { display: block; width: 100%; margin: 8px 0 0; accent-color: var(--accent); }
+.img-compare-onion .onion-label { text-align: center; font-size: 0.82em; color: var(--text-muted); margin-top: 2px; }
+
+/* Diagram source collapsible */
+/* Metrics table */
+.metrics-table { font-size: 0.88em; margin: 0.5em 0; border-collapse: collapse; }
+.metrics-table th { text-align: left; padding: 4px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-soft); }
+.metrics-table td { padding: 4px 12px; border-bottom: 1px solid var(--border); }
+.metrics-table td:last-child { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 600; }
+
+.diagram-source { margin-top: 0.4em; }
+.diagram-source summary { font-size: 0.85em; color: var(--text-muted); cursor: pointer; padding: 4px 0; }
+.diagram-source summary:hover { color: var(--text); }
+.diagram-source pre { max-height: 400px; overflow-y: auto; }
+
+.reward-overview { overflow-x: auto; margin: 0.8em 0 1.5em; }
+.reward-overview table { font-size: 0.88em; }
+.reward-overview th { font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.05em; }
+.reward-overview th.rv-rotate {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  height: 120px; min-width: 28px; padding: 8px 4px;
+  font-size: 0.7em; letter-spacing: 0.04em;
+}
+.reward-overview td { text-align: center; padding: 7px 8px; }
+.reward-overview td:first-child { text-align: left; font-weight: 500; font-size: 0.9em; }
+.rv-reward { font-weight: 700; font-size: 1.05em; font-variant-numeric: tabular-nums; }
+.reward-overview .rv-avg-row td {
+  background: var(--surface-3) !important;
+  font-weight: 700; border-top: 2px solid var(--border-strong);
+}
+.rv-gate-hdr { background: var(--success-soft) !important; color: var(--success) !important; border-bottom: 2px solid var(--success-border) !important; }
+.rv-llm-hdr { background: var(--accent-soft) !important; color: var(--accent) !important; border-bottom: 2px solid var(--accent) !important; }
+.rv-other-hdr { background: var(--warning-soft) !important; color: var(--warning) !important; border-bottom: 2px solid var(--warning-border) !important; }
+</style>
+</head>
+<body>
+<button id="theme-toggle" type="button" aria-label="Toggle theme">☾</button>
+<header class="report-header">
+  <h1>model-routing-eval rits/zai-org/glm-5-3@medium</h1>
+  <div class="header-meta"><span class="meta-chip"><span class="meta-label">Run</span><code>smoke-glm</code></span><span class="meta-chip"><span class="meta-label">Date</span>2026-10-09 15:31</span></div>
+</header>
+<section class="section">
+<h2>Run Configuration</h2>
+<dl class="config-grid">
+<div class="kv"><dt>Model</dt><dd>rits/zai-org/glm-5-3</dd></div>
+<div class="kv"><dt>Subagent Model</dt><dd>—</dd></div>
+<div class="kv"><dt>Effort</dt><dd>medium</dd></div>
+<div class="kv"><dt>Agent</dt><dd>codex</dd></div>
+<div class="kv"><dt>Agent Version</dt><dd>codex-cli 0.162.0</dd></div>
+<div class="kv"><dt>Duration</dt><dd>5 min</dd></div>
+<div class="kv"><dt>Cost</dt><dd>$0.00</dd></div>
+<div class="kv"><dt>Turns</dt><dd>2</dd></div>
+<div class="kv"><dt>Exit Code</dt><dd>0</dd></div>
+<div class="kv"><dt>Total Cost</dt><dd>n/a (agent-only)</dd></div>
+</dl>
+<h2>Cost Provenance</h2>
+<dl class="config-grid">
+<div class="kv"><dt>Cost source</dt><dd>pricing-table</dd></div>
+</dl>
+<h3 class="subsection-heading">Model Usage</h3>
+<table class="usage-table">
+<tr><th></th><th>Total</th></tr>
+<tr><th>Input tokens (total)</th><td><span class="cur-val">842,222</span></td></tr>
+<tr><th>Output tokens</th><td><span class="cur-val">6,036</span></td></tr>
+<tr><th>Cache read</th><td><span class="cur-val">678,400</span></td></tr>
+<tr><th>Cache write</th><td><span class="cur-val">—</span></td></tr>
+<tr><th>Cache hit</th><td><span class="cur-val">80.5%</span></td></tr>
+<tr><th>Cost</th><td><span class="cur-val">$0.00</span></td></tr>
+<tr><th>Cost / turn</th><td><span class="cur-val">$0.0000</span></td></tr>
+<tr><th>Output tokens / turn</th><td><span class="cur-val">3,018</span></td></tr>
+<tr><th>Cost / Mtok</th><td><span class="cur-val">$0.00</span></td></tr>
+</table>
+<details class="eval-params">
+<summary><span class="eval-params-label">Parameters</span><span class="eval-params-preview">/skill {{ input.prompt }}</span></summary>
+<dl class="config-grid">
+<div class="kv"><dt>Execution Mode</dt><dd>case</dd></div>
+<div class="kv"><dt>Max Budget</dt><dd>$5</dd></div>
+<div class="kv"><dt>Timeout</dt><dd>40 min</dd></div>
+<div class="kv"><dt>Effort</dt><dd>medium</dd></div>
+</dl>
+<div class="run-command"><span class="run-command-label">Skill Args</span><pre><code>/skill {{ input.prompt }}</code></pre></div>
+</details>
+</section>
+<section class="section">
+<h2>Scoring Summary</h2>
+<table>
+<tr><th>Judge</th><th>Type</th><th>Metric</th><th>Value</th><th>Threshold</th><th>Status</th></tr>
+<tr class="metric-row"><td>tests_pass</td><td class="judge-type">check</td><td>pass_rate</td><td>100%</td><td>&ge; 80%</td><td><span class="pass">PASS</span></td></tr>
+</table>
+</section>
+<h2 class="section-heading">Per-Case Details</h2>
+<details open class="case case-pass"><summary><span class="pass">t01_rename_symbol</span> <span class="skip">(1/1 pass)</span></summary>
+<table><tr><th>Judge</th><th>Value</th><th>Rationale</th></tr>
+<tr><td>tests_pass</td><td><span class="pass">PASS</span></td><td class="rationale"><p>hidden tests passed</p></td></tr>
+</table>
+<details open class="io-group io-input"><summary>Input (1)</summary>
+<details class="file-entry"><summary><span class="file-name">input.yaml</span><span class="file-meta">6 lines · 210 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6</pre><pre class="output">task: t01_rename_symbol
+prompt: 'Rename the function `calc` in the `shop` package to `compute_total`. Update every
+
+  call site, the tests, and the docs. Keep behaviour identical. Run the tests when done.
+
+  '</pre></div></details>
+</details>
+<details open class="io-group io-output"><summary>Output (13)</summary>
+<details class="file-entry"><summary><span class="file-name">_modified/README.md</span><span class="file-meta">8 lines · 123 B</span></summary>
+<button type="button" class="md-toggle" onclick="var d=this.closest('details'),n=d.querySelector('.numwrap'),r=d.querySelector('.md-rendered');n.hidden=!n.hidden;r.hidden=!r.hidden;this.textContent=n.hidden?'raw':'rendered';">rendered</button><div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</pre><pre class="output"># shop
+
+Tiny pricing helpers.
+
+```python
+from shop import compute_total
+compute_total([(10, 2)], tax_rate=0.1)  # 22.0
+```</pre></div><div class="md-rendered" hidden><h1>shop</h1>
+<p>Tiny pricing helpers.</p>
+<pre class="output">from shop import compute_total
+compute_total([(10, 2)], tax_rate=0.1)  # 22.0</pre></div></details>
+<div class="file-badge">_modified/shop/__pycache__/__init__.cpython-314.pyc <span class="file-meta">284 B</span></div>
+<span class="skip">(284 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">_modified/shop/__init__.py</span><span class="file-meta">4 lines · 95 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4</pre><pre class="output">from .pricing import compute_total
+from .cart import Cart
+
+__all__ = ["compute_total", "Cart"]</pre></div></details>
+<div class="file-badge">_modified/shop/__pycache__/cart.cpython-314.pyc <span class="file-meta">1.1 KB</span></div>
+<span class="skip">(1091 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">_modified/shop/cart.py</span><span class="file-meta">13 lines · 296 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre><pre class="output">from .pricing import compute_total
+
+
+class Cart:
+    def __init__(self, tax_rate=0.0):
+        self.items = []
+        self.tax_rate = tax_rate
+
+    def add(self, price, qty=1):
+        self.items.append((price, qty))
+
+    def total(self):
+        return compute_total(self.items, self.tax_rate)</pre></div></details>
+<div class="file-badge">_modified/shop/__pycache__/pricing.cpython-314.pyc <span class="file-meta">746 B</span></div>
+<span class="skip">(746 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">_modified/shop/pricing.py</span><span class="file-meta">7 lines · 255 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</pre><pre class="output">def compute_total(items, tax_rate=0.0):
+    """Return the total price of items with tax applied.
+
+    items: iterable of (unit_price, quantity)
+    """
+    subtotal = sum(price * qty for price, qty in items)
+    return round(subtotal * (1 + tax_rate), 2)</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/solution.diff</span><span class="file-meta">82 lines · 2.6 KB</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre><pre class="output">diff --git a/README.md b/README.md
+index 5e4132f..6ac5fe3 100644
+--- a/README.md
++++ b/README.md
+@@ -3,6 +3,6 @@
+ Tiny pricing helpers.
+ 
+ ```python
+-from shop import calc
+-calc([(10, 2)], tax_rate=0.1)  # 22.0
++from shop import compute_total
++compute_total([(10, 2)], tax_rate=0.1)  # 22.0
+ ```
+diff --git a/shop/__init__.py b/shop/__init__.py
+index 6118c7e..b6d5993 100644
+--- a/shop/__init__.py
++++ b/shop/__init__.py
+@@ -1,4 +1,4 @@
+-from .pricing import calc
++from .pricing import compute_total
+ from .cart import Cart
+ 
+-__all__ = ["calc", "Cart"]
++__all__ = ["compute_total", "Cart"]
+diff --git a/shop/__pycache__/__init__.cpython-314.pyc b/shop/__pycache__/__init__.cpython-314.pyc
+new file mode 100644
+index 0000000..03f85dc
+Binary files /dev/null and b/shop/__pycache__/__init__.cpython-314.pyc differ
+diff --git a/shop/__pycache__/cart.cpython-314.pyc b/shop/__pycache__/cart.cpython-314.pyc
+new file mode 100644
+index 0000000..a7ed6ad
+Binary files /dev/null and b/shop/__pycache__/cart.cpython-314.pyc differ
+diff --git a/shop/__pycache__/pricing.cpython-314.pyc b/shop/__pycache__/pricing.cpython-314.pyc
+new file mode 100644
+index 0000000..6575005
+Binary files /dev/null and b/shop/__pycache__/pricing.cpython-314.pyc differ
+diff --git a/shop/cart.py b/shop/cart.py
+index 816f6d5..8aea5f1 100644
+--- a/shop/cart.py
++++ b/shop/cart.py
+@@ -1,4 +1,4 @@
+-from .pricing import calc
++from .pricing import compute_total
+ 
+ 
+ class Cart:
+@@ -10,4 +10,4 @@ class Cart:
+         self.items.append((price, qty))
+ 
+     def total(self):
+-        return calc(self.items, self.tax_rate)
++        return compute_total(self.items, self.tax_rate)
+diff --git a/shop/pricing.py b/shop/pricing.py
+index 98607bf..cb346b2 100644
+--- a/shop/pricing.py
++++ b/shop/pricing.py
+@@ -1,4 +1,4 @@
+-def calc(items, tax_rate=0.0):
++def compute_total(items, tax_rate=0.0):
+     """Return the total price of items with tax applied.
+ 
+     items: iterable of (unit_price, quantity)
+diff --git a/tests/__pycache__/test_pricing.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_pricing.cpython-314-pytest-9.1.1.pyc
+new file mode 100644
+index 0000000..fe6156f
+Binary files /dev/null and b/tests/__pycache__/test_pricing.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_pricing.py b/tests/test_pricing.py
+index e0cf100..25bea37 100644
+--- a/tests/test_pricing.py
++++ b/tests/test_pricing.py
+@@ -1,8 +1,8 @@
+-from shop import calc, Cart
++from shop import compute_total, Cart
+ 
+ 
+-def test_calc():
+-    assert calc([(10, 2), (5, 1)], 0.1) == 27.5
++def test_compute_total():
++    assert compute_total([(10, 2), (5, 1)], 0.1) == 27.5
+ 
+ 
+ def test_cart():</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/stdout.log</span><span class="file-meta">23 lines · 18.6 KB</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre><pre class="output">{"type":"thread.started","thread_id":"01a12146-2eac-7c93-b0e1-cecff952b8c2"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `rits/zai-org/glm-5-3` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"I’ll inspect the repository and required agent guidance, then locate every `calc` reference."}}
+{"type":"item.started","item":{"id":"item_2","type":"command_execution","command":"/usr/bin/bash -lc \"pwd &amp;&amp; printf '\\\\n-- branch/remotes --\\\\n' &amp;&amp; git branch --show-current &amp;&amp; git remote -v &amp;&amp; printf '\\\\n-- status --\\\\n' &amp;&amp; git status --short &amp;&amp; printf '\\\\n-- guidance --\\\\n' &amp;&amp; cat ~/.agents/wiki/workspace-and-implementation.md &amp;&amp; printf '\\\\n-- codex runtime --\\\\n' &amp;&amp; cat ~/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"command_execution","command":"/usr/bin/bash -lc \"pwd &amp;&amp; printf '\\\\n-- branch/remotes --\\\\n' &amp;&amp; git branch --show-current &amp;&amp; git remote -v &amp;&amp; printf '\\\\n-- status --\\\\n' &amp;&amp; git status --short &amp;&amp; printf '\\\\n-- guidance --\\\\n' &amp;&amp; cat ~/.agents/wiki/workspace-and-implementation.md &amp;&amp; printf '\\\\n-- codex runtime --\\\\n' &amp;&amp; cat ~/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol\n\n-- branch/remotes --\nmaster\n\n-- status --\n\n-- guidance --\n# Workspace and Implementation\n\n## Change discipline\n\n- Prefer small, targeted edits. Re-read changed files and inspect the final diff\n  before reporting completion.\n- If hooks modify staged files, re-check the diff and rerun relevant validation\n  before committing.\n\n## Implementation workflow\n\n- Turn the request into a concrete file-level brief before making broad changes,\n  including API contracts, response shapes, and validation behavior.\n- For integrations, verify the actual consumer contract from source, schemas, local\n  sibling repositories, or authoritative documentation. Do not infer Jira fields,\n  GitLab variables, or endpoint semantics from names alone.\n- Implement in focused increments. Run the narrowest relevant tests after each\n  backend or client change, then run the repository-required lint, build, and\n  validation commands.\n- Add or update tests with behavior changes. Prefer regression tests for bugs\n  involving retries, rate limits, authentication, external APIs, and response\n  mapping.\n- Track long-running development servers with PID files or equivalent logs, report\n  their URLs, and stop them when requested.\n- Report exact changed files, validation results, environmental limitations, and any\n  follow-up needed. Do not claim an integration test passed if its runtime\n  dependency was unavailable.\n\n-- codex runtime --\n# Codex Runtime Behavior\n\nThis page applies only to Codex. All non-Codex runtimes must ignore it.\n\nUse the `caveman:caveman` skill in lite mode for all sessions and user-facing chat\nresponses by default. Keep responses concise, but use complete grammatical\nsentences and retain articles. Preserve exact code, commands, errors, numbers,\nnegations, and technical terms. Use normal prose in code comments, commits,\ndocumentation, issues, reviews, and other text written for third parties. Use full\nor ultra mode only when the user explicitly requests it. Stop or change this mode\nwhen the user requests `normal mode`, `stop caveman`, or a different Caveman\nintensity.\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"The workspace is clean. I’m checking the applicable skill and mapping all references before editing."}}
+{"type":"item.started","item":{"id":"item_4","type":"command_execution","command":"/usr/bin/bash -lc \"printf '%s\\\\n' '-- nested agent instructions --' &amp;&amp; find .. -name AGENTS.md -print &amp;&amp; printf '%s\\\\n' '-- caveman skill --' &amp;&amp; cat /home/alustosa/.codex/plugins/cache/caveman/caveman/3.2.0/skills/caveman/SKILL.md &amp;&amp; printf '%s\\\\n' '-- files --' &amp;&amp; rg --files &amp;&amp; printf '%s\\\\n' '-- calc references --' &amp;&amp; rg -n --hidden --glob '\"'!/.git'\"' '\\\\bcalc\\\\b|shop\\\\.calc|calc\\\\(' .\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_4","type":"command_execution","command":"/usr/bin/bash -lc \"printf '%s\\\\n' '-- nested agent instructions --' &amp;&amp; find .. -name AGENTS.md -print &amp;&amp; printf '%s\\\\n' '-- caveman skill --' &amp;&amp; cat /home/alustosa/.codex/plugins/cache/caveman/caveman/3.2.0/skills/caveman/SKILL.md &amp;&amp; printf '%s\\\\n' '-- files --' &amp;&amp; rg --files &amp;&amp; printf '%s\\\\n' '-- calc references --' &amp;&amp; rg -n --hidden --glob '\"'!/.git'\"' '\\\\bcalc\\\\b|shop\\\\.calc|calc\\\\(' .\"","aggregated_output":"-- nested agent instructions --\n-- caveman skill --\n---\nname: caveman\ndescription: &gt;\n  Terse caveman voice: answer first, fluff gone, every technical fact kept.\n  Use for /caveman, \"caveman mode\", \"talk like caveman\", \"be brief\", \"less\n  tokens\". Stays on until \"stop caveman\" or \"normal mode\".\n---\n\n# caveman\n\nRespond terse like smart caveman. All technical substance stay. Only fluff die.\n\nCaveman is a voice, not broken grammar. Reader pays per token and reads in a terminal. Every word earns its place. Every fact survives.\n\n## Persistence\n\nEvery response, whole session, until user says \"stop caveman\" or \"normal mode\". Unsure if still on? It is. Confirm the switch-off in one line.\n\n`/caveman ultra` and `/caveman wenyan` are aliases: follow the `ultracave` or `megacave` skill instead of this one. `/caveman status` reports the mode and changes nothing. Relay the hook's `Caveman mode: &lt;mode&gt;` value when present. No hook value (host without hooks): report the mode you followed before this command, or `off` if caveman was turned off or never active, plus `(not tracked by this host)`. Example: `Caveman mode: caveman (not tracked by this host)`. Loading this skill to answer status is not activation. Never infer a mode from the configured default.\n\n## Why\n\n1. Every output token is billed and read. Filler costs twice.\n2. Code, commands, paths, numbers, errors are the payload. One changed character breaks them.\n3. Ceremony is expensive, grammar is cheap. \"Sure, I'd be happy to help\" is ten tokens. \"the\" is one.\n4. A dropped negation costs more than every token saved. Clarity beats compression.\n\n## Rules\n\n### 1. Answer first\n\nAnswer, then reason, then next step. Pattern: `[thing] [action] [reason]. [next step].`\n\nBad: \"Sure! I'd be happy to help. The issue you're experiencing is likely caused by...\"\nGood: \"Bug in auth middleware. Token expiry check use `&lt;` not `&lt;=`. Fix:\"\n\n### 2. Kill ceremony\n\nNo greeting, hedging, pleasantries, recap, or closer. No \"Sure!\", \"Let me\", \"I'll now\", \"Hope this helps\". No just/really/basically/actually/simply.\n\n### 3. Short word\n\n\"fix\" not \"implement a solution for\". Standard acronyms fine (DB, API, HTTP). Invented abbreviations not (cfg, impl, fn): same tokens, harder read. No arrows.\n\n### 4. Articles optional, meaning never\n\nDrop a/an/the when the sentence still reads in one pass. Fragments fine. Never drop not/never/no/only/except. Numbers and units exact.\n\nBad: \"Migration drop column backup first.\"\nGood: \"Back up first. Then run migration: it drops the column.\"\n\n### 5. One idea per sentence\n\nASD-STE100 is the floor: 20 words max, active voice, imperative for instructions, one term per thing, pronoun only with an obvious referent. Compression and clarity conflict? Clarity wins.\n\n### 6. Payload verbatim\n\nCode blocks unchanged. Commands, paths, API names exact. Errors quoted exact, shortest decisive line only. Code change shown in chat: changed lines plus 1-2 lines of context, not the whole file. Whole file only if the user asks, the file is new, or most of it changes. Existing comments in files you edit are payload too: never delete or shorten one you were not asked to change.\n\n### 7. Tool runs: bounded status\n\nNo text between routine calls. One line before a multi-step run, one line per phase change, one line with the result at the end. Otherwise text before a call only to clarify, warn, or disambiguate.\n\n### 8. User's language\n\nCompress the style, not the language. An explicit reply-language instruction wins. Never switch because of quoted text. Technical terms and errors stay verbatim. Particles and case markers are grammar, not filler.\n\n### 9. Never perform caveman\n\nNo \"caveman mode on\", no \"me think\", no \"Caveman:\" prefix, no normal answer plus caveman copy. No decorative tables or emoji. Never add a word to sound caveman. Caveman phrasing not shorter than plain? Use plain.\n\n## When to break the rules\n\nPlain prose, then resume:\n\n1. Security warning.\n2. Irreversible action. Confirm in full sentences first.\n3. Step order a fragment could scramble.\n4. User confused or repeats the question.\n5. Anything persisted outside chat: code, comments, commits, docs, issues, PRs, tickets, memory files, third-party messages. `/caveman-compress` exempt.\n6. Harness asks for a status line or confirmation. Give it. Harness decides *when* you speak, caveman decides *how*.\n7. You ask the user a question or offer options. Full sentences, so the answer comes back right first time.\n\n## Pre-send check\n\n1. First sentence announces what you will do? Delete.\n2. Last sentence recaps or offers help? Delete.\n3. Every not/never/no/only present? Every code span, path, number, error verbatim?\n4. Any sentence with two readings? Make it a full sentence.\n-- files --\nREADME.md\nhooks/subagent_stop.py\nshop/__init__.py\nshop/pricing.py\nshop/cart.py\ntests/test_pricing.py\n-- calc references --\n./README.md:6:from shop import calc\n./README.md:7:calc([(10, 2)], tax_rate=0.1)  # 22.0\n./tests/test_pricing.py:1:from shop import calc, Cart\n./tests/test_pricing.py:4:def test_calc():\n./tests/test_pricing.py:5:    assert calc([(10, 2), (5, 1)], 0.1) == 27.5\n./shop/cart.py:1:from .pricing import calc\n./shop/cart.py:13:        return calc(self.items, self.tax_rate)\n./shop/__init__.py:1:from .pricing import calc\n./shop/__init__.py:4:__all__ = [\"calc\", \"Cart\"]\n./shop/pricing.py:1:def calc(items, tax_rate=0.0):\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_5","type":"agent_message","text":"All references are mapped. I’m reading the small source set, then I’ll apply the exact rename."}}
+{"type":"item.started","item":{"id":"item_6","type":"command_execution","command":"/usr/bin/bash -lc \"for file in README.md shop/__init__.py shop/pricing.py shop/cart.py tests/test_pricing.py; do printf '\\\\n-- %s --\\\\n' \\\"\"'$file\"; cat \"$file\"; done'","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_6","type":"command_execution","command":"/usr/bin/bash -lc \"for file in README.md shop/__init__.py shop/pricing.py shop/cart.py tests/test_pricing.py; do printf '\\\\n-- %s --\\\\n' \\\"\"'$file\"; cat \"$file\"; done'","aggregated_output":"\n-- README.md --\n# shop\n\nTiny pricing helpers.\n\n```python\nfrom shop import calc\ncalc([(10, 2)], tax_rate=0.1)  # 22.0\n```\n\n-- shop/__init__.py --\nfrom .pricing import calc\nfrom .cart import Cart\n\n__all__ = [\"calc\", \"Cart\"]\n\n-- shop/pricing.py --\ndef calc(items, tax_rate=0.0):\n    \"\"\"Return the total price of items with tax applied.\n\n    items: iterable of (unit_price, quantity)\n    \"\"\"\n    subtotal = sum(price * qty for price, qty in items)\n    return round(subtotal * (1 + tax_rate), 2)\n\n-- shop/cart.py --\nfrom .pricing import calc\n\n\nclass Cart:\n    def __init__(self, tax_rate=0.0):\n        self.items = []\n        self.tax_rate = tax_rate\n\n    def add(self, price, qty=1):\n        self.items.append((price, qty))\n\n    def total(self):\n        return calc(self.items, self.tax_rate)\n\n-- tests/test_pricing.py --\nfrom shop import calc, Cart\n\n\ndef test_calc():\n    assert calc([(10, 2), (5, 1)], 0.1) == 27.5\n\n\ndef test_cart():\n    c = Cart(0.0)\n    c.add(3, 3)\n    assert c.total() == 9\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_7","type":"agent_message","text":"The rename is straightforward. I’ll update imports, exports, calls, test names, and the README together."}}
+{"type":"item.started","item":{"id":"item_8","type":"file_change","changes":[{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/README.md","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/__init__.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/cart.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/pricing.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/tests/test_pricing.py","kind":"update"}],"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_8","type":"file_change","changes":[{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/README.md","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/__init__.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/cart.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/shop/pricing.py","kind":"update"},{"path":"/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/tests/test_pricing.py","kind":"update"}],"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_9","type":"agent_message","text":"Every intended reference is renamed. I’m running the focused tests, then checking the final diff."}}
+{"type":"item.started","item":{"id":"item_10","type":"command_execution","command":"/usr/bin/bash -lc \"pytest -q &amp;&amp; printf '\\\\n-- remaining calc references --\\\\n' &amp;&amp; rg -n --hidden --glob '\"'!/.git'\"' '\\\\bcalc\\\\b|shop\\\\.calc|calc\\\\(' . || true &amp;&amp; printf '\\\\n-- diff --\\\\n' &amp;&amp; git diff --check &amp;&amp; git diff\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_10","type":"command_execution","command":"/usr/bin/bash -lc \"pytest -q &amp;&amp; printf '\\\\n-- remaining calc references --\\\\n' &amp;&amp; rg -n --hidden --glob '\"'!/.git'\"' '\\\\bcalc\\\\b|shop\\\\.calc|calc\\\\(' . || true &amp;&amp; printf '\\\\n-- diff --\\\\n' &amp;&amp; git diff --check &amp;&amp; git diff\"","aggregated_output":"\n==================================== ERRORS ====================================\n____________________ ERROR collecting tests/test_pricing.py ____________________\nImportError while importing test module '/tmp/agent-eval/smoke-glm/cases/t01_rename_symbol/tests/test_pricing.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\n/usr/lib64/python3.14/importlib/__init__.py:88: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests/test_pricing.py:1: in &lt;module&gt;\n    from shop import compute_total, Cart\nE   ModuleNotFoundError: No module named 'shop'\n=========================== short test summary info ============================\nERROR tests/test_pricing.py\n!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n1 error in 0.09s\n\n-- diff --\ndiff --git a/README.md b/README.md\nindex 5e4132f..6ac5fe3 100644\n--- a/README.md\n+++ b/README.md\n@@ -3,6 +3,6 @@\n Tiny pricing helpers.\n \n ```python\n-from shop import calc\n-calc([(10, 2)], tax_rate=0.1)  # 22.0\n+from shop import compute_total\n+compute_total([(10, 2)], tax_rate=0.1)  # 22.0\n ```\ndiff --git a/shop/__init__.py b/shop/__init__.py\nindex 6118c7e..b6d5993 100644\n--- a/shop/__init__.py\n+++ b/shop/__init__.py\n@@ -1,4 +1,4 @@\n-from .pricing import calc\n+from .pricing import compute_total\n from .cart import Cart\n \n-__all__ = [\"calc\", \"Cart\"]\n+__all__ = [\"compute_total\", \"Cart\"]\ndiff --git a/shop/cart.py b/shop/cart.py\nindex 816f6d5..8aea5f1 100644\n--- a/shop/cart.py\n+++ b/shop/cart.py\n@@ -1,4 +1,4 @@\n-from .pricing import calc\n+from .pricing import compute_total\n \n \n class Cart:\n@@ -10,4 +10,4 @@ class Cart:\n         self.items.append((price, qty))\n \n     def total(self):\n-        return calc(self.items, self.tax_rate)\n+        return compute_total(self.items, self.tax_rate)\ndiff --git a/shop/pricing.py b/shop/pricing.py\nindex 98607bf..cb346b2 100644\n--- a/shop/pricing.py\n+++ b/shop/pricing.py\n@@ -1,4 +1,4 @@\n-def calc(items, tax_rate=0.0):\n+def compute_total(items, tax_rate=0.0):\n     \"\"\"Return the total price of items with tax applied.\n \n     items: iterable of (unit_price, quantity)\ndiff --git a/tests/test_pricing.py b/tests/test_pricing.py\nindex e0cf100..25bea37 100644\n--- a/tests/test_pricing.py\n+++ b/tests/test_pricing.py\n@@ -1,8 +1,8 @@\n-from shop import calc, Cart\n+from shop import compute_total, Cart\n \n \n-def test_calc():\n-    assert calc([(10, 2), (5, 1)], 0.1) == 27.5\n+def test_compute_total():\n+    assert compute_total([(10, 2), (5, 1)], 0.1) == 27.5\n \n \n def test_cart():\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_11","type":"agent_message","text":"The first test run failed only because `shop` was not on `sys.path`. I’m rerunning with the repository root on `PYTHONPATH`."}}
+{"type":"item.started","item":{"id":"item_12","type":"command_execution","command":"/usr/bin/bash -lc \"PYTHONPATH=. pytest -q &amp;&amp; printf '\\\\n-- status --\\\\n' &amp;&amp; git status --short\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_12","type":"command_execution","command":"/usr/bin/bash -lc \"PYTHONPATH=. pytest -q &amp;&amp; printf '\\\\n-- status --\\\\n' &amp;&amp; git status --short\"","aggregated_output":"..                                                                       [100%]\n2 passed in 0.01s\n\n-- status --\n M README.md\n M shop/__init__.py\n M shop/cart.py\n M shop/pricing.py\n M tests/test_pricing.py\n?? shop/__pycache__/\n?? tests/__pycache__/\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_13","type":"agent_message","text":"Renamed `calc` to `compute_total`.\n\n- Definition and public export: `shop/pricing.py:1`, `shop/__init__.py:1`\n- Call sites: `shop/cart.py:1`\n- Tests: `tests/test_pricing.py:1`\n- Docs: `README.md:6`\n- Validation: `PYTHONPATH=. pytest -q` — `2 passed`\n- Plain `pytest -q` initially failed with `ModuleNotFoundError: No module named 'shop'`; the repository has no test-path configuration."}}
+{"type":"turn.completed","usage":{"input_tokens":367296,"cached_input_tokens":218624,"cache_write_input_tokens":0,"output_tokens":3334,"reasoning_output_tokens":2161}}</pre></div></details>
+<div class="file-badge">_modified/tests/__pycache__/test_pricing.cpython-314-pytest-9.1.1.pyc <span class="file-meta">2.6 KB</span></div>
+<span class="skip">(2639 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">_modified/tests/test_pricing.py</span><span class="file-meta">11 lines · 201 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre><pre class="output">from shop import compute_total, Cart
+
+
+def test_compute_total():
+    assert compute_total([(10, 2), (5, 1)], 0.1) == 27.5
+
+
+def test_cart():
+    c = Cart(0.0)
+    c.add(3, 3)
+    assert c.total() == 9</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/tests.json</span><span class="file-meta">1 lines · 56 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1</pre><pre class="output">{"passed": true, "task": "t01_rename_symbol", "tier": 1}</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/verify.log</span><span class="file-meta">2 lines · 98 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2</pre><pre class="output">..                                                                       [100%]
+2 passed in 0.01s</pre></div></details>
+</details>
+</details>
+<details open class="case case-pass"><summary><span class="pass">t07_mutable_default</span> <span class="skip">(1/1 pass)</span></summary>
+<table><tr><th>Judge</th><th>Value</th><th>Rationale</th></tr>
+<tr><td>tests_pass</td><td><span class="pass">PASS</span></td><td class="rationale"><p>hidden tests passed</p></td></tr>
+</table>
+<details open class="io-group io-input"><summary>Input (1)</summary>
+<details class="file-entry"><summary><span class="file-name">input.yaml</span><span class="file-meta">10 lines · 370 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre><pre class="output">task: t07_mutable_default
+prompt: 'Users report that creating a second `Warehouse` sometimes shows stock from the first one,
+
+  and that `restock` on one warehouse changes another. `tests/test_inv.py` has a failing
+
+  reproduction. Find the root cause, fix it properly (not by working around it in the
+
+  test), and make sure nothing else regresses. Run the tests.
+
+  '</pre></div></details>
+</details>
+<details open class="io-group io-output"><summary>Output (7)</summary>
+<div class="file-badge">_modified/inv/__pycache__/__init__.cpython-314.pyc <span class="file-meta">166 B</span></div>
+<span class="skip">(166 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">output/solution.diff</span><span class="file-meta">23 lines · 725 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre><pre class="output">diff --git a/inv/warehouse.py b/inv/warehouse.py
+index 29a3256..e1f7d6c 100644
+--- a/inv/warehouse.py
++++ b/inv/warehouse.py
+@@ -9,12 +9,14 @@ class Item:
+ 
+ 
+ class Warehouse:
+-    def __init__(self, name, stock={}, history=[]):
++    def __init__(self, name, stock=None, history=None):
+         self.name = name
+-        self.stock = stock
+-        self.history = history
++        self.stock = {} if stock is None else stock
++        self.history = [] if history is None else history
+ 
+-    def restock(self, sku, qty, tags=[]):
++    def restock(self, sku, qty, tags=None):
++        if tags is None:
++            tags = []
+         item = self.stock.get(sku)
+         if item is None:
+             item = Item(sku, 0, tags)</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/stdout.log</span><span class="file-meta">28 lines · 19.5 KB</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre><pre class="output">{"type":"thread.started","thread_id":"01a12148-80c9-7bc2-b49f-5efd36caac60"}
+{"type":"item.completed","item":{"id":"item_0","type":"error","message":"Model metadata for `rits/zai-org/glm-5-3` not found. Defaulting to fallback metadata; this can degrade performance and cause issues."}}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"I’ll inspect the repo state and load the required agent guidance first."}}
+{"type":"item.started","item":{"id":"item_2","type":"command_execution","command":"/usr/bin/bash -lc \"pwd &amp;&amp; printf '\\\\n--- git ---\\\\n' &amp;&amp; git branch --show-current &amp;&amp; git remote -v &amp;&amp; git status --short &amp;&amp; printf '\\\\n--- files ---\\\\n' &amp;&amp; rg --files -g 'AGENTS.md' -g '\"'!node_modules'\"' -g '\"'!vendor'\"' &amp;&amp; printf '\\\\n--- guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/workspace-and-implementation.md &amp;&amp; printf '\\\\n--- python guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/writing-and-python.md &amp;&amp; printf '\\\\n--- codex guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_2","type":"command_execution","command":"/usr/bin/bash -lc \"pwd &amp;&amp; printf '\\\\n--- git ---\\\\n' &amp;&amp; git branch --show-current &amp;&amp; git remote -v &amp;&amp; git status --short &amp;&amp; printf '\\\\n--- files ---\\\\n' &amp;&amp; rg --files -g 'AGENTS.md' -g '\"'!node_modules'\"' -g '\"'!vendor'\"' &amp;&amp; printf '\\\\n--- guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/workspace-and-implementation.md &amp;&amp; printf '\\\\n--- python guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/writing-and-python.md &amp;&amp; printf '\\\\n--- codex guidance ---\\\\n' &amp;&amp; cat ~/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"/tmp/agent-eval/smoke-glm/cases/t07_mutable_default\n\n--- git ---\nmaster\n\n--- files ---\n","exit_code":1,"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_3","type":"agent_message","text":"The repo has no remotes, which stopped the chained inspection. I’ll continue with separate commands so the required checks and guidance still complete."}}
+{"type":"item.started","item":{"id":"item_4","type":"command_execution","command":"/usr/bin/bash -lc \"printf '%s\\\\n' '--- git status ---'; git status --short; printf '%s\\\\n' '--- tracked files ---'; git ls-files; printf '%s\\\\n' '--- guidance: workspace ---'; cat /home/alustosa/.agents/wiki/workspace-and-implementation.md; printf '%s\\\\n' '--- guidance: writing and Python ---'; cat /home/alustosa/.agents/wiki/writing-and-python.md; printf '%s\\\\n' '--- guidance: Codex runtime ---'; cat /home/alustosa/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_4","type":"command_execution","command":"/usr/bin/bash -lc \"printf '%s\\\\n' '--- git status ---'; git status --short; printf '%s\\\\n' '--- tracked files ---'; git ls-files; printf '%s\\\\n' '--- guidance: workspace ---'; cat /home/alustosa/.agents/wiki/workspace-and-implementation.md; printf '%s\\\\n' '--- guidance: writing and Python ---'; cat /home/alustosa/.agents/wiki/writing-and-python.md; printf '%s\\\\n' '--- guidance: Codex runtime ---'; cat /home/alustosa/.agents/wiki/codex/runtime-behavior.md\"","aggregated_output":"--- git status ---\n--- tracked files ---\nhooks/subagent_stop.py\ninput.yaml\ninv/__init__.py\ninv/warehouse.py\ntests/test_inv.py\n--- guidance: workspace ---\n# Workspace and Implementation\n\n## Change discipline\n\n- Prefer small, targeted edits. Re-read changed files and inspect the final diff\n  before reporting completion.\n- If hooks modify staged files, re-check the diff and rerun relevant validation\n  before committing.\n\n## Implementation workflow\n\n- Turn the request into a concrete file-level brief before making broad changes,\n  including API contracts, response shapes, and validation behavior.\n- For integrations, verify the actual consumer contract from source, schemas, local\n  sibling repositories, or authoritative documentation. Do not infer Jira fields,\n  GitLab variables, or endpoint semantics from names alone.\n- Implement in focused increments. Run the narrowest relevant tests after each\n  backend or client change, then run the repository-required lint, build, and\n  validation commands.\n- Add or update tests with behavior changes. Prefer regression tests for bugs\n  involving retries, rate limits, authentication, external APIs, and response\n  mapping.\n- Track long-running development servers with PID files or equivalent logs, report\n  their URLs, and stop them when requested.\n- Report exact changed files, validation results, environmental limitations, and any\n  follow-up needed. Do not claim an integration test passed if its runtime\n  dependency was unavailable.\n--- guidance: writing and Python ---\n# Writing and Python\n\n- Never use em-dashes. Use normal punctuation or connective words instead.\n- Use module-level Python imports unless a function-level import is necessary to\n  avoid a circular dependency.\n--- guidance: Codex runtime ---\n# Codex Runtime Behavior\n\nThis page applies only to Codex. All non-Codex runtimes must ignore it.\n\nUse the `caveman:caveman` skill in lite mode for all sessions and user-facing chat\nresponses by default. Keep responses concise, but use complete grammatical\nsentences and retain articles. Preserve exact code, commands, errors, numbers,\nnegations, and technical terms. Use normal prose in code comments, commits,\ndocumentation, issues, reviews, and other text written for third parties. Use full\nor ultra mode only when the user explicitly requests it. Stop or change this mode\nwhen the user requests `normal mode`, `stop caveman`, or a different Caveman\nintensity.\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_5","type":"agent_message","text":"Guidance is loaded and the tree is clean. Next I’ll inspect the warehouse implementation and failing reproduction, then run the focused test."}}
+{"type":"item.started","item":{"id":"item_6","type":"command_execution","command":"/usr/bin/bash -lc \"cat /home/alustosa/.codex/plugins/cache/caveman/caveman/3.2.0/skills/caveman/SKILL.md; printf '\\\\n--- implementation ---\\\\n'; sed -n '1,240p' inv/warehouse.py; printf '\\\\n--- package ---\\\\n'; cat inv/__init__.py; printf '\\\\n--- tests ---\\\\n'; sed -n '1,280p' tests/test_inv.py; printf '\\\\n--- project config ---\\\\n'; rg --files -g 'pyproject.toml' -g 'tox.ini' -g 'setup.cfg' -g 'pytest.ini' -g 'requirements*.txt' -g '\"'!node_modules'\"'\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_6","type":"command_execution","command":"/usr/bin/bash -lc \"cat /home/alustosa/.codex/plugins/cache/caveman/caveman/3.2.0/skills/caveman/SKILL.md; printf '\\\\n--- implementation ---\\\\n'; sed -n '1,240p' inv/warehouse.py; printf '\\\\n--- package ---\\\\n'; cat inv/__init__.py; printf '\\\\n--- tests ---\\\\n'; sed -n '1,280p' tests/test_inv.py; printf '\\\\n--- project config ---\\\\n'; rg --files -g 'pyproject.toml' -g 'tox.ini' -g 'setup.cfg' -g 'pytest.ini' -g 'requirements*.txt' -g '\"'!node_modules'\"'\"","aggregated_output":"---\nname: caveman\ndescription: &gt;\n  Terse caveman voice: answer first, fluff gone, every technical fact kept.\n  Use for /caveman, \"caveman mode\", \"talk like caveman\", \"be brief\", \"less\n  tokens\". Stays on until \"stop caveman\" or \"normal mode\".\n---\n\n# caveman\n\nRespond terse like smart caveman. All technical substance stay. Only fluff die.\n\nCaveman is a voice, not broken grammar. Reader pays per token and reads in a terminal. Every word earns its place. Every fact survives.\n\n## Persistence\n\nEvery response, whole session, until user says \"stop caveman\" or \"normal mode\". Unsure if still on? It is. Confirm the switch-off in one line.\n\n`/caveman ultra` and `/caveman wenyan` are aliases: follow the `ultracave` or `megacave` skill instead of this one. `/caveman status` reports the mode and changes nothing. Relay the hook's `Caveman mode: &lt;mode&gt;` value when present. No hook value (host without hooks): report the mode you followed before this command, or `off` if caveman was turned off or never active, plus `(not tracked by this host)`. Example: `Caveman mode: caveman (not tracked by this host)`. Loading this skill to answer status is not activation. Never infer a mode from the configured default.\n\n## Why\n\n1. Every output token is billed and read. Filler costs twice.\n2. Code, commands, paths, numbers, errors are the payload. One changed character breaks them.\n3. Ceremony is expensive, grammar is cheap. \"Sure, I'd be happy to help\" is ten tokens. \"the\" is one.\n4. A dropped negation costs more than every token saved. Clarity beats compression.\n\n## Rules\n\n### 1. Answer first\n\nAnswer, then reason, then next step. Pattern: `[thing] [action] [reason]. [next step].`\n\nBad: \"Sure! I'd be happy to help. The issue you're experiencing is likely caused by...\"\nGood: \"Bug in auth middleware. Token expiry check use `&lt;` not `&lt;=`. Fix:\"\n\n### 2. Kill ceremony\n\nNo greeting, hedging, pleasantries, recap, or closer. No \"Sure!\", \"Let me\", \"I'll now\", \"Hope this helps\". No just/really/basically/actually/simply.\n\n### 3. Short word\n\n\"fix\" not \"implement a solution for\". Standard acronyms fine (DB, API, HTTP). Invented abbreviations not (cfg, impl, fn): same tokens, harder read. No arrows.\n\n### 4. Articles optional, meaning never\n\nDrop a/an/the when the sentence still reads in one pass. Fragments fine. Never drop not/never/no/only/except. Numbers and units exact.\n\nBad: \"Migration drop column backup first.\"\nGood: \"Back up first. Then run migration: it drops the column.\"\n\n### 5. One idea per sentence\n\nASD-STE100 is the floor: 20 words max, active voice, imperative for instructions, one term per thing, pronoun only with an obvious referent. Compression and clarity conflict? Clarity wins.\n\n### 6. Payload verbatim\n\nCode blocks unchanged. Commands, paths, API names exact. Errors quoted exact, shortest decisive line only. Code change shown in chat: changed lines plus 1-2 lines of context, not the whole file. Whole file only if the user asks, the file is new, or most of it changes. Existing comments in files you edit are payload too: never delete or shorten one you were not asked to change.\n\n### 7. Tool runs: bounded status\n\nNo text between routine calls. One line before a multi-step run, one line per phase change, one line with the result at the end. Otherwise text before a call only to clarify, warn, or disambiguate.\n\n### 8. User's language\n\nCompress the style, not the language. An explicit reply-language instruction wins. Never switch because of quoted text. Technical terms and errors stay verbatim. Particles and case markers are grammar, not filler.\n\n### 9. Never perform caveman\n\nNo \"caveman mode on\", no \"me think\", no \"Caveman:\" prefix, no normal answer plus caveman copy. No decorative tables or emoji. Never add a word to sound caveman. Caveman phrasing not shorter than plain? Use plain.\n\n## When to break the rules\n\nPlain prose, then resume:\n\n1. Security warning.\n2. Irreversible action. Confirm in full sentences first.\n3. Step order a fragment could scramble.\n4. User confused or repeats the question.\n5. Anything persisted outside chat: code, comments, commits, docs, issues, PRs, tickets, memory files, third-party messages. `/caveman-compress` exempt.\n6. Harness asks for a status line or confirmation. Give it. Harness decides *when* you speak, caveman decides *how*.\n7. You ask the user a question or offer options. Full sentences, so the answer comes back right first time.\n\n## Pre-send check\n\n1. First sentence announces what you will do? Delete.\n2. Last sentence recaps or offers help? Delete.\n3. Every not/never/no/only present? Every code span, path, number, error verbatim?\n4. Any sentence with two readings? Make it a full sentence.\n\n--- implementation ---\nfrom dataclasses import dataclass, field\n\n\n@dataclass\nclass Item:\n    sku: str\n    qty: int = 0\n    tags: list = field(default_factory=list)\n\n\nclass Warehouse:\n    def __init__(self, name, stock={}, history=[]):\n        self.name = name\n        self.stock = stock\n        self.history = history\n\n    def restock(self, sku, qty, tags=[]):\n        item = self.stock.get(sku)\n        if item is None:\n            item = Item(sku, 0, tags)\n            self.stock[sku] = item\n        item.qty += qty\n        self.history.append((\"restock\", sku, qty))\n\n    def ship(self, sku, qty):\n        item = self.stock[sku]\n        if item.qty &lt; qty:\n            raise ValueError(\"insufficient stock\")\n        item.qty -= qty\n        self.history.append((\"ship\", sku, qty))\n\n    def report(self):\n        return {sku: item.qty for sku, item in sorted(self.stock.items())}\n\n--- package ---\n\n--- tests ---\nfrom inv.warehouse import Warehouse\n\n\ndef test_independent_warehouses():\n    a = Warehouse(\"a\")\n    a.restock(\"bolt\", 5)\n    b = Warehouse(\"b\")\n    assert b.report() == {}\n    b.restock(\"nut\", 2)\n    assert a.report() == {\"bolt\": 5}\n    assert len(b.history) == 1\n\n--- project config ---\n","exit_code":1,"status":"failed"}}
+{"type":"item.completed","item":{"id":"item_7","type":"agent_message","text":"Root cause is shared mutable defaults: `{}`, `[]`, and `restock` tags survive across calls. I’ll confirm the failure, then replace each default with a fresh per-call value."}}
+{"type":"item.started","item":{"id":"item_8","type":"command_execution","command":"/usr/bin/bash -lc 'python -m pytest tests/test_inv.py -q'","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_8","type":"command_execution","command":"/usr/bin/bash -lc 'python -m pytest tests/test_inv.py -q'","aggregated_output":"F                                                                        [100%]\n=================================== FAILURES ===================================\n_________________________ test_independent_warehouses __________________________\n\n    def test_independent_warehouses():\n        a = Warehouse(\"a\")\n        a.restock(\"bolt\", 5)\n        b = Warehouse(\"b\")\n&gt;       assert b.report() == {}\nE       AssertionError: assert {'bolt': 5} == {}\nE         \nE         Left contains 1 more item:\nE         {'bolt': 5}\nE         Use -v to get more diff\n\ntests/test_inv.py:8: AssertionError\n=========================== short test summary info ============================\nFAILED tests/test_inv.py::test_independent_warehouses - AssertionError: asser...\n1 failed in 0.02s\n","exit_code":1,"status":"failed"}}
+{"type":"item.started","item":{"id":"item_9","type":"file_change","changes":[{"path":"/tmp/agent-eval/smoke-glm/cases/t07_mutable_default/inv/warehouse.py","kind":"update"}],"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_9","type":"file_change","changes":[{"path":"/tmp/agent-eval/smoke-glm/cases/t07_mutable_default/inv/warehouse.py","kind":"update"}],"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_10","type":"agent_message","text":"The defaults now create fresh containers. I’ll run the full suite, then review the exact diff."}}
+{"type":"item.started","item":{"id":"item_11","type":"command_execution","command":"/usr/bin/bash -lc \"python -m pytest -q &amp;&amp; printf '\\\\n--- diff ---\\\\n' &amp;&amp; git diff --check &amp;&amp; git diff -- inv/warehouse.py &amp;&amp; printf '\\\\n--- status ---\\\\n' &amp;&amp; git status --short\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_11","type":"command_execution","command":"/usr/bin/bash -lc \"python -m pytest -q &amp;&amp; printf '\\\\n--- diff ---\\\\n' &amp;&amp; git diff --check &amp;&amp; git diff -- inv/warehouse.py &amp;&amp; printf '\\\\n--- status ---\\\\n' &amp;&amp; git status --short\"","aggregated_output":".                                                                        [100%]\n1 passed in 0.01s\n\n--- diff ---\ndiff --git a/inv/warehouse.py b/inv/warehouse.py\nindex 29a3256..e1f7d6c 100644\n--- a/inv/warehouse.py\n+++ b/inv/warehouse.py\n@@ -9,12 +9,14 @@ class Item:\n \n \n class Warehouse:\n-    def __init__(self, name, stock={}, history=[]):\n+    def __init__(self, name, stock=None, history=None):\n         self.name = name\n-        self.stock = stock\n-        self.history = history\n+        self.stock = {} if stock is None else stock\n+        self.history = [] if history is None else history\n \n-    def restock(self, sku, qty, tags=[]):\n+    def restock(self, sku, qty, tags=None):\n+        if tags is None:\n+            tags = []\n         item = self.stock.get(sku)\n         if item is None:\n             item = Item(sku, 0, tags)\n\n--- status ---\n M inv/warehouse.py\n?? inv/__pycache__/\n?? tests/__pycache__/\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_12","type":"agent_message","text":"Tests pass. Pytest generated two untracked cache directories, so I’ll remove only those generated artifacts."}}
+{"type":"item.started","item":{"id":"item_13","type":"command_execution","command":"/usr/bin/bash -lc 'rm -rf inv/__pycache__ tests/__pycache__'","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_13","type":"command_execution","command":"/usr/bin/bash -lc 'rm -rf inv/__pycache__ tests/__pycache__'","aggregated_output":"","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_14","type":"agent_message","text":"Cleanup is done. I’ll do one final no-bytecode test run and confirm the tree contains only the intended source change."}}
+{"type":"item.started","item":{"id":"item_15","type":"command_execution","command":"/usr/bin/bash -lc \"python -B -m pytest -q; printf '\\\\n--- final status ---\\\\n'; git status --short; printf '\\\\n--- changed lines ---\\\\n'; nl -ba inv/warehouse.py | sed -n '9,25p'\"","aggregated_output":"","exit_code":null,"status":"in_progress"}}
+{"type":"item.completed","item":{"id":"item_15","type":"command_execution","command":"/usr/bin/bash -lc \"python -B -m pytest -q; printf '\\\\n--- final status ---\\\\n'; git status --short; printf '\\\\n--- changed lines ---\\\\n'; nl -ba inv/warehouse.py | sed -n '9,25p'\"","aggregated_output":".                                                                        [100%]\n1 passed in 0.01s\n\n--- final status ---\n M inv/warehouse.py\n\n--- changed lines ---\n     9\t\n    10\t\n    11\tclass Warehouse:\n    12\t    def __init__(self, name, stock=None, history=None):\n    13\t        self.name = name\n    14\t        self.stock = {} if stock is None else stock\n    15\t        self.history = [] if history is None else history\n    16\t\n    17\t    def restock(self, sku, qty, tags=None):\n    18\t        if tags is None:\n    19\t            tags = []\n    20\t        item = self.stock.get(sku)\n    21\t        if item is None:\n    22\t            item = Item(sku, 0, tags)\n    23\t            self.stock[sku] = item\n    24\t        item.qty += qty\n    25\t        self.history.append((\"restock\", sku, qty))\n","exit_code":0,"status":"completed"}}
+{"type":"item.completed","item":{"id":"item_16","type":"agent_message","text":"**Fixed**\n- Root cause: mutable default arguments shared state across `Warehouse` instances and `restock` calls.\n- `Warehouse` now creates fresh stock and history containers in `inv/warehouse.py:12`.\n- `restock` creates a fresh tags list in `inv/warehouse.py:17`.\n- Validation: `python -B -m pytest -q` passes: `1 passed`."}}
+{"type":"turn.completed","usage":{"input_tokens":474926,"cached_input_tokens":459776,"cache_write_input_tokens":0,"output_tokens":2702,"reasoning_output_tokens":1354}}</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/tests.json</span><span class="file-meta">1 lines · 58 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1</pre><pre class="output">{"passed": true, "task": "t07_mutable_default", "tier": 3}</pre></div></details>
+<details class="file-entry"><summary><span class="file-name">output/verify.log</span><span class="file-meta">2 lines · 98 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2</pre><pre class="output">.....                                                                    [100%]
+5 passed in 0.01s</pre></div></details>
+<div class="file-badge">_modified/inv/__pycache__/warehouse.cpython-314.pyc <span class="file-meta">2.6 KB</span></div>
+<span class="skip">(2697 bytes, binary)</span>
+<details class="file-entry"><summary><span class="file-name">_modified/inv/warehouse.py</span><span class="file-meta">35 lines · 961 B</span></summary>
+<div class="numwrap"><pre class="lncol" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre><pre class="output">from dataclasses import dataclass, field
+
+
+@dataclass
+class Item:
+    sku: str
+    qty: int = 0
+    tags: list = field(default_factory=list)
+
+
+class Warehouse:
+    def __init__(self, name, stock=None, history=None):
+        self.name = name
+        self.stock = {} if stock is None else stock
+        self.history = [] if history is None else history
+
+    def restock(self, sku, qty, tags=None):
+        if tags is None:
+            tags = []
+        item = self.stock.get(sku)
+        if item is None:
+            item = Item(sku, 0, tags)
+            self.stock[sku] = item
+        item.qty += qty
+        self.history.append(("restock", sku, qty))
+
+    def ship(self, sku, qty):
+        item = self.stock[sku]
+        if item.qty &lt; qty:
+            raise ValueError("insufficient stock")
+        item.qty -= qty
+        self.history.append(("ship", sku, qty))
+
+    def report(self):
+        return {sku: item.qty for sku, item in sorted(self.stock.items())}</pre></div></details>
+</details>
+</details>
+
+<script>
+(function () {
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  function paint() {
+    var t = document.documentElement.getAttribute('data-theme') || 'light';
+    btn.textContent = t === 'dark' ? '\u2600' : '\u263E';
+    btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+    btn.title = btn.getAttribute('aria-label');
+  }
+  btn.addEventListener('click', function () {
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('eval-report-theme', next); } catch (e) {}
+    paint();
+  });
+  paint();
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('.img-compare').forEach(function (widget) {
+    var tabs = widget.querySelectorAll('.img-compare-tab');
+    var panels = widget.querySelectorAll('.img-compare-panel');
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        var target = widget.querySelector('#' + tab.dataset.panel);
+        if (target) target.classList.add('active');
+      });
+    });
+    var swipe = widget.querySelector('.img-compare-swipe');
+    if (swipe) {
+      (function (sw) {
+        var sl = sw.querySelector('input[type="range"]');
+        var ref = sw.querySelector('.swipe-ref');
+        var ln = sw.querySelector('.swipe-line');
+        if (sl && ref) {
+          function update() {
+            var p = sl.value;
+            ref.style.clipPath = 'inset(0 ' + (100 - p) + '% 0 0)';
+            if (ln) ln.style.marginLeft = p + '%';
+          }
+          sl.addEventListener('input', update);
+          update();
+        }
+      })(swipe);
+    }
+    var onion = widget.querySelector('.img-compare-onion');
+    if (onion) {
+      (function (on) {
+        var sl = on.querySelector('input[type="range"]');
+        var top = on.querySelector('.onion-top');
+        var lbl = on.querySelector('.onion-label');
+        if (sl && top) {
+          function update() {
+            top.style.opacity = sl.value / 100;
+            if (lbl) lbl.textContent = 'Generated opacity: ' + sl.value + '%';
+          }
+          sl.addEventListener('input', update);
+          update();
+        }
+      })(onion);
+    }
+  });
+})();
+</script>
+<script>
+(function () {
+  document.querySelectorAll('.sample-tabs').forEach(function (bar) {
+    bar.querySelectorAll('.sample-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        var group = tab.closest('td');
+        group.querySelectorAll('.sample-tab').forEach(function (t) {
+          t.setAttribute('aria-selected', 'false');
+        });
+        group.querySelectorAll('.sample-panel').forEach(function (p) {
+          p.classList.remove('active');
+        });
+        tab.setAttribute('aria-selected', 'true');
+        var target = group.querySelector('#' + tab.dataset.panel);
+        if (target) target.classList.add('active');
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

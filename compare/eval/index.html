@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Model Comparison</title>
+<style>
+:root {
+  --bg: #cbd1da; --surface: #ffffff; --surface2: #f1f5f9;
+  --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
+  --accent: #2563eb; --green: #16a34a; --yellow: #d97706; --red: #dc2626;
+  --hover: rgba(15,23,42,0.04);
+  --best-bg: #dcfce7; --worst-bg: #fee2e2;
+  --header-1: #ffffff; --header-2: #e2e8f0;
+  --verdict-1: rgba(22,163,74,0.08); --verdict-2: rgba(37,99,235,0.06);
+  --verdict-border: rgba(22,163,74,0.35);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0b1220; --surface: #0f1729; --surface2: #162033;
+  --border: #1e2c44; --text: #e2e8f0; --text-muted: #94a3b8;
+  --accent: #60a5fa; --green: #4ade80; --yellow: #fbbf24; --red: #f87171;
+  --hover: rgba(255,255,255,0.03);
+  --best-bg: rgba(74,222,128,0.10); --worst-bg: rgba(248,113,113,0.10);
+  --header-1: #162033; --header-2: #0b1220;
+  --verdict-1: rgba(74,222,128,0.08); --verdict-2: rgba(96,165,250,0.06);
+  --verdict-border: rgba(74,222,128,0.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--bg); }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+       background: var(--bg); color: var(--text); line-height: 1.6;
+       transition: background-color .15s ease, color .15s ease; }
+.header { position: relative; background: linear-gradient(135deg, var(--header-1) 0%, var(--header-2) 100%);
+           border-bottom: 1px solid var(--border); padding: 24px 32px; }
+.header h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+.header .subtitle { color: var(--text-muted); font-size: 14px; }
+#theme-toggle { position: absolute; top: 20px; right: 24px; width: 34px; height: 34px;
+                background: var(--surface); border: 1px solid var(--border); color: var(--text);
+                border-radius: 8px; cursor: pointer; font-size: 16px; line-height: 1;
+                display: flex; align-items: center; justify-content: center; transition: border-color .15s; }
+#theme-toggle:hover { border-color: var(--accent); }
+.tab-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border);
+           padding: 0 16px; overflow-x: auto; }
+.tab-bar button { background: none; border: none; color: var(--text-muted); padding: 12px 20px;
+                  cursor: pointer; font-size: 14px; font-weight: 500;
+                  border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; }
+.tab-bar button:hover { color: var(--text); background: var(--hover); }
+.tab-bar button.active { border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.page { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+.overview { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+            padding: 20px 24px; margin-bottom: 20px; font-size: 14px; line-height: 1.7; color: var(--text-muted); }
+.verdict { background: linear-gradient(135deg, var(--verdict-1) 0%, var(--verdict-2) 100%);
+           border: 1px solid var(--verdict-border); border-radius: 12px;
+           padding: 24px 28px; margin-bottom: 28px; }
+.verdict h2 { font-size: 18px; color: var(--green); margin-bottom: 10px; }
+.verdict p { font-size: 15px; line-height: 1.7; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+         gap: 16px; margin-bottom: 28px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        padding: 20px 24px; position: relative; }
+.card .badge { position: absolute; top: -10px; right: 16px; font-size: 11px; font-weight: 700;
+               padding: 3px 10px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.card h3 { font-size: 18px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.stat { display: flex; flex-direction: column; }
+.stat .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: block; }
+.stat .value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; display: block; }
+.green { color: var(--green); } .yellow { color: var(--yellow); }
+.red { color: var(--red); } .muted { color: var(--text-muted); }
+section { margin-bottom: 32px; }
+section h2 { font-size: 17px; font-weight: 600; margin-bottom: 14px; padding-bottom: 8px;
+             border-bottom: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { text-align: left; padding: 10px 12px; background: var(--surface);
+           border-bottom: 1px solid var(--border); font-weight: 600; color: var(--text-muted);
+           text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+tbody td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+tbody tr:hover { background: var(--hover); }
+.best { background: var(--best-bg); font-weight: 600; color: var(--green); }
+.worst { background: var(--worst-bg); color: var(--red); }
+.insight { background: var(--surface2); border-left: 3px solid var(--accent); padding: 14px 18px;
+           margin: 14px 0; border-radius: 0 6px 6px 0; font-size: 14px; line-height: 1.6; }
+.analysis-section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+            padding: 24px 28px; margin-bottom: 28px; }
+.analysis-section h2 { font-size: 17px; font-weight: 600; margin-bottom: 14px; padding-bottom: 8px;
+             border-bottom: 1px solid var(--border); }
+.analysis-section h3 { font-size: 15px; font-weight: 600; margin: 16px 0 8px; }
+.analysis-section p { font-size: 14px; line-height: 1.7; margin-bottom: 8px; }
+.analysis-section table { margin: 12px 0; }
+.analysis-section .placeholder { color: var(--text-muted); font-style: italic; }
+.iframe-wrap { width: 100%; height: calc(100vh - 90px); border: none; }
+.run-link { padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 12px; }
+.sub-bar { display: flex; align-items: center; gap: 4px; padding: 8px 16px;
+           background: var(--surface); border-bottom: 1px solid var(--border); }
+.sub-bar button { background: none; border: none; color: var(--text-muted); padding: 6px 14px;
+                  cursor: pointer; font-size: 13px; border-bottom: 2px solid transparent; font-weight: 500; }
+.sub-bar button.active { color: var(--accent); border-bottom-color: var(--accent); }
+@media (max-width: 900px) { .cards { grid-template-columns: 1fr; } .page { padding: 16px; } }
+@media print { :root { color-scheme: light; } }
+</style>
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('eval-report-theme');
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
+</head>
+<body>
+
+<div class="header">
+  <button id="theme-toggle" type="button" aria-label="Toggle theme">&#9728;</button>
+  <h1>Model Comparison</h1>
+  <div class="subtitle">8 eval runs across 2 models</div>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <button class="active" data-tab="comparison" data-color="var(--accent)">Comparison</button>
+  <button data-tab="claude-sonnet-5-5" data-color="#8b949e">Sonnet 5.5 (4 runs)</button>
+  <button data-tab="claude-haiku-5-5" data-color="#8b949e">Haiku 5.5 (4 runs)</button>
+</div>
+
+<div class="tab-content active" id="tab-comparison">
+<div class="page">
+<div class="verdict">
+<h2>Bottom Line</h2>
+<p class="placeholder">Analysis pending — will be replaced with a per-model verdict.</p>
+</div>
+
+<div class="cards">
+<div class="card">
+  <h3><span class="dot" style="background:#8b949e"></span> Sonnet 5.5 <span style="font-size:11px; color:var(--text-muted); font-weight:400;">(4 runs avg)</span></h3>
+  <div class="stats">
+    <div class="stat"><span class="label">Solution Quality</span><span class="value green">4.56</span></div>
+    <div class="stat"><span class="label">Tests Pass</span><span class="value green">98.8%</span></div>
+    <div class="stat"><span class="label">Avg Run Cost</span><span class="value red">$5.77</span></div>
+    <div class="stat"><span class="label">Wall Clock</span><span class="value green">14 min</span></div>
+    <div class="stat"><span class="label">Output Tokens</span><span class="value">78.5K</span></div>
+    <div class="stat"><span class="label">Turns</span><span class="value">133</span></div>
+  </div>
+</div>
+<div class="card">
+  <h3><span class="dot" style="background:#8b949e"></span> Haiku 5.5 <span style="font-size:11px; color:var(--text-muted); font-weight:400;">(4 runs avg)</span></h3>
+  <div class="stats">
+    <div class="stat"><span class="label">Solution Quality</span><span class="value red">4.50</span></div>
+    <div class="stat"><span class="label">Tests Pass</span><span class="value red">97.6%</span></div>
+    <div class="stat"><span class="label">Avg Run Cost</span><span class="value green">$1.22</span></div>
+    <div class="stat"><span class="label">Wall Clock</span><span class="value red">23 min</span></div>
+    <div class="stat"><span class="label">Output Tokens</span><span class="value">268.3K</span></div>
+    <div class="stat"><span class="label">Turns</span><span class="value">249</span></div>
+  </div>
+</div>
+</div>
+
+<section>
+<h2>Cost &amp; Efficiency</h2>
+<table><thead><tr><th>Metric</th><th>Sonnet 5.5</th><th>Haiku 5.5</th></tr></thead><tbody><tr><td>Avg Run Cost</td><td class="worst">$5.77 ($5.56-$6.01)</td><td class="best">$1.22 ($0.92-$1.59)</td></tr><tr><td>Avg Output Tokens</td><td class="best">78.5K (71.3K-84.4K)</td><td class="worst">268.3K (207.5K-355.5K)</td></tr><tr><td>Tokens / Turn</td><td class="worst">589 (542-627)</td><td class="best">1,062 (924-1,213)</td></tr><tr><td>Avg Turns</td><td class="best">133 (127-137)</td><td class="worst">249 (219-293)</td></tr><tr><td>Wall Clock</td><td class="best">14 min (12 min-17 min)</td><td class="worst">23 min (18 min-30 min)</td></tr><tr><td>Cost / Turn</td><td class="worst">$0.0433 ($0.0414-$0.0449)</td><td class="best">$0.0048 ($0.0042-$0.0054)</td></tr><tr><td>Cache Hit Rate</td><td class="worst">83.8% (82.6%-85.1%)</td><td class="best">91.0% (90.5%-92.0%)</td></tr></tbody></table></section>
+
+<section>
+<h2>Quality Scores</h2>
+<table><thead><tr><th>Metric</th><th>Sonnet 5.5</th><th>Haiku 5.5</th></tr></thead><tbody><tr><td>Solution Quality</td><td class="best">4.56 (4.50-4.62)</td><td class="worst">4.50 (4.38-4.62)</td></tr><tr><td>Tests Pass</td><td class="best">98.8% (95.2%-100.0%)</td><td class="worst">97.6% (95.2%-100.0%)</td></tr></tbody></table></section>
+
+<section>
+<h2>Per-Case: Solution Quality</h2>
+<table><thead><tr><th>Case</th><th>Sonnet 5.5</th><th>Haiku 5.5</th></tr></thead><tbody><tr><td>r01_fromager_distinfo</td><td class="best">5.0</td><td class="worst">4.5</td></tr><tr><td>r01t_fromager_distinfo_ticket</td><td class="worst">4.0</td><td class="best">4.2</td></tr><tr><td>r02_fromager_age_filter</td><td>5.0</td><td>5.0</td></tr><tr><td>r02t_fromager_age_filter_ticket</td><td class="best">5.0</td><td class="worst">4.5</td></tr><tr><td>r03_fromager_dep_chain</td><td>5.0</td><td>5.0</td></tr><tr><td>r03t_fromager_dep_chain_ticket</td><td>3.5</td><td>3.5</td></tr><tr><td>r04_fromager_age_fallback</td><td>5.0</td><td>5.0</td></tr><tr><td>r05_fromager_version_prebuilt</td><td class="worst">4.0</td><td class="best">4.2</td></tr><tr><td>t01_rename_symbol</td><td>--</td><td>--</td></tr><tr><td>t02_ini_to_toml</td><td>--</td><td>--</td></tr><tr><td>t03_add_type_hints</td><td>--</td><td>--</td></tr><tr><td>t04_lru_cache</td><td>--</td><td>--</td></tr><tr><td>t05_cli_json_flag</td><td>--</td><td>--</td></tr><tr><td>t06_log_parser</td><td>--</td><td>--</td></tr><tr><td>t07_mutable_default</td><td>--</td><td>--</td></tr><tr><td>t08_timezone_bug</td><td>--</td><td>--</td></tr><tr><td>t09_thread_safety</td><td>--</td><td>--</td></tr><tr><td>t10_plugin_registry</td><td>--</td><td>--</td></tr><tr><td>t11_async_migration</td><td>--</td><td>--</td></tr><tr><td>t12_needle_bug</td><td>--</td><td>--</td></tr><tr><td>t13_unicode_dedupe</td><td>--</td><td>--</td></tr><tr><td>t14_dep_resolver</td><td>--</td><td>--</td></tr><tr><td>t15_perf_regression</td><td>--</td><td>--</td></tr><tr><td>t16_json_patch</td><td>--</td><td>--</td></tr></tbody></table>
+</section>
+
+<section>
+<h2>Per-Case: Tests Pass</h2>
+<table><thead><tr><th>Case</th><th>Sonnet 5.5</th><th>Haiku 5.5</th></tr></thead><tbody><tr><td>r01_fromager_distinfo</td><td class="best">100.0%</td><td class="worst">75.0%</td></tr><tr><td>r01t_fromager_distinfo_ticket</td><td>--</td><td>--</td></tr><tr><td>r02_fromager_age_filter</td><td>100.0%</td><td>100.0%</td></tr><tr><td>r02t_fromager_age_filter_ticket</td><td>--</td><td>--</td></tr><tr><td>r03_fromager_dep_chain</td><td>100.0%</td><td>100.0%</td></tr><tr><td>r03t_fromager_dep_chain_ticket</td><td>--</td><td>--</td></tr><tr><td>r04_fromager_age_fallback</td><td>100.0%</td><td>100.0%</td></tr><tr><td>r05_fromager_version_prebuilt</td><td class="best">100.0%</td><td class="worst">75.0%</td></tr><tr><td>t01_rename_symbol</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t02_ini_to_toml</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t03_add_type_hints</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t04_lru_cache</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t05_cli_json_flag</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t06_log_parser</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t07_mutable_default</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t08_timezone_bug</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t09_thread_safety</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t10_plugin_registry</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t11_async_migration</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t12_needle_bug</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t13_unicode_dedupe</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t14_dep_resolver</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t15_perf_regression</td><td>100.0%</td><td>100.0%</td></tr><tr><td>t16_json_patch</td><td class="worst">75.0%</td><td class="best">100.0%</td></tr></tbody></table>
+</section>
+
+<section id="statistics">
+<h2>Statistical Significance (ANOVA)</h2>
+<p>Mixed-effects model (statsmodels mixedlm, per-term Wald tests) — <strong>not significant</strong> at &alpha;=0.05.</p>
+<table><thead><tr><th>Term</th><th>p (raw)</th><th>p (adjusted)</th><th>Result</th></tr></thead><tbody>
+<tr><td>effort</td><td>0.7047</td><td>1.0000</td><td>not significant</td></tr>
+<tr><td>model</td><td>0.7047</td><td>1.0000</td><td>not significant</td></tr>
+<tr><td>effort:model</td><td>0.4215</td><td>1.0000</td><td>not significant</td></tr>
+</tbody></table>
+<p style="color:var(--text-muted);font-size:12px;">Holm-corrected across a family of 3 term test(s); significance on adjusted p.</p>
+<p style="color:var(--text-muted);font-size:12px;">n_cases = 24 · replications = 2</p>
+<h3>Pairwise level contrasts (post-hoc)</h3>
+<p><strong>effort</strong> — Holm-corrected across the 1 contrast(s) within this factor &middot; omnibus adjusted p: 1.0000</p>
+<p style="color:var(--text-muted);font-size:12px;">Estimates are reference-cell contrasts from the fitted model — level differences at the other factors&#x27; reference levels, NOT marginal means (the model includes interactions).</p>
+<table><thead><tr><th>A</th><th>B</th><th>Estimate</th><th>SE</th><th>p (raw)</th><th>p (adjusted)</th><th>Result</th></tr></thead><tbody>
+<tr><td>low</td><td>medium</td><td>0.0104</td><td>0.0275</td><td>0.7047</td><td>0.7047</td><td>not significant</td></tr>
+</tbody></table>
+<p><strong>model</strong> — Holm-corrected across the 1 contrast(s) within this factor &middot; omnibus adjusted p: 1.0000</p>
+<p style="color:var(--text-muted);font-size:12px;">Estimates are reference-cell contrasts from the fitted model — level differences at the other factors&#x27; reference levels, NOT marginal means (the model includes interactions).</p>
+<table><thead><tr><th>A</th><th>B</th><th>Estimate</th><th>SE</th><th>p (raw)</th><th>p (adjusted)</th><th>Result</th></tr></thead><tbody>
+<tr><td>claude-haiku-5-5</td><td>claude-sonnet-5-5</td><td>0.0104</td><td>0.0275</td><td>0.7047</td><td>0.7047</td><td>not significant</td></tr>
+</tbody></table>
+<h3>Cost / quality Pareto frontier</h3>
+<table><thead><tr><th>Condition</th><th>Mean score</th><th>Cost (USD)</th></tr></thead><tbody>
+<tr><td>claude-sonnet-5-5</td><td>0.964</td><td>5.9250</td></tr>
+<tr><td>claude-haiku-5-5</td><td>0.953</td><td>0.9600</td></tr>
+</tbody></table>
+<p style="color:var(--text-muted);font-size:12px;">Statistics computed by <code>/eval-anova</code> (anova.json).</p>
+</section>
+
+<div class="analysis-section" id="model-strengths">
+<h2>Where Each Model Shined</h2>
+<p class="placeholder">Analysis pending — will be replaced with per-model strengths.</p>
+</div>
+
+<div class="analysis-section" id="shared-weaknesses">
+<h2>Shared Weaknesses Across All Models</h2>
+<p class="placeholder">Analysis pending — will be replaced with cross-cutting weaknesses.</p>
+</div>
+
+<div class="analysis-section" id="recommendations">
+<h2>Recommendations</h2>
+<p class="placeholder">Analysis pending — will be replaced with actionable recommendations.</p>
+</div>
+
+</div>
+</div>
+
+<div class="tab-content" id="tab-claude-sonnet-5-5">
+  <div class="sub-bar" id="subbar-claude-sonnet-5-5">
+    <button class=" active" data-sub="0" style="color:var(--accent); border-bottom-color:var(--accent);">Run 1 (2026-10-09-claude-sonnet-5-5-effort-low)</button>
+    <button class="" data-sub="1" style="">Run 2 (2026-10-09-claude-sonnet-5-5-effort-low-r1)</button>
+    <button class="" data-sub="2" style="">Run 3 (2026-10-09-claude-sonnet-5-5-effort-medium)</button>
+    <button class="" data-sub="3" style="">Run 4 (2026-10-09-claude-sonnet-5-5-effort-medium-r1)</button>
+  </div>
+  <div class="sub-panel" data-model="claude-sonnet-5-5" data-idx="0">
+    <div class="page"><p>No HTML report available.</p></div>
+  </div>
+  <div class="sub-panel" data-model="claude-sonnet-5-5" data-idx="1" style="display:none;">
+    <iframe class="iframe-wrap" src="2026-10-09-claude-sonnet-5-5-effort-low-r1/report.html"></iframe>
+  </div>
+  <div class="sub-panel" data-model="claude-sonnet-5-5" data-idx="2" style="display:none;">
+    <div class="page"><p>No HTML report available.</p></div>
+  </div>
+  <div class="sub-panel" data-model="claude-sonnet-5-5" data-idx="3" style="display:none;">
+    <iframe class="iframe-wrap" src="2026-10-09-claude-sonnet-5-5-effort-medium-r1/report.html"></iframe>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-claude-haiku-5-5">
+  <div class="sub-bar" id="subbar-claude-haiku-5-5">
+    <button class=" active" data-sub="0" style="color:var(--accent); border-bottom-color:var(--accent);">Run 1 (2026-10-09-claude-haiku-5-5-effort-low)</button>
+    <button class="" data-sub="1" style="">Run 2 (2026-10-09-claude-haiku-5-5-effort-low-r1)</button>
+    <button class="" data-sub="2" style="">Run 3 (2026-10-09-claude-haiku-5-5-effort-medium)</button>
+    <button class="" data-sub="3" style="">Run 4 (2026-10-09-claude-haiku-5-5-effort-medium-r1)</button>
+  </div>
+  <div class="sub-panel" data-model="claude-haiku-5-5" data-idx="0">
+    <div class="page"><p>No HTML report available.</p></div>
+  </div>
+  <div class="sub-panel" data-model="claude-haiku-5-5" data-idx="1" style="display:none;">
+    <iframe class="iframe-wrap" src="2026-10-09-claude-haiku-5-5-effort-low-r1/report.html"></iframe>
+  </div>
+  <div class="sub-panel" data-model="claude-haiku-5-5" data-idx="2" style="display:none;">
+    <div class="page"><p>No HTML report available.</p></div>
+  </div>
+  <div class="sub-panel" data-model="claude-haiku-5-5" data-idx="3" style="display:none;">
+    <iframe class="iframe-wrap" src="2026-10-09-claude-haiku-5-5-effort-medium-r1/report.html"></iframe>
+  </div>
+</div>
+
+<script>
+document.getElementById('tabBar').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  document.querySelectorAll('.tab-bar button').forEach(b => {
+    b.classList.remove('active'); b.style.color = ''; b.style.borderBottomColor = '';
+  });
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  const c = e.target.dataset.color;
+  e.target.classList.add('active');
+  e.target.style.color = c; e.target.style.borderBottomColor = c;
+  document.getElementById('tab-' + e.target.dataset.tab).classList.add('active');
+});
+const initTab = document.querySelector('.tab-bar button.active');
+if (initTab) { initTab.style.color = initTab.dataset.color; initTab.style.borderBottomColor = initTab.dataset.color; }
+
+document.querySelectorAll('.sub-bar').forEach(bar => {
+  bar.addEventListener('click', e => {
+    if (e.target.tagName !== 'BUTTON') return;
+    bar.querySelectorAll('button').forEach(b => {
+      b.classList.remove('active'); b.style.color = 'var(--text-muted)'; b.style.borderBottomColor = 'transparent';
+    });
+    e.target.classList.add('active');
+    e.target.style.color = 'var(--accent)'; e.target.style.borderBottomColor = 'var(--accent)';
+    const idx = e.target.dataset.sub;
+    const parent = bar.parentElement;
+    parent.querySelectorAll('.sub-panel').forEach(p => p.style.display = 'none');
+    parent.querySelector('.sub-panel[data-idx="' + idx + '"]').style.display = '';
+  });
+});
+</script>
+<script>
+(function () {
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+  function paint() {
+    var t = document.documentElement.getAttribute('data-theme') || 'light';
+    btn.textContent = t === 'dark' ? '\u2600' : '\u263E';
+    btn.title = t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+    btn.setAttribute('aria-label', btn.title);
+  }
+  btn.addEventListener('click', function () {
+    var next = (document.documentElement.getAttribute('data-theme') || 'light') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('eval-report-theme', next); } catch (e) {}
+    paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

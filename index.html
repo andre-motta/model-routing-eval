@@ -1,0 +1,462 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>model-routing-eval results</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><style>
+:root{color-scheme:light;--surface:#fcfcfb;--surface-2:#f0efec;--grid:#e3e2de;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#8a8984;
+ --floor:#2a78d6;--middle:#eb6834;--flagship:#1baf7a;--free:#8a8984;--accent:#e00;--seq-1:#cde2fb;--seq-2:#86b6ef;--seq-3:#3987e5;--seq-4:#1c5cab}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--surface:#1a1a19;--surface-2:#2a2a28;--grid:#383835;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8f8e88;
+ --floor:#3987e5;--middle:#d95926;--flagship:#199e70;--free:#a3a29c;--seq-1:#184f95;--seq-2:#256abf;--seq-3:#5598e7;--seq-4:#9ec5f4}}
+:root[data-theme="dark"]{color-scheme:dark;--surface:#1a1a19;--surface-2:#2a2a28;--grid:#383835;--ink:#fff;--ink-2:#c3c2b7;--ink-3:#8f8e88;
+ --floor:#3987e5;--middle:#d95926;--flagship:#199e70;--free:#a3a29c;--seq-1:#184f95;--seq-2:#256abf;--seq-3:#5598e7;--seq-4:#9ec5f4}
+*{box-sizing:border-box}
+body{font-family:'Red Hat Text',system-ui,sans-serif;max-width:1120px;margin:0 auto;padding:1.5rem 16px 4rem;background:var(--surface);color:var(--ink);line-height:1.45}
+h1,h2,h3{font-family:'Red Hat Display',system-ui,sans-serif;font-weight:600;letter-spacing:-.01em}
+h1{font-size:2rem;margin:.2rem 0 .4rem} h2{font-size:1.35rem;margin:2.4rem 0 .4rem;padding-top:1.2rem;border-top:1px solid var(--grid)} h3{font-size:1.05rem;margin:1.2rem 0 .3rem}
+p{margin:.4rem 0} .lede{font-size:1.05rem;color:var(--ink-2)} .note{color:var(--ink-3);font-size:.88rem} a{color:var(--floor)}
+.rule{height:3px;background:var(--accent);width:72px;margin:.6rem 0 1rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.6rem;margin:1rem 0}
+.tile{border:1px solid var(--grid);border-radius:6px;padding:.7rem .8rem;background:var(--surface)}
+.tile .v{font-family:'Red Hat Display',system-ui,sans-serif;font-size:1.9rem;font-weight:600;line-height:1.1} .tile .l{color:var(--ink-2);font-size:.85rem;margin-top:.2rem}
+figure{margin:1rem 0;padding:.9rem .9rem .6rem;border:1px solid var(--grid);border-radius:6px;background:var(--surface)}
+figcaption{font-weight:600;margin-bottom:.1rem} figure .sub{color:var(--ink-2);font-size:.88rem;margin-bottom:.6rem}
+svg{width:100%;height:auto;display:block;font-family:'Red Hat Text',system-ui,sans-serif}
+.legend{display:flex;flex-wrap:wrap;gap:.3rem 1.1rem;font-size:.85rem;color:var(--ink-2);margin:.4rem 0 .2rem}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.4rem;vertical-align:-1px;background:var(--c)}
+table{border-collapse:collapse;width:100%;margin:.6rem 0;font-size:.9rem} th,td{border-bottom:1px solid var(--grid);padding:.35rem .55rem;text-align:left;vertical-align:top}
+th{color:var(--ink-2);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600} td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:.45rem;vertical-align:0}
+.pill{display:inline-block;font-size:.72rem;padding:.05rem .4rem;border-radius:3px;background:var(--surface-2);color:var(--ink-2);margin-left:.3rem}
+details{margin:.6rem 0} summary{cursor:pointer;color:var(--ink-2)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);padding:.4rem .6rem;border-radius:4px;font-size:.82rem;line-height:1.35;max-width:300px;opacity:0;transition:opacity .08s;z-index:9}
+.tip b{font-size:.95rem;display:block} .hit{fill:transparent;cursor:default} .mark:hover,.hit:hover+.mark{filter:brightness(1.12)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.6rem} .card{border:1px solid var(--grid);border-top:4px solid var(--accent);border-radius:4px;padding:.7rem .8rem;background:var(--surface)}
+code{background:var(--surface-2);padding:.1rem .3rem;border-radius:3px;font-size:.9em}
+@media (max-width:640px){h1{font-size:1.5rem} .tile .v{font-size:1.5rem}}
+</style></head><body>
+<h1>Which model, at which effort, for which task</h1><div class="rule"></div>
+<p class="lede">The same coding tasks, run headlessly through real coding agents on every model tier we have. Hidden tests decide pass or fail;
+for real-repository tasks Claude Opus 5.5 also scores the diff against the merged PR. Built with
+<a href="https://github.com/opendatahub-io/agent-eval-harness">agent-eval-harness</a>; source, tasks and raw records at
+<a href="https://github.com/andre-motta/model-routing-eval">github.com/andre-motta/model-routing-eval</a>.</p>
+<div class="tiles"><div class="tile"><div class="v">404</div><div class="l">recorded case-runs</div></div><div class="tile"><div class="v">24</div><div class="l">tasks in six tiers</div></div><div class="tile"><div class="v">12</div><div class="l">model and effort configurations</div></div><div class="tile"><div class="v">95%</div><div class="l">pass rate of the cheapest paid config, Luna low</div></div><div class="tile"><div class="v">126x</div><div class="l">cost gap, Opus 5.5 medium vs Luna low, same tasks</div></div></div>
+<p class="note">Costs are list prices, October 2026, from token usage. Claude Code reports its own cost; Codex runs are priced from the repository rate
+table; GLM 5.3 via the EnMaaS gateway is free. Configurations are model@effort. Colour follows the price tier.</p>
+
+<h2>Results</h2>
+<figure><figcaption>Pass rate vs cost per case</figcaption><div class="sub">Spec tasks with hidden tests, configurations that ran the full set. Hover a dot for replications.</div><svg viewBox="0 0 980 420" role="img" aria-label="Pass rate versus cost per case, one dot per configuration">
+<line x1="56" x2="956" y1="327.8" y2="327.8" stroke="var(--grid)" stroke-width="1"/><text x="48" y="331.8" text-anchor="end" font-size="12" fill="var(--ink-2)">75%</text>
+<line x1="56" x2="956" y1="267.4" y2="267.4" stroke="var(--grid)" stroke-width="1"/><text x="48" y="271.4" text-anchor="end" font-size="12" fill="var(--ink-2)">80%</text>
+<line x1="56" x2="956" y1="207.1" y2="207.1" stroke="var(--grid)" stroke-width="1"/><text x="48" y="211.1" text-anchor="end" font-size="12" fill="var(--ink-2)">85%</text>
+<line x1="56" x2="956" y1="146.7" y2="146.7" stroke="var(--grid)" stroke-width="1"/><text x="48" y="150.7" text-anchor="end" font-size="12" fill="var(--ink-2)">90%</text>
+<line x1="56" x2="956" y1="86.4" y2="86.4" stroke="var(--grid)" stroke-width="1"/><text x="48" y="90.4" text-anchor="end" font-size="12" fill="var(--ink-2)">95%</text>
+<line x1="56" x2="956" y1="26.0" y2="26.0" stroke="var(--grid)" stroke-width="1"/><text x="48" y="30.0" text-anchor="end" font-size="12" fill="var(--ink-2)">100%</text>
+<line x1="92.0" x2="92.0" y1="20" y2="364" stroke="var(--grid)" stroke-width="1"/><text x="92.0" y="382" text-anchor="middle" font-size="12" fill="var(--ink-2)">$0.002</text>
+<line x1="293.3" x2="293.3" y1="20" y2="364" stroke="var(--grid)" stroke-width="1"/><text x="293.3" y="382" text-anchor="middle" font-size="12" fill="var(--ink-2)">1¢</text>
+<line x1="581.3" x2="581.3" y1="20" y2="364" stroke="var(--grid)" stroke-width="1"/><text x="581.3" y="382" text-anchor="middle" font-size="12" fill="var(--ink-2)">10¢</text>
+<line x1="869.3" x2="869.3" y1="20" y2="364" stroke="var(--grid)" stroke-width="1"/><text x="869.3" y="382" text-anchor="middle" font-size="12" fill="var(--ink-2)">$1</text>
+<text x="506" y="414" text-anchor="middle" font-size="12" fill="var(--ink-3)">mean cost per case, list price, log scale</text>
+<text transform="translate(14 192) rotate(-90)" text-anchor="middle" font-size="12" fill="var(--ink-3)">hidden-test pass rate</text>
+<g><circle class="hit" cx="92.0" cy="83.5" r="14" data-v="GLM 5.3 medium" data-l="95% pass, $0 per case, 21 case-runs over 1 replication(s)"/><circle class="mark" cx="92.0" cy="83.5" r="6" fill="var(--free)" stroke="var(--surface)" stroke-width="2"/><text x="92.0" y="71.5" text-anchor="middle" font-size="11.5" fill="var(--ink)">GLM 5.3 medium</text></g>
+<g><circle class="hit" cx="210.9" cy="83.5" r="14" data-v="Luna low" data-l="95% pass, $0.005 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="210.9" cy="83.5" r="6" fill="var(--floor)" stroke="var(--surface)" stroke-width="2"/><text x="210.9" y="71.5" text-anchor="middle" font-size="11.5" fill="var(--ink)">Luna low</text></g>
+<g><circle class="hit" cx="314.9" cy="26.0" r="14" data-v="Luna xhigh" data-l="100% pass, $0.012 per case, 24 case-runs over 2 replication(s)"/><circle class="mark" cx="314.9" cy="26.0" r="6" fill="var(--floor)" stroke="var(--surface)" stroke-width="2"/><text x="314.9" y="14.0" text-anchor="middle" font-size="11.5" fill="var(--ink)">Luna xhigh</text></g>
+<g><circle class="hit" cx="460.0" cy="54.8" r="14" data-v="Haiku 5.5 low" data-l="98% pass, $0.038 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="460.0" cy="54.8" r="6" fill="var(--floor)" stroke="var(--surface)" stroke-width="2"/><text x="460.0" y="42.8" text-anchor="middle" font-size="11.5" fill="var(--ink)">Haiku 5.5 low</text></g>
+<g><circle class="hit" cx="468.8" cy="26.0" r="14" data-v="Sol 6.1 low" data-l="100% pass, $0.041 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="468.8" cy="26.0" r="6" fill="var(--middle)" stroke="var(--surface)" stroke-width="2"/><text x="468.8" y="14.0" text-anchor="middle" font-size="11.5" fill="var(--ink)">Sol 6.1 low</text></g>
+<g><circle class="hit" cx="506.8" cy="54.8" r="14" data-v="Haiku 5.5 medium" data-l="98% pass, $0.055 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="506.8" cy="54.8" r="6" fill="var(--floor)" stroke="var(--surface)" stroke-width="2"/><text x="506.8" y="75.8" text-anchor="middle" font-size="11.5" fill="var(--ink)">Haiku 5.5 medium</text></g>
+<g><circle class="hit" cx="670.0" cy="54.8" r="14" data-v="Sonnet 5.5 low" data-l="98% pass, $0.20 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="670.0" cy="54.8" r="6" fill="var(--middle)" stroke="var(--surface)" stroke-width="2"/><text x="670.0" y="42.8" text-anchor="middle" font-size="11.5" fill="var(--ink)">Sonnet 5.5 low</text></g>
+<g><circle class="hit" cx="681.9" cy="26.0" r="14" data-v="Sonnet 5.5 medium" data-l="100% pass, $0.22 per case, 42 case-runs over 2 replication(s)"/><circle class="mark" cx="681.9" cy="26.0" r="6" fill="var(--middle)" stroke="var(--surface)" stroke-width="2"/><text x="681.9" y="14.0" text-anchor="middle" font-size="11.5" fill="var(--ink)">Sonnet 5.5 medium</text></g>
+<g><circle class="hit" cx="815.5" cy="26.0" r="14" data-v="Opus 5.5 medium" data-l="100% pass, $0.65 per case, 21 case-runs over 1 replication(s)"/><circle class="mark" cx="815.5" cy="26.0" r="6" fill="var(--flagship)" stroke="var(--surface)" stroke-width="2"/><text x="815.5" y="14.0" text-anchor="middle" font-size="11.5" fill="var(--ink)">Opus 5.5 medium</text></g>
+</svg><div class="legend"><span style="--c:var(--floor)">Floor tier ($0.10 per 1M input)</span><span style="--c:var(--middle)">Middle tier ($2)</span><span style="--c:var(--flagship)">Flagship tier ($4 to $10)</span><span style="--c:var(--free)">Free (GLM via EnMaaS)</span></div></figure>
+<figure><figcaption>Mean cost per case</figcaption><div class="sub">List prices, October 2026. Log scale. GLM via EnMaaS is free.</div><svg viewBox="0 0 980 392" role="img" aria-label="bar chart">
+<text x="190" y="19.8" text-anchor="end" font-size="12.5" fill="var(--ink)">GLM 5.3 medium</text>
+<rect class="hit" x="200" y="-1.0" width="780" height="32" data-v="$0" data-l="21 case-runs, 95% pass, 277 s mean wall time"/>
+<rect class="mark" x="200" y="4" width="3" height="22" fill="var(--free)"/>
+<text x="208.0" y="19.8" font-size="12" fill="var(--ink-2)">$0</text>
+<text x="190" y="51.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna low</text>
+<rect class="hit" x="200" y="31.0" width="780" height="32" data-v="$0.005" data-l="42 case-runs, 95% pass, 78 s mean wall time"/>
+<path class="mark" d="M200,36 h91.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-91.0 z" fill="var(--floor)"/>
+<text x="303.0" y="51.8" font-size="12" fill="var(--ink-2)">$0.005</text>
+<text x="190" y="83.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna xhigh</text>
+<rect class="hit" x="200" y="63.0" width="780" height="32" data-v="$0.012" data-l="24 case-runs, 100% pass, 235 s mean wall time"/>
+<path class="mark" d="M200,68 h174.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-174.0 z" fill="var(--floor)"/>
+<text x="386.0" y="83.8" font-size="12" fill="var(--ink-2)">$0.012</text>
+<text x="190" y="115.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 low</text>
+<rect class="hit" x="200" y="95.0" width="780" height="32" data-v="$0.038" data-l="42 case-runs, 98% pass, 44 s mean wall time"/>
+<path class="mark" d="M200,100 h289.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-289.9 z" fill="var(--floor)"/>
+<text x="501.9" y="115.8" font-size="12" fill="var(--ink-2)">$0.038</text>
+<text x="190" y="147.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 low</text>
+<rect class="hit" x="200" y="127.0" width="780" height="32" data-v="$0.041" data-l="42 case-runs, 100% pass, 74 s mean wall time"/>
+<path class="mark" d="M200,132 h297.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-297.0 z" fill="var(--middle)"/>
+<text x="509.0" y="147.8" font-size="12" fill="var(--ink-2)">$0.041</text>
+<text x="190" y="179.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 medium</text>
+<rect class="hit" x="200" y="159.0" width="780" height="32" data-v="$0.055" data-l="42 case-runs, 98% pass, 67 s mean wall time"/>
+<path class="mark" d="M200,164 h327.2 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-327.2 z" fill="var(--floor)"/>
+<text x="539.2" y="179.8" font-size="12" fill="var(--ink-2)">$0.055</text>
+<text x="190" y="211.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 xhigh (partial)</text>
+<rect class="hit" x="200" y="191.0" width="780" height="32" data-v="$0.19" data-l="4 case-runs, 100% pass, 296 s mean wall time"/>
+<path class="mark" d="M200,196 h453.4 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-453.4 z" fill="var(--middle)"/>
+<text x="665.4" y="211.8" font-size="12" fill="var(--ink-2)">$0.19</text>
+<text x="190" y="243.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 low</text>
+<rect class="hit" x="200" y="223.0" width="780" height="32" data-v="$0.20" data-l="42 case-runs, 98% pass, 29 s mean wall time"/>
+<path class="mark" d="M200,228 h457.6 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-457.6 z" fill="var(--middle)"/>
+<text x="669.6" y="243.8" font-size="12" fill="var(--ink-2)">$0.20</text>
+<text x="190" y="275.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Terra 5.6 medium (hard subset)</text>
+<rect class="hit" x="200" y="255.0" width="780" height="32" data-v="$0.22" data-l="8 case-runs, 88% pass, 254 s mean wall time"/>
+<path class="mark" d="M200,260 h466.3 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-466.3 z" fill="var(--middle)"/>
+<text x="678.3" y="275.8" font-size="12" fill="var(--ink-2)">$0.22</text>
+<text x="190" y="307.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 medium</text>
+<rect class="hit" x="200" y="287.0" width="780" height="32" data-v="$0.22" data-l="42 case-runs, 100% pass, 38 s mean wall time"/>
+<path class="mark" d="M200,292 h467.1 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-467.1 z" fill="var(--middle)"/>
+<text x="679.1" y="307.8" font-size="12" fill="var(--ink-2)">$0.22</text>
+<text x="190" y="339.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Astra medium (hard subset)</text>
+<rect class="hit" x="200" y="319.0" width="780" height="32" data-v="$0.58" data-l="8 case-runs, 100% pass, 131 s mean wall time"/>
+<path class="mark" d="M200,324 h562.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-562.9 z" fill="var(--flagship)"/>
+<text x="774.9" y="339.8" font-size="12" fill="var(--ink-2)">$0.58</text>
+<text x="190" y="371.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Opus 5.5 medium</text>
+<rect class="hit" x="200" y="351.0" width="780" height="32" data-v="$0.65" data-l="21 case-runs, 100% pass, 93 s mean wall time"/>
+<path class="mark" d="M200,356 h573.8 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-573.8 z" fill="var(--flagship)"/>
+<text x="785.8" y="371.8" font-size="12" fill="var(--ink-2)">$0.65</text>
+</svg><div class="legend"><span style="--c:var(--floor)">Floor tier ($0.10 per 1M input)</span><span style="--c:var(--middle)">Middle tier ($2)</span><span style="--c:var(--flagship)">Flagship tier ($4 to $10)</span><span style="--c:var(--free)">Free (GLM via EnMaaS)</span></div></figure>
+<figure><figcaption>Pass rate by tier</figcaption><div class="sub">Hidden-test pass rate per configuration and task tier. Hover a cell for the missed tasks.</div><svg viewBox="0 0 918 400" role="img" aria-label="Pass rate per tier and configuration">
+<text x="259" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T1 Mechanical</text>
+<text x="377" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T2 Bounded impl.</text>
+<text x="495" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T3 Debugging</text>
+<text x="613" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T4 Architecture</text>
+<text x="731" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T5 Long context</text>
+<text x="849" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T6 Real repo</text>
+<text x="190" y="54.4" text-anchor="end" font-size="12.5" fill="var(--ink)">GLM 5.3 medium</text>
+<rect class="mark" x="201" y="35" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="GLM 5.3 medium, tier 1 Mechanical: 3 of 3 case-runs passed"/><text x="259" y="54.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="35" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="GLM 5.3 medium, tier 2 Bounded impl.: 3 of 3 case-runs passed"/><text x="377" y="54.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="35" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="GLM 5.3 medium, tier 3 Debugging: 4 of 4 case-runs passed"/><text x="495" y="54.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="35" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="GLM 5.3 medium, tier 4 Architecture: 4 of 4 case-runs passed"/><text x="613" y="54.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="35" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="GLM 5.3 medium, tier 5 Long context: 2 of 2 case-runs passed"/><text x="731" y="54.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="35" width="116" height="28" fill="var(--seq-2)" data-v="80%" data-l="GLM 5.3 medium, tier 6 Real repo: 4 of 5 case-runs passed. Missed: r01_fromager_distinfo"/><text x="849" y="54.4" text-anchor="middle" font-size="12" fill="var(--ink)" pointer-events="none">80%</text>
+<text x="190" y="84.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna low</text>
+<rect class="mark" x="201" y="65" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna low, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="84.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="65" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna low, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="84.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="65" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna low, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="84.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="65" width="116" height="28" fill="var(--seq-2)" data-v="88%" data-l="Luna low, tier 4 Architecture: 7 of 8 case-runs passed. Missed: t10_plugin_registry"/><text x="613" y="84.4" text-anchor="middle" font-size="12" fill="var(--ink)" pointer-events="none">88%</text>
+<rect class="mark" x="673" y="65" width="116" height="28" fill="var(--seq-1)" data-v="75%" data-l="Luna low, tier 5 Long context: 3 of 4 case-runs passed. Missed: t15_perf_regression"/><text x="731" y="84.4" text-anchor="middle" font-size="12" fill="var(--ink)" pointer-events="none">75%</text>
+<rect class="mark" x="791" y="65" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna low, tier 6 Real repo: 10 of 10 case-runs passed"/><text x="849" y="84.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="114.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna xhigh</text>
+<rect class="mark" x="201" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 1 Mechanical: 3 of 3 case-runs passed"/><text x="259" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 2 Bounded impl.: 3 of 3 case-runs passed"/><text x="377" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 3 Debugging: 4 of 4 case-runs passed"/><text x="495" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 4 Architecture: 4 of 4 case-runs passed"/><text x="613" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 5 Long context: 2 of 2 case-runs passed"/><text x="731" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="95" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Luna xhigh, tier 6 Real repo: 8 of 8 case-runs passed"/><text x="849" y="114.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="144.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 low</text>
+<rect class="mark" x="201" y="125" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 low, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="125" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 low, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="125" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 low, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="125" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 low, tier 4 Architecture: 8 of 8 case-runs passed"/><text x="613" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="125" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 low, tier 5 Long context: 4 of 4 case-runs passed"/><text x="731" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="125" width="116" height="28" fill="var(--seq-3)" data-v="90%" data-l="Haiku 5.5 low, tier 6 Real repo: 9 of 10 case-runs passed. Missed: r01_fromager_distinfo"/><text x="849" y="144.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">90%</text>
+<text x="190" y="174.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 low</text>
+<rect class="mark" x="201" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 4 Architecture: 8 of 8 case-runs passed"/><text x="613" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 5 Long context: 4 of 4 case-runs passed"/><text x="731" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="155" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 low, tier 6 Real repo: 10 of 10 case-runs passed"/><text x="849" y="174.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="204.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 medium</text>
+<rect class="mark" x="201" y="185" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 medium, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="185" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 medium, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="185" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 medium, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="185" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 medium, tier 4 Architecture: 8 of 8 case-runs passed"/><text x="613" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="185" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Haiku 5.5 medium, tier 5 Long context: 4 of 4 case-runs passed"/><text x="731" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="185" width="116" height="28" fill="var(--seq-3)" data-v="90%" data-l="Haiku 5.5 medium, tier 6 Real repo: 9 of 10 case-runs passed. Missed: r05_fromager_version_prebuilt"/><text x="849" y="204.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">90%</text>
+<text x="190" y="234.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 xhigh (partial)</text>
+<rect x="201" y="215" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="319" y="215" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="437" y="215" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="555" y="215" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="673" y="215" width="116" height="28" fill="var(--surface-2)"/>
+<rect class="mark" x="791" y="215" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sol 6.1 xhigh (partial), tier 6 Real repo: 4 of 4 case-runs passed"/><text x="849" y="234.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="264.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 low</text>
+<rect class="mark" x="201" y="245" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 low, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="264.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="245" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 low, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="264.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="245" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 low, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="264.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="245" width="116" height="28" fill="var(--seq-2)" data-v="88%" data-l="Sonnet 5.5 low, tier 4 Architecture: 7 of 8 case-runs passed. Missed: t16_json_patch"/><text x="613" y="264.4" text-anchor="middle" font-size="12" fill="var(--ink)" pointer-events="none">88%</text>
+<rect class="mark" x="673" y="245" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 low, tier 5 Long context: 4 of 4 case-runs passed"/><text x="731" y="264.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="245" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 low, tier 6 Real repo: 10 of 10 case-runs passed"/><text x="849" y="264.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="294.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Terra 5.6 medium (hard subset)</text>
+<rect x="201" y="275" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="319" y="275" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="437" y="275" width="116" height="28" fill="var(--surface-2)"/>
+<rect class="mark" x="555" y="275" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Terra 5.6 medium (hard subset), tier 4 Architecture: 2 of 2 case-runs passed"/><text x="613" y="294.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="275" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Terra 5.6 medium (hard subset), tier 5 Long context: 1 of 1 case-runs passed"/><text x="731" y="294.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="275" width="116" height="28" fill="var(--seq-2)" data-v="80%" data-l="Terra 5.6 medium (hard subset), tier 6 Real repo: 4 of 5 case-runs passed. Missed: r05_fromager_version_prebuilt"/><text x="849" y="294.4" text-anchor="middle" font-size="12" fill="var(--ink)" pointer-events="none">80%</text>
+<text x="190" y="324.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 medium</text>
+<rect class="mark" x="201" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 1 Mechanical: 6 of 6 case-runs passed"/><text x="259" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 2 Bounded impl.: 6 of 6 case-runs passed"/><text x="377" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 3 Debugging: 8 of 8 case-runs passed"/><text x="495" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 4 Architecture: 8 of 8 case-runs passed"/><text x="613" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 5 Long context: 4 of 4 case-runs passed"/><text x="731" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="305" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Sonnet 5.5 medium, tier 6 Real repo: 10 of 10 case-runs passed"/><text x="849" y="324.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="354.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Astra medium (hard subset)</text>
+<rect x="201" y="335" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="319" y="335" width="116" height="28" fill="var(--surface-2)"/>
+<rect x="437" y="335" width="116" height="28" fill="var(--surface-2)"/>
+<rect class="mark" x="555" y="335" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Astra medium (hard subset), tier 4 Architecture: 2 of 2 case-runs passed"/><text x="613" y="354.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="335" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Astra medium (hard subset), tier 5 Long context: 1 of 1 case-runs passed"/><text x="731" y="354.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="335" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Astra medium (hard subset), tier 6 Real repo: 5 of 5 case-runs passed"/><text x="849" y="354.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<text x="190" y="384.4" text-anchor="end" font-size="12.5" fill="var(--ink)">Opus 5.5 medium</text>
+<rect class="mark" x="201" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 1 Mechanical: 3 of 3 case-runs passed"/><text x="259" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="319" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 2 Bounded impl.: 3 of 3 case-runs passed"/><text x="377" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="437" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 3 Debugging: 4 of 4 case-runs passed"/><text x="495" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="555" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 4 Architecture: 4 of 4 case-runs passed"/><text x="613" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="673" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 5 Long context: 2 of 2 case-runs passed"/><text x="731" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+<rect class="mark" x="791" y="365" width="116" height="28" fill="var(--seq-4)" data-v="100%" data-l="Opus 5.5 medium, tier 6 Real repo: 5 of 5 case-runs passed"/><text x="849" y="384.4" text-anchor="middle" font-size="12" fill="var(--surface)" pointer-events="none">100%</text>
+</svg></figure>
+<figure><figcaption>Ticket-only tasks: judge score against the merged PR</figcaption><div class="sub">Three real fromager issues given as plain issue text. Claude Opus 5.5 scores the diff against the merged PR, 1 to 5. Hover for per-task scores.</div><svg viewBox="0 0 980 392" role="img" aria-label="bar chart">
+<text x="190" y="19.8" text-anchor="end" font-size="12.5" fill="var(--ink)">GLM 5.3 medium</text>
+<rect class="hit" x="200" y="-1.0" width="780" height="32" data-v="5.00" data-l="3 judged runs, $0 per case. r01t distinfo 5.0, r02t age_filter 5.0, r03t dep_chain 5.0"/>
+<path class="mark" d="M200,4 h686.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-686.0 z" fill="var(--free)"/>
+<text x="898.0" y="19.8" font-size="12" fill="var(--ink-2)">5.00</text>
+<text x="190" y="51.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 xhigh (partial)</text>
+<rect class="hit" x="200" y="31.0" width="780" height="32" data-v="4.67" data-l="3 judged runs, $0.16 per case. r01t distinfo 5.0, r02t age_filter 5.0, r03t dep_chain 4.0"/>
+<path class="mark" d="M200,36 h640.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-640.0 z" fill="var(--middle)"/>
+<text x="852.0" y="51.8" font-size="12" fill="var(--ink-2)">4.67</text>
+<text x="190" y="83.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Opus 5.5 medium</text>
+<rect class="hit" x="200" y="63.0" width="780" height="32" data-v="4.33" data-l="6 judged runs, $1.07 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 4.0"/>
+<path class="mark" d="M200,68 h594.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-594.0 z" fill="var(--flagship)"/>
+<text x="806.0" y="83.8" font-size="12" fill="var(--ink-2)">4.33</text>
+<text x="190" y="115.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Astra medium (hard subset)</text>
+<rect class="hit" x="200" y="95.0" width="780" height="32" data-v="4.33" data-l="3 judged runs, $0.46 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 4.0"/>
+<path class="mark" d="M200,100 h594.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-594.0 z" fill="var(--flagship)"/>
+<text x="806.0" y="115.8" font-size="12" fill="var(--ink-2)">4.33</text>
+<text x="190" y="147.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 medium</text>
+<rect class="hit" x="200" y="127.0" width="780" height="32" data-v="4.22" data-l="9 judged runs, $0.41 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 3.7"/>
+<path class="mark" d="M200,132 h578.7 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-578.7 z" fill="var(--middle)"/>
+<text x="790.7" y="147.8" font-size="12" fill="var(--ink-2)">4.22</text>
+<text x="190" y="179.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 low</text>
+<rect class="hit" x="200" y="159.0" width="780" height="32" data-v="4.17" data-l="6 judged runs, $0.45 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 3.5"/>
+<path class="mark" d="M200,164 h571.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-571.0 z" fill="var(--middle)"/>
+<text x="783.0" y="179.8" font-size="12" fill="var(--ink-2)">4.17</text>
+<text x="190" y="211.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 low</text>
+<rect class="hit" x="200" y="191.0" width="780" height="32" data-v="4.17" data-l="6 judged runs, $0.044 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 3.5"/>
+<path class="mark" d="M200,196 h571.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-571.0 z" fill="var(--middle)"/>
+<text x="783.0" y="211.8" font-size="12" fill="var(--ink-2)">4.17</text>
+<text x="190" y="243.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 low</text>
+<rect class="hit" x="200" y="223.0" width="780" height="32" data-v="4.00" data-l="9 judged runs, $0.059 per case. r01t distinfo 4.0, r02t age_filter 4.7, r03t dep_chain 3.3"/>
+<path class="mark" d="M200,228 h548.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-548.0 z" fill="var(--floor)"/>
+<text x="760.0" y="243.8" font-size="12" fill="var(--ink-2)">4.00</text>
+<text x="190" y="275.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 medium</text>
+<rect class="hit" x="200" y="255.0" width="780" height="32" data-v="4.00" data-l="6 judged runs, $0.11 per case. r01t distinfo 4.5, r02t age_filter 4.0, r03t dep_chain 3.5"/>
+<path class="mark" d="M200,260 h548.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-548.0 z" fill="var(--floor)"/>
+<text x="760.0" y="275.8" font-size="12" fill="var(--ink-2)">4.00</text>
+<text x="190" y="307.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Terra 5.6 medium (hard subset)</text>
+<rect class="hit" x="200" y="287.0" width="780" height="32" data-v="4.00" data-l="3 judged runs, $0.19 per case. r01t distinfo 4.0, r02t age_filter 5.0, r03t dep_chain 3.0"/>
+<path class="mark" d="M200,292 h548.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-548.0 z" fill="var(--middle)"/>
+<text x="760.0" y="307.8" font-size="12" fill="var(--ink-2)">4.00</text>
+<text x="190" y="339.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna xhigh</text>
+<rect class="hit" x="200" y="319.0" width="780" height="32" data-v="3.50" data-l="6 judged runs, $0.018 per case. r01t distinfo 4.0, r02t age_filter 4.0, r03t dep_chain 2.5"/>
+<path class="mark" d="M200,324 h479.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-479.0 z" fill="var(--floor)"/>
+<text x="691.0" y="339.8" font-size="12" fill="var(--ink-2)">3.50</text>
+<text x="190" y="371.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna low</text>
+<rect class="hit" x="200" y="351.0" width="780" height="32" data-v="3.00" data-l="6 judged runs, $0.007 per case. r01t distinfo 3.5, r02t age_filter 4.0, r03t dep_chain 1.5"/>
+<path class="mark" d="M200,356 h410.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-410.0 z" fill="var(--floor)"/>
+<text x="622.0" y="371.8" font-size="12" fill="var(--ink-2)">3.00</text>
+</svg><div class="legend"><span style="--c:var(--floor)">Floor tier ($0.10 per 1M input)</span><span style="--c:var(--middle)">Middle tier ($2)</span><span style="--c:var(--flagship)">Flagship tier ($4 to $10)</span><span style="--c:var(--free)">Free (GLM via EnMaaS)</span></div></figure>
+<figure><figcaption>Mean wall time per case</figcaption><div class="sub">Seconds from prompt to agent exit.</div><svg viewBox="0 0 980 392" role="img" aria-label="bar chart">
+<text x="190" y="19.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 low</text>
+<rect class="hit" x="200" y="-1.0" width="780" height="32" data-v="29 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,4 h64.4 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-64.4 z" fill="var(--middle)"/>
+<text x="276.4" y="19.8" font-size="12" fill="var(--ink-2)">29 s</text>
+<text x="190" y="51.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sonnet 5.5 medium</text>
+<rect class="hit" x="200" y="31.0" width="780" height="32" data-v="38 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,36 h83.6 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-83.6 z" fill="var(--middle)"/>
+<text x="295.6" y="51.8" font-size="12" fill="var(--ink-2)">38 s</text>
+<text x="190" y="83.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 low</text>
+<rect class="hit" x="200" y="63.0" width="780" height="32" data-v="44 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,68 h97.8 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-97.8 z" fill="var(--floor)"/>
+<text x="309.8" y="83.8" font-size="12" fill="var(--ink-2)">44 s</text>
+<text x="190" y="115.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Haiku 5.5 medium</text>
+<rect class="hit" x="200" y="95.0" width="780" height="32" data-v="67 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,100 h152.7 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-152.7 z" fill="var(--floor)"/>
+<text x="364.7" y="115.8" font-size="12" fill="var(--ink-2)">67 s</text>
+<text x="190" y="147.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 low</text>
+<rect class="hit" x="200" y="127.0" width="780" height="32" data-v="74 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,132 h167.7 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-167.7 z" fill="var(--middle)"/>
+<text x="379.7" y="147.8" font-size="12" fill="var(--ink-2)">74 s</text>
+<text x="190" y="179.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna low</text>
+<rect class="hit" x="200" y="159.0" width="780" height="32" data-v="78 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,164 h177.3 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-177.3 z" fill="var(--floor)"/>
+<text x="389.3" y="179.8" font-size="12" fill="var(--ink-2)">78 s</text>
+<text x="190" y="211.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Opus 5.5 medium</text>
+<rect class="hit" x="200" y="191.0" width="780" height="32" data-v="93 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,196 h213.7 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-213.7 z" fill="var(--flagship)"/>
+<text x="425.7" y="211.8" font-size="12" fill="var(--ink-2)">93 s</text>
+<text x="190" y="243.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Astra medium (hard subset)</text>
+<rect class="hit" x="200" y="223.0" width="780" height="32" data-v="131 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,228 h299.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-299.9 z" fill="var(--flagship)"/>
+<text x="511.9" y="243.8" font-size="12" fill="var(--ink-2)">131 s</text>
+<text x="190" y="275.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Luna xhigh</text>
+<rect class="hit" x="200" y="255.0" width="780" height="32" data-v="235 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,260 h542.9 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-542.9 z" fill="var(--floor)"/>
+<text x="754.9" y="275.8" font-size="12" fill="var(--ink-2)">235 s</text>
+<text x="190" y="307.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Terra 5.6 medium (hard subset)</text>
+<rect class="hit" x="200" y="287.0" width="780" height="32" data-v="254 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,292 h587.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-587.0 z" fill="var(--middle)"/>
+<text x="799.0" y="307.8" font-size="12" fill="var(--ink-2)">254 s</text>
+<text x="190" y="339.8" text-anchor="end" font-size="12.5" fill="var(--ink)">GLM 5.3 medium</text>
+<rect class="hit" x="200" y="319.0" width="780" height="32" data-v="277 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,324 h641.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-641.0 z" fill="var(--free)"/>
+<text x="853.0" y="339.8" font-size="12" fill="var(--ink-2)">277 s</text>
+<text x="190" y="371.8" text-anchor="end" font-size="12.5" fill="var(--ink)">Sol 6.1 xhigh (partial)</text>
+<rect class="hit" x="200" y="351.0" width="780" height="32" data-v="296 s" data-l="mean wall time per case, hidden tests excluded"/>
+<path class="mark" d="M200,356 h686.0 a4,4 0 0 1 4,4 v14 a4,4 0 0 1 -4,4 h-686.0 z" fill="var(--middle)"/>
+<text x="898.0" y="371.8" font-size="12" fill="var(--ink-2)">296 s</text>
+</svg><div class="legend"><span style="--c:var(--floor)">Floor tier ($0.10 per 1M input)</span><span style="--c:var(--middle)">Middle tier ($2)</span><span style="--c:var(--flagship)">Flagship tier ($4 to $10)</span><span style="--c:var(--free)">Free (GLM via EnMaaS)</span></div></figure>
+
+<h2>Tables</h2>
+<h3>All configurations</h3><table><thead><tr><th class="">configuration</th><th class="num">case-runs (reps)</th><th class="num">pass</th><th class="num">cost / case</th><th class="num">wall</th><th class="num">tasks</th></tr></thead><tbody><tr><td class=""><span class="swatch" style="background:var(--free)"></span>GLM 5.3 medium</td><td class="num">21 (1)</td><td class="num">95%</td><td class="num">$0</td><td class="num">277 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Luna low</td><td class="num">42 (2)</td><td class="num">95%</td><td class="num">$0.005</td><td class="num">78 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Luna xhigh</td><td class="num">24 (2)</td><td class="num">100%</td><td class="num">$0.012</td><td class="num">235 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 low</td><td class="num">42 (2)</td><td class="num">98%</td><td class="num">$0.038</td><td class="num">44 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sol 6.1 low</td><td class="num">42 (2)</td><td class="num">100%</td><td class="num">$0.041</td><td class="num">74 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 medium</td><td class="num">42 (2)</td><td class="num">98%</td><td class="num">$0.055</td><td class="num">67 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sol 6.1 xhigh (partial)</td><td class="num">4 (1)</td><td class="num">100%</td><td class="num">$0.19</td><td class="num">296 s</td><td class="num">4</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sonnet 5.5 low</td><td class="num">42 (2)</td><td class="num">98%</td><td class="num">$0.20</td><td class="num">29 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Terra 5.6 medium (hard subset)</td><td class="num">8 (1)</td><td class="num">88%</td><td class="num">$0.22</td><td class="num">254 s</td><td class="num">8</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sonnet 5.5 medium</td><td class="num">42 (2)</td><td class="num">100%</td><td class="num">$0.22</td><td class="num">38 s</td><td class="num">21</td></tr><tr><td class=""><span class="swatch" style="background:var(--flagship)"></span>Astra medium (hard subset)</td><td class="num">8 (1)</td><td class="num">100%</td><td class="num">$0.58</td><td class="num">131 s</td><td class="num">8</td></tr><tr><td class=""><span class="swatch" style="background:var(--flagship)"></span>Opus 5.5 medium</td><td class="num">21 (1)</td><td class="num">100%</td><td class="num">$0.65</td><td class="num">93 s</td><td class="num">21</td></tr></tbody></table>
+<h3>Effort, same model</h3><table><thead><tr><th class="">model</th><th class="">effort (reps)</th><th class="">pass rate</th><th class="">cost / case</th><th class="">wall</th></tr></thead><tbody><tr><td class="">Luna</td><td class="">low (2) vs xhigh (2)</td><td class="">95% vs 100%</td><td class="">$0.005 vs $0.012</td><td class="">78 s vs 235 s</td></tr><tr><td class="">Sol 6.1</td><td class="">low (2) vs xhigh (1)</td><td class="">100% vs 100%</td><td class="">$0.041 vs $0.19</td><td class="">74 s vs 296 s</td></tr><tr><td class="">Haiku 5.5</td><td class="">low (2) vs medium (2)</td><td class="">98% vs 98%</td><td class="">$0.038 vs $0.055</td><td class="">44 s vs 67 s</td></tr><tr><td class="">Sonnet 5.5</td><td class="">low (2) vs medium (2)</td><td class="">98% vs 100%</td><td class="">$0.20 vs $0.22</td><td class="">29 s vs 38 s</td></tr></tbody></table>
+<h3>eval: mixed-effects ANOVA over pass per case-run</h3><table><thead><tr><th class="">condition</th><th class="num">pass mean</th><th class="num">std</th><th class="num">case-runs</th><th class="num">cost / run</th></tr></thead><tbody><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 low</td><td class="num">95.3%</td><td class="num">0.17</td><td class="num">48</td><td class="num">$0.96</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 medium</td><td class="num">94.3%</td><td class="num">0.17</td><td class="num">48</td><td class="num">$1.48</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sonnet 5.5 low</td><td class="num">94.3%</td><td class="num">0.17</td><td class="num">48</td><td class="num">$5.62</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sonnet 5.5 medium</td><td class="num">96.4%</td><td class="num">0.10</td><td class="num">48</td><td class="num">$5.92</td></tr></tbody></table><p><b>Verdict:</b> effort: p = 0.70 (not significant); model: p = 0.70 (not significant); effort:model: p = 0.42 (not significant). Holm-corrected. <b>Pareto frontier:</b> Haiku 5.5 low, Sonnet 5.5 medium. <a href="compare/eval/index.html">Open the eval-compare report</a>.</p>
+<h3>Replications that disagreed</h3><table><thead><tr><th class="">configuration</th><th class="">task</th><th class="">replications</th></tr></thead><tbody><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Luna low</td><td class="">t10_plugin_registry</td><td class="">pass / fail</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Luna low</td><td class="">t15_perf_regression</td><td class="">pass / fail</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 low</td><td class="">r01_fromager_distinfo</td><td class="">pass / fail</td></tr><tr><td class=""><span class="swatch" style="background:var(--floor)"></span>Haiku 5.5 medium</td><td class="">r05_fromager_version_prebuilt</td><td class="">pass / fail</td></tr><tr><td class=""><span class="swatch" style="background:var(--middle)"></span>Sonnet 5.5 low</td><td class="">t16_json_patch</td><td class="">pass / fail</td></tr></tbody></table>
+<details><summary>Analyzer summary (per tier and config, cheapest passing config per task)</summary><pre style='white-space:pre-wrap;font-size:.8rem;color:var(--ink-2)'># Results
+
+404 runs, 24 tasks, 12 configs
+
+## Pass rate and mean cost per config, by tier
+
+### Tier 1: Mechanical
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 100% | $0.000 | 87 | 3 |
+| gpt-6-luna@low | 100% | $0.002 | 35 | 6 |
+| gpt-6-luna@xhigh | 100% | $0.004 | 99 | 3 |
+| haiku-5-5@low | 100% | $0.009 | 15 | 6 |
+| haiku-5-5@medium | 100% | $0.011 | 24 | 6 |
+| gpt-6.1-sol@low | 100% | $0.019 | 36 | 6 |
+| sonnet-5-5@low | 100% | $0.105 | 13 | 6 |
+| sonnet-5-5@medium | 100% | $0.111 | 13 | 6 |
+| opus-5-5@medium | 100% | $0.227 | 15 | 3 |
+
+### Tier 2: Bounded impl
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 100% | $0.000 | 140 | 3 |
+| gpt-6-luna@low | 100% | $0.003 | 58 | 6 |
+| gpt-6-luna@xhigh | 100% | $0.006 | 138 | 3 |
+| haiku-5-5@low | 100% | $0.010 | 22 | 6 |
+| haiku-5-5@medium | 100% | $0.014 | 35 | 6 |
+| gpt-6.1-sol@low | 100% | $0.034 | 63 | 6 |
+| sonnet-5-5@low | 100% | $0.130 | 18 | 6 |
+| sonnet-5-5@medium | 100% | $0.147 | 23 | 6 |
+| opus-5-5@medium | 100% | $0.316 | 32 | 3 |
+
+### Tier 3: Debugging
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 100% | $0.000 | 227 | 4 |
+| gpt-6-luna@low | 100% | $0.002 | 44 | 8 |
+| gpt-6-luna@xhigh | 100% | $0.006 | 142 | 4 |
+| haiku-5-5@low | 100% | $0.010 | 23 | 8 |
+| haiku-5-5@medium | 100% | $0.012 | 33 | 8 |
+| gpt-6.1-sol@low | 100% | $0.027 | 53 | 8 |
+| sonnet-5-5@low | 100% | $0.152 | 20 | 8 |
+| sonnet-5-5@medium | 100% | $0.159 | 20 | 8 |
+| opus-5-5@medium | 100% | $0.274 | 38 | 4 |
+
+### Tier 4: Architecture
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 100% | $0.000 | 342 | 4 |
+| gpt-6-luna@low | 88% | $0.005 | 88 | 8 |
+| gpt-6-luna@xhigh | 100% | $0.010 | 237 | 4 |
+| haiku-5-5@low | 100% | $0.014 | 38 | 8 |
+| haiku-5-5@medium | 100% | $0.043 | 87 | 8 |
+| gpt-6.1-sol@low | 100% | $0.047 | 93 | 8 |
+| sonnet-5-5@low | 88% | $0.141 | 26 | 8 |
+| gpt-5.6-terra@medium | 100% | $0.158 | 251 | 2 |
+| sonnet-5-5@medium | 100% | $0.202 | 62 | 8 |
+| gpt-6-astra@medium | 100% | $0.429 | 132 | 2 |
+| opus-5-5@medium | 100% | $0.951 | 261 | 4 |
+
+### Tier 5: Long context
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 100% | $0.000 | 158 | 2 |
+| gpt-6-luna@low | 75% | $0.002 | 38 | 4 |
+| gpt-6-luna@xhigh | 100% | $0.005 | 117 | 2 |
+| haiku-5-5@low | 100% | $0.015 | 28 | 4 |
+| haiku-5-5@medium | 100% | $0.015 | 38 | 4 |
+| gpt-6.1-sol@low | 100% | $0.031 | 56 | 4 |
+| gpt-5.6-terra@medium | 100% | $0.101 | 123 | 1 |
+| sonnet-5-5@medium | 100% | $0.165 | 26 | 4 |
+| sonnet-5-5@low | 100% | $0.206 | 26 | 4 |
+| gpt-6-astra@medium | 100% | $0.262 | 61 | 1 |
+| opus-5-5@medium | 100% | $0.485 | 40 | 2 |
+
+### Tier 6: Real repo
+
+| config | pass rate | mean cost | mean wall s | n |
+|---|---|---|---|---|
+| glm-5-3@medium | 88% | $0.000 | 484 | 8 |
+| gpt-6-luna@low | 81% | $0.010 | 128 | 16 |
+| gpt-6-luna@xhigh | 79% | $0.021 | 346 | 14 |
+| gpt-6.1-sol@low | 94% | $0.059 | 96 | 16 |
+| haiku-5-5@low | 84% | $0.092 | 89 | 19 |
+| haiku-5-5@medium | 88% | $0.143 | 117 | 16 |
+| gpt-6.1-sol@xhigh | 100% | $0.181 | 277 | 7 |
+| gpt-5.6-terra@medium | 75% | $0.243 | 241 | 8 |
+| sonnet-5-5@low | 94% | $0.416 | 54 | 16 |
+| sonnet-5-5@medium | 95% | $0.419 | 54 | 19 |
+| gpt-6-astra@medium | 100% | $0.615 | 123 | 8 |
+| opus-5-5@medium | 100% | $1.141 | 99 | 11 |
+
+## Cheapest config that passed every repetition, per task
+
+| task | tier | cheapest passing config | cost | most expensive passing | cost | saving |
+|---|---|---|---|---|---|---|
+| r01_fromager_distinfo | 6 | gpt-6-luna@low | $0.007 | opus-5-5@medium | $1.048 | 99% |
+| r01t_fromager_distinfo_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.879 | 100% |
+| r02_fromager_age_filter | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.526 | 100% |
+| r02t_fromager_age_filter_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.719 | 100% |
+| r03_fromager_dep_chain | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.031 | 100% |
+| r03t_fromager_dep_chain_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.600 | 100% |
+| r04_fromager_age_fallback | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.504 | 100% |
+| r05_fromager_version_prebuilt | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $2.050 | 100% |
+| t01_rename_symbol | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.214 | 100% |
+| t02_ini_to_toml | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.232 | 100% |
+| t03_add_type_hints | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.234 | 100% |
+| t04_lru_cache | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.294 | 100% |
+| t05_cli_json_flag | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.278 | 100% |
+| t06_log_parser | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.376 | 100% |
+| t07_mutable_default | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.299 | 100% |
+| t08_timezone_bug | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.289 | 100% |
+| t09_thread_safety | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.206 | 100% |
+| t10_plugin_registry | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.392 | 100% |
+| t11_async_migration | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.253 | 100% |
+| t12_needle_bug | 5 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.427 | 100% |
+| t13_unicode_dedupe | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.302 | 100% |
+| t14_dep_resolver | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $2.665 | 100% |
+| t15_perf_regression | 5 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.543 | 100% |
+| t16_json_patch | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.495 | 100% |
+
+## Routing scenario
+
+Everything on `opus-5-5@medium`: $20.05 for 100% pass rate (27 runs).
+Routed per tier to the cheapest fully-passing config: $0.00 for 23 passing tasks.
+</pre></details>
+
+<h2>Per-run reports</h2>
+<p class="note">Every run, including pilots and runs cut short. Each report has the run configuration, token and cache metrics, per-case scores with judge rationales, and the agent transcripts.</p>
+<table><thead><tr><th class="">run</th><th class="">model</th><th class="">effort</th><th class="">agent</th><th class="num">cases</th><th class="num">cost</th></tr></thead><tbody><tr><td class=""><a href="runs/2026-10-09-claude-haiku-5-5-effort-low.html">2026-10-09-claude-haiku-5-5-effort-low</a></td><td class="">claude-haiku-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">24</td><td class="num">$0.92</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-haiku-5-5-effort-low-r1.html">2026-10-09-claude-haiku-5-5-effort-low-r1</a></td><td class="">claude-haiku-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">24</td><td class="num">$1.00</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-haiku-5-5-effort-medium.html">2026-10-09-claude-haiku-5-5-effort-medium</a></td><td class="">claude-haiku-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">24</td><td class="num">$1.36</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-haiku-5-5-effort-medium-r1.html">2026-10-09-claude-haiku-5-5-effort-medium-r1</a></td><td class="">claude-haiku-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">24</td><td class="num">$1.59</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-sonnet-5-5-effort-low.html">2026-10-09-claude-sonnet-5-5-effort-low</a></td><td class="">claude-sonnet-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">24</td><td class="num">$5.67</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-sonnet-5-5-effort-low-r1.html">2026-10-09-claude-sonnet-5-5-effort-low-r1</a></td><td class="">claude-sonnet-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">24</td><td class="num">$5.56</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-sonnet-5-5-effort-medium.html">2026-10-09-claude-sonnet-5-5-effort-medium</a></td><td class="">claude-sonnet-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">24</td><td class="num">$6.01</td></tr><tr><td class=""><a href="runs/2026-10-09-claude-sonnet-5-5-effort-medium-r1.html">2026-10-09-claude-sonnet-5-5-effort-medium-r1</a></td><td class="">claude-sonnet-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">24</td><td class="num">$5.84</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6-luna-effort-low.html">2026-10-09-gpt-6-luna-effort-low</a></td><td class="">gpt-6-luna</td><td class="">low</td><td class="">codex</td><td class="num">24</td><td class="num">$0.12</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6-luna-effort-low-r1.html">2026-10-09-gpt-6-luna-effort-low-r1</a></td><td class="">gpt-6-luna</td><td class="">low</td><td class="">codex</td><td class="num">24</td><td class="num">$0.14</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6-luna-effort-xhigh.html">2026-10-09-gpt-6-luna-effort-xhigh</a></td><td class="">gpt-6-luna</td><td class="">xhigh</td><td class="">codex</td><td class="num">24</td><td class="num">$0.30</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6-luna-effort-xhigh-r1.html">2026-10-09-gpt-6-luna-effort-xhigh-r1</a><span class="pill">partial</span></td><td class="">gpt-6-luna</td><td class="">xhigh</td><td class="">codex</td><td class="num">6</td><td class="num">$0.090</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6.1-sol-effort-low.html">2026-10-09-gpt-6.1-sol-effort-low</a></td><td class="">gpt-6.1-sol</td><td class="">low</td><td class="">codex</td><td class="num">24</td><td class="num">$0.96</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6.1-sol-effort-low-r1.html">2026-10-09-gpt-6.1-sol-effort-low-r1</a></td><td class="">gpt-6.1-sol</td><td class="">low</td><td class="">codex</td><td class="num">24</td><td class="num">$1.01</td></tr><tr><td class=""><a href="runs/2026-10-09-gpt-6.1-sol-effort-xhigh.html">2026-10-09-gpt-6.1-sol-effort-xhigh</a><span class="pill">partial</span></td><td class="">gpt-6.1-sol</td><td class="">xhigh</td><td class="">codex</td><td class="num">7</td><td class="num">$1.27</td></tr><tr><td class=""><a href="runs/claude-opus-5-5-medium.html">claude-opus-5-5-medium</a></td><td class="">claude-opus-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">24</td><td class="num">$16.95</td></tr><tr><td class=""><a href="runs/glm-5-3-medium.html">glm-5-3-medium</a></td><td class="">rits/zai-org/glm-5-3</td><td class="">medium</td><td class="">codex</td><td class="num">24</td><td class="num">$0</td></tr><tr><td class=""><a href="runs/gpt-5.6-terra-medium-hard.html">gpt-5.6-terra-medium-hard</a></td><td class="">gpt-5.6-terra</td><td class="">medium</td><td class="">codex</td><td class="num">11</td><td class="num">$2.36</td></tr><tr><td class=""><a href="runs/gpt-6-astra-medium-hard.html">gpt-6-astra-medium-hard</a></td><td class="">gpt-6-astra</td><td class="">medium</td><td class="">codex</td><td class="num">11</td><td class="num">$6.04</td></tr><tr><td class=""><a href="runs/smoke-glm.html">smoke-glm</a><span class="pill">pilot</span></td><td class="">rits/zai-org/glm-5-3</td><td class="">medium</td><td class="">codex</td><td class="num">2</td><td class="num">$0</td></tr><tr><td class=""><a href="runs/smoke-haiku-low.html">smoke-haiku-low</a><span class="pill">pilot</span></td><td class="">claude-haiku-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">2</td><td class="num">$0.060</td></tr><tr><td class=""><a href="runs/smoke-haiku-low-tickets.html">smoke-haiku-low-tickets</a><span class="pill">pilot</span></td><td class="">claude-haiku-5-5</td><td class="">low</td><td class="">claude-code</td><td class="num">3</td><td class="num">$0.21</td></tr><tr><td class=""><a href="runs/smoke-luna-low.html">smoke-luna-low</a><span class="pill">pilot</span></td><td class="">gpt-6-luna</td><td class="">low</td><td class="">codex</td><td class="num">1</td><td class="num">$0.003</td></tr><tr><td class=""><a href="runs/smoke-opus-medium-tickets.html">smoke-opus-medium-tickets</a><span class="pill">pilot</span></td><td class="">claude-opus-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">3</td><td class="num">$3.10</td></tr><tr><td class=""><a href="runs/smoke-sonnet-medium-tickets.html">smoke-sonnet-medium-tickets</a><span class="pill">pilot</span></td><td class="">claude-sonnet-5-5</td><td class="">medium</td><td class="">claude-code</td><td class="num">3</td><td class="num">$1.21</td></tr></tbody></table>
+<p class="note">Built by <code>harness/build_site.py</code>. Hover or focus any mark for details; every value is also in the tables.</p>
+<script>
+(function(){
+  const tip=document.createElement('div');tip.className='tip';document.body.appendChild(tip);
+  function show(e,el){const v=el.getAttribute('data-v'),l=el.getAttribute('data-l');tip.textContent='';
+    const b=document.createElement('b');b.textContent=v;tip.appendChild(b);tip.appendChild(document.createTextNode(l));
+    tip.style.opacity=1;move(e);}
+  function move(e){const x=e.clientX+14,y=e.clientY+14;tip.style.left=Math.min(x,window.innerWidth-320)+'px';tip.style.top=Math.min(y,window.innerHeight-120)+'px';}
+  function hide(){tip.style.opacity=0;}
+  document.querySelectorAll('[data-v]').forEach(el=>{el.addEventListener('pointerenter',e=>show(e,el));el.addEventListener('pointermove',move);
+    el.addEventListener('pointerleave',hide);el.addEventListener('focus',()=>{const r=el.getBoundingClientRect();show({clientX:r.left+r.width/2,clientY:r.top},el)});el.addEventListener('blur',hide);el.setAttribute('tabindex','0');});
+})();
+</script></body></html>
