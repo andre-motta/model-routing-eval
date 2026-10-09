@@ -6,7 +6,7 @@
  "effort": "low",
  "rep": 1,
  "passed": false,
- "quality": null,
+ "quality": 1,
  "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
  "run_id": "2026-10-09-gpt-6-luna-effort-low-r1",
  "wall_s": 106.8,

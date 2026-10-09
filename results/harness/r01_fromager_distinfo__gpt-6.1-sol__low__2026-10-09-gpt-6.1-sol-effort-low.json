@@ -6,7 +6,7 @@
  "effort": "low",
  "rep": 0,
  "passed": true,
- "quality": null,
+ "quality": 4,
  "verify_tail": "hidden tests passed",
  "run_id": "2026-10-09-gpt-6.1-sol-effort-low",
  "wall_s": 112.5,

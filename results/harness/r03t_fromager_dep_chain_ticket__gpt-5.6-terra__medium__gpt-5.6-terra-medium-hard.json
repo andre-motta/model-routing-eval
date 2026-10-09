@@ -6,7 +6,7 @@
  "effort": "medium",
  "rep": 0,
  "passed": false,
- "quality": null,
+ "quality": 3,
  "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
  "run_id": "gpt-5.6-terra-medium-hard",
  "wall_s": 276.0,

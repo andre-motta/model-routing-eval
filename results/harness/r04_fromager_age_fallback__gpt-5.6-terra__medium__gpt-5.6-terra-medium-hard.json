@@ -6,7 +6,7 @@
  "effort": "medium",
  "rep": 0,
  "passed": true,
- "quality": null,
+ "quality": 5,
  "verify_tail": "hidden tests passed",
  "run_id": "gpt-5.6-terra-medium-hard",
  "wall_s": 203.6,

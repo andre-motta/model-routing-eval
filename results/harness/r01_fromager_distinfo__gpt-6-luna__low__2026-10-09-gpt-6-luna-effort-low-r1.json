@@ -6,7 +6,7 @@
  "effort": "low",
  "rep": 1,
  "passed": true,
- "quality": null,
+ "quality": 4,
  "verify_tail": "hidden tests passed",
  "run_id": "2026-10-09-gpt-6-luna-effort-low-r1",
  "wall_s": 74.4,

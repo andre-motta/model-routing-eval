@@ -410,7 +410,7 @@
   {
    "tier": 6,
    "config": "glm-5-3@medium",
-   "pass_rate": 0.5,
+   "pass_rate": 0.875,
    "mean_cost": 0.0,
    "mean_wall": 484.225,
    "n": 8
@@ -418,7 +418,7 @@
   {
    "tier": 6,
    "config": "gpt-5.6-terra@medium",
-   "pass_rate": 0.5,
+   "pass_rate": 0.75,
    "mean_cost": 0.242523375,
    "mean_wall": 241.4375,
    "n": 8
@@ -434,7 +434,7 @@
   {
    "tier": 6,
    "config": "gpt-6-luna@low",
-   "pass_rate": 0.625,
+   "pass_rate": 0.8125,
    "mean_cost": 0.0101033125,
    "mean_wall": 128.15625,
    "n": 16
@@ -450,7 +450,7 @@
   {
    "tier": 6,
    "config": "gpt-6.1-sol@low",
-   "pass_rate": 0.625,
+   "pass_rate": 0.9375,
    "mean_cost": 0.0586396875,
    "mean_wall": 96.15,
    "n": 16
@@ -508,8 +508,8 @@
   {
    "task": "r01t_fromager_distinfo_ticket",
    "tier": 6,
-   "cheapest": "haiku-5-5@low",
-   "cheapest_cost": 0.013440425,
+   "cheapest": "glm-5-3@medium",
+   "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.8797332
   },
@@ -524,8 +524,8 @@
   {
    "task": "r02t_fromager_age_filter_ticket",
    "tier": 6,
-   "cheapest": "haiku-5-5@low",
-   "cheapest_cost": 0.029843095,
+   "cheapest": "glm-5-3@medium",
+   "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.7687562000000001
   },
@@ -540,8 +540,8 @@
   {
    "task": "r03t_fromager_dep_chain_ticket",
    "tier": 6,
-   "cheapest": "gpt-6-astra@medium",
-   "cheapest_cost": 0.71904,
+   "cheapest": "glm-5-3@medium",
+   "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 1.6446612
   },
@@ -695,7 +695,7 @@
   "all_on_priciest_cost": 16.9501658,
   "all_on_priciest_pass": 1.0,
   "routed_cost": 0.0,
-  "routed_passing": 20
+  "routed_passing": 23
  },
  "per_run": [
   {
@@ -4169,7 +4169,7 @@
    "tok_cached": 676096,
    "tok_out": 4983,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4179,7 +4179,7 @@
    "model": "gpt-6-luna",
    "effort": "low",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.004479,
    "wall": 61.4,
    "turns": 1,
@@ -4187,7 +4187,7 @@
    "tok_cached": 342784,
    "tok_out": 2103,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4205,7 +4205,7 @@
    "tok_cached": 291584,
    "tok_out": 1545,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4215,7 +4215,7 @@
    "model": "gpt-6-luna",
    "effort": "low",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.004081,
    "wall": 45.3,
    "turns": 1,
@@ -4223,7 +4223,7 @@
    "tok_cached": 336128,
    "tok_out": 1439,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4241,7 +4241,7 @@
    "tok_cached": 827648,
    "tok_out": 3185,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4259,7 +4259,7 @@
    "tok_cached": 773120,
    "tok_out": 3431,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 2.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4277,7 +4277,7 @@
    "tok_cached": 742656,
    "tok_out": 4422,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4295,7 +4295,7 @@
    "tok_cached": 1628928,
    "tok_out": 7848,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4601,7 +4601,7 @@
    "tok_cached": 284160,
    "tok_out": 2927,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4619,7 +4619,7 @@
    "tok_cached": 994560,
    "tok_out": 5028,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 3.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4637,7 +4637,7 @@
    "tok_cached": 307712,
    "tok_out": 2023,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4647,7 +4647,7 @@
    "model": "gpt-6-luna",
    "effort": "low",
    "rep": 1,
-   "passed": false,
+   "passed": true,
    "cost": 0.004043,
    "wall": 78.9,
    "turns": 1,
@@ -4655,7 +4655,7 @@
    "tok_cached": 326912,
    "tok_out": 1547,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4673,7 +4673,7 @@
    "tok_cached": 1351168,
    "tok_out": 4339,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4691,7 +4691,7 @@
    "tok_cached": 499200,
    "tok_out": 4632,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 1.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4709,7 +4709,7 @@
    "tok_cached": 604416,
    "tok_out": 4383,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -4727,7 +4727,7 @@
    "tok_cached": 3009280,
    "tok_out": 9542,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6-luna@low"
   },
   {
@@ -5465,7 +5465,7 @@
    "tok_cached": 259072,
    "tok_out": 3145,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5475,7 +5475,7 @@
    "model": "gpt-6.1-sol",
    "effort": "low",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.026706,
    "wall": 47.1,
    "turns": 1,
@@ -5483,7 +5483,7 @@
    "tok_cached": 150656,
    "tok_out": 1164,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5501,7 +5501,7 @@
    "tok_cached": 178432,
    "tok_out": 1819,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5511,7 +5511,7 @@
    "model": "gpt-6.1-sol",
    "effort": "low",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.047672,
    "wall": 74.4,
    "turns": 1,
@@ -5519,7 +5519,7 @@
    "tok_cached": 287616,
    "tok_out": 1891,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5537,7 +5537,7 @@
    "tok_cached": 237440,
    "tok_out": 2230,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5547,7 +5547,7 @@
    "model": "gpt-6.1-sol",
    "effort": "low",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.067981,
    "wall": 103.5,
    "turns": 1,
@@ -5555,7 +5555,7 @@
    "tok_cached": 465408,
    "tok_out": 2144,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5573,7 +5573,7 @@
    "tok_cached": 253056,
    "tok_out": 3396,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5591,7 +5591,7 @@
    "tok_cached": 484864,
    "tok_out": 5680,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5897,7 +5897,7 @@
    "tok_cached": 296448,
    "tok_out": 3385,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5907,7 +5907,7 @@
    "model": "gpt-6.1-sol",
    "effort": "low",
    "rep": 1,
-   "passed": false,
+   "passed": true,
    "cost": 0.03194,
    "wall": 60.5,
    "turns": 1,
@@ -5915,7 +5915,7 @@
    "tok_cached": 152704,
    "tok_out": 1667,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5933,7 +5933,7 @@
    "tok_cached": 178816,
    "tok_out": 1775,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5943,7 +5943,7 @@
    "model": "gpt-6.1-sol",
    "effort": "low",
    "rep": 1,
-   "passed": false,
+   "passed": true,
    "cost": 0.038948,
    "wall": 58.9,
    "turns": 1,
@@ -5951,7 +5951,7 @@
    "tok_cached": 237184,
    "tok_out": 1523,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5969,7 +5969,7 @@
    "tok_cached": 253440,
    "tok_out": 2599,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5987,7 +5987,7 @@
    "tok_cached": 331008,
    "tok_out": 1715,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 3.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6005,7 +6005,7 @@
    "tok_cached": 500480,
    "tok_out": 4938,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6023,7 +6023,7 @@
    "tok_cached": 545024,
    "tok_out": 6636,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6761,7 +6761,7 @@
    "tok_cached": 2141184,
    "tok_out": 15713,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 3.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6771,7 +6771,7 @@
    "model": "rits/zai-org/glm-5-3",
    "effort": "medium",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.0,
    "wall": 247.7,
    "turns": 1,
@@ -6779,7 +6779,7 @@
    "tok_cached": 909312,
    "tok_out": 5921,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6797,7 +6797,7 @@
    "tok_cached": 854016,
    "tok_out": 5163,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6807,7 +6807,7 @@
    "model": "rits/zai-org/glm-5-3",
    "effort": "medium",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.0,
    "wall": 364.8,
    "turns": 1,
@@ -6815,7 +6815,7 @@
    "tok_cached": 1734656,
    "tok_out": 8469,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6833,7 +6833,7 @@
    "tok_cached": 1624064,
    "tok_out": 8860,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6843,7 +6843,7 @@
    "model": "rits/zai-org/glm-5-3",
    "effort": "medium",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.0,
    "wall": 717.0,
    "turns": 1,
@@ -6851,7 +6851,7 @@
    "tok_cached": 5660160,
    "tok_out": 18927,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6869,7 +6869,7 @@
    "tok_cached": 2670592,
    "tok_out": 10657,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -6887,7 +6887,7 @@
    "tok_cached": 6179328,
    "tok_out": 24581,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "glm-5-3@medium"
   },
   {
@@ -7193,7 +7193,7 @@
    "tok_cached": 1053440,
    "tok_out": 10396,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7203,7 +7203,7 @@
    "model": "gpt-5.6-terra",
    "effort": "medium",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.128481,
    "wall": 130.3,
    "turns": 1,
@@ -7211,7 +7211,7 @@
    "tok_cached": 414464,
    "tok_out": 3799,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 4.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7229,7 +7229,7 @@
    "tok_cached": 496640,
    "tok_out": 3594,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7239,7 +7239,7 @@
    "model": "gpt-5.6-terra",
    "effort": "medium",
    "rep": 0,
-   "passed": false,
+   "passed": true,
    "cost": 0.127738,
    "wall": 118.6,
    "turns": 1,
@@ -7247,7 +7247,7 @@
    "tok_cached": 407808,
    "tok_out": 3848,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7265,7 +7265,7 @@
    "tok_cached": 707584,
    "tok_out": 7319,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7283,7 +7283,7 @@
    "tok_cached": 1184512,
    "tok_out": 7494,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 3.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7301,7 +7301,7 @@
    "tok_cached": 586752,
    "tok_out": 7066,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 5.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7319,7 +7319,7 @@
    "tok_cached": 1438976,
    "tok_out": 13330,
    "tok_reason": 0,
-   "quality": NaN,
+   "quality": 3.0,
    "config": "gpt-5.6-terra@medium"
   },
   {
