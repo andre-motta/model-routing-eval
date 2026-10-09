@@ -14,3 +14,8 @@ matrix:
     effort: !replace
       - low
       - xhigh
+judges:
+  # A runner:/ judge inside a Codex profile would try to run the Claude judge through Codex. Skip it
+  # during the run; ./rescore.sh re-judges every run with eval.yaml (claude-code runner).
+  - name: solution_quality
+    if: "False"

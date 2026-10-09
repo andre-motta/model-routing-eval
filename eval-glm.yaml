@@ -22,3 +22,8 @@ matrix:
       - rits/zai-org/glm-5-3
     effort: !replace
       - medium
+judges:
+  # A runner:/ judge inside a Codex profile would try to run the Claude judge through Codex. Skip it
+  # during the run; ./rescore.sh re-judges every run with eval.yaml (claude-code runner).
+  - name: solution_quality
+    if: "False"

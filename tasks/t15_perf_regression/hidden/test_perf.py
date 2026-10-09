@@ -37,5 +37,6 @@ def test_large_input_is_fast_and_correct():
 def test_regression_test_added():
     tests = pathlib.Path(__file__).resolve().parent.parent / "tests"
     src = "\n".join(p.read_text() for p in tests.glob("test_*.py"))
-    assert src.count("def test_") >= 2
-    assert "perf_counter" in src or "time" in src or "timeout" in src or "benchmark" in src
+    assert src.count("def test_") >= 2, "expected a new regression test under tests/"
+    # Any shape of regression test is fine: a timing bound, an operation-count budget, or a large-input run.
+    assert any(k in src for k in ("perf_counter", "time", "timeout", "benchmark", "comparisons", "count", "range(")), src[-400:]

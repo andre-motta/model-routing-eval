@@ -14,9 +14,11 @@ RUNS=$AGENT_EVAL_RUNS_DIR/model-routing-eval
 if [ $# -gt 0 ]; then IDS=("$@"); else IDS=($(ls "$RUNS" | grep -v '^compare-')); fi
 for id in "${IDS[@]}"; do
   [ -f "$RUNS/$id/run_result.json" ] || continue
-  cfg=$(.venv/bin/python -c "import json;print(json.load(open('$RUNS/$id/run_result.json'))['eval_params']['config_chain'][-1])")
+  # Always judge with eval.yaml: its runner is claude-code, so the runner:/claude-opus-5-5 judge works for
+  # Codex and GLM runs too (a runner:/ judge inside a Codex profile would try to run Opus through Codex).
+  cfg=eval.yaml
   model=$(.venv/bin/python -c "import json;print(json.load(open('$RUNS/$id/run_result.json'))['model'])")
-  echo "== rescoring $id ($cfg, $model)"
+  echo "== rescoring $id ($model)"
   .venv/bin/python "$S/score.py" judges --run-id "$id" --config "$cfg" --model "$model" 2>&1 | grep -E "pass_rate|mean=|judge_cost|rror" || true
   .venv/bin/python "$S/report.py" --run-id "$id" --config "$cfg" --title "model-routing-eval $id" >/dev/null 2>&1 || true
 done
