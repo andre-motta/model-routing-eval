@@ -1,0 +1,115 @@
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..70e5559 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,109 @@
+-"""Implement parse_line and summarize here. See FORMAT.md."""
++"""Parse access log lines and summarize them. See FORMAT.md."""
++
++import math
++import re
++from collections import Counter
++from dataclasses import dataclass, field
++from datetime import datetime, timezone
++
++_METHOD_RE = re.compile(r"[A-Z]+")
++_STATUS_RE = re.compile(r"[0-9]{3}")
++_LATENCY_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")
++_BYTES_RE = re.compile(r"[0-9]+")
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int
++    malformed: int
++    by_status: dict[int, int] = field(default_factory=dict)
++    by_method: dict[str, int] = field(default_factory=dict)
++    p50_latency_ms: float = 0.0
++    p95_latency_ms: float = 0.0
++    bytes_total: int = 0
++    error_rate: float = 0.0
++    top_paths: list[tuple[str, int]] = field(default_factory=list)
++
++
++def parse_line(line: str) -> Record | None:
++    """Return the Record for one log line, or None if the line is malformed."""
++    parts = line.split()
++    if len(parts) not in (5, 6):
++        return None
++    ts_text, method, path, status_text, latency_text, *rest = parts
++    bytes_text = rest[0] if rest else "0"
++
++    try:
++        ts = datetime.fromisoformat(ts_text)
++    except ValueError:
++        return None
++    # Naive timestamps have no zone, so they cannot be stored as UTC.
++    if ts.tzinfo is None:
++        return None
++    ts = ts.astimezone(timezone.utc)
++
++    if not _METHOD_RE.fullmatch(method):
++        return None
++    if not path.startswith("/"):
++        return None
++    if not _STATUS_RE.fullmatch(status_text):
++        return None
++    if not _LATENCY_RE.fullmatch(latency_text):
++        return None
++    if not _BYTES_RE.fullmatch(bytes_text):
++        return None
++
++    return Record(
++        ts=ts,
++        method=method,
++        path=path,
++        status=int(status_text),
++        latency_ms=float(latency_text),
++        bytes=int(bytes_text),
++    )
++
++
++def _nearest_rank(sorted_values: list[float], pct: float) -> float:
++    """Nearest-rank percentile of an already sorted, non-empty list."""
++    rank = math.ceil(pct / 100 * len(sorted_values))
++    return sorted_values[max(rank, 1) - 1]
++
++
++def summarize(lines) -> Summary:
++    """Parse every line and aggregate the good records. Bad lines are counted."""
++    records = []
++    malformed = 0
++    for line in lines:
++        record = parse_line(line)
++        if record is None:
++            malformed += 1
++        else:
++            records.append(record)
++
++    by_status = Counter(r.status for r in records)
++    by_method = Counter(r.method for r in records)
++    path_counts = Counter(r.path for r in records)
++    latencies = sorted(r.latency_ms for r in records)
++    errors = sum(1 for r in records if r.status >= 500)
++
++    return Summary(
++        total=len(records),
++        malformed=malformed,
++        by_status=dict(by_status),
++        by_method=dict(by_method),
++        p50_latency_ms=_nearest_rank(latencies, 50) if latencies else 0.0,
++        p95_latency_ms=_nearest_rank(latencies, 95) if latencies else 0.0,
++        bytes_total=sum(r.bytes for r in records),
++        error_rate=errors / len(records) if records else 0.0,
++        top_paths=sorted(path_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:5],
++    )

@@ -1,0 +1,28 @@
+[
+ {
+  "backend": "codex",
+  "model": "gpt-6-luna",
+  "effort": "low",
+  "tokens": {
+   "input": 14039,
+   "cached": 6912,
+   "cache_write": 0,
+   "output": 5
+  },
+  "cost_usd": 0.00147552,
+  "wall_s": null
+ },
+ {
+  "backend": "codex",
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "tokens": {
+   "input": 13015,
+   "cached": 7936,
+   "cache_write": 0,
+   "output": 5
+  },
+  "cost_usd": 0.0276672,
+  "wall_s": null
+ }
+]

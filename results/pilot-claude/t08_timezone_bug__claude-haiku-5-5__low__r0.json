@@ -1,0 +1,24 @@
+{
+ "task": "t08_timezone_bug",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "......                                                                   [100%]\n6 passed in 0.03s\n",
+ "ts": "2026-10-09T09:27:47",
+ "wall_s": 17.029380559921265,
+ "tokens": {
+  "input": 12,
+  "cached": 163418,
+  "cache_write": 20528,
+  "output": 2790,
+  "reasoning": 1044
+ },
+ "turns": 6,
+ "cost_usd": 0.007135980000000001,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

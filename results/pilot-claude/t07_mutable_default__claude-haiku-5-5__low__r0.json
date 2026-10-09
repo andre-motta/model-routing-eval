@@ -1,0 +1,24 @@
+{
+ "task": "t07_mutable_default",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": ".....                                                                    [100%]\n5 passed in 0.02s\n",
+ "ts": "2026-10-09T09:27:30",
+ "wall_s": 11.611320972442627,
+ "tokens": {
+  "input": 8,
+  "cached": 101739,
+  "cache_write": 19532,
+  "output": 1668,
+  "reasoning": 300
+ },
+ "turns": 5,
+ "cost_usd": 0.00575859,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

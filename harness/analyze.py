@@ -87,6 +87,26 @@ def main():
 
     (out / "summary.md").write_text("\n".join(md))
 
+    # machine-readable summary for the deck generator
+    summary = {
+        "n_runs": int(len(df)), "n_tasks": int(df.task.nunique()), "configs": sorted(df.config.unique()),
+        "by_tier_config": [dict(tier=int(r.tier), config=r.config, pass_rate=float(r.pass_rate), mean_cost=float(r.mean_cost),
+                                mean_wall=float(r.mean_wall), n=int(r.n)) for _, r in g.iterrows()],
+        "cheapest_passing": [], "routing": {"priciest": priciest, "all_on_priciest_cost": float(base.cost.sum()),
+                                            "all_on_priciest_pass": float(base.passed.mean()), "routed_cost": routed_cost,
+                                            "routed_passing": routed_pass},
+        "per_run": df.drop(columns=["error"]).to_dict(orient="records"),
+    }
+    for (task, tier), sub in per.groupby(["task", "tier"]):
+        ok = sub[sub.all_pass].sort_values("cost")
+        if not ok.empty:
+            lo, hi = ok.iloc[0], ok.iloc[-1]
+            summary["cheapest_passing"].append(dict(task=task, tier=int(tier), cheapest=lo.config, cheapest_cost=float(lo.cost),
+                                                    priciest=hi.config, priciest_cost=float(hi.cost)))
+        else:
+            summary["cheapest_passing"].append(dict(task=task, tier=int(tier), cheapest=None))
+    (out / "summary.json").write_text(json.dumps(summary, indent=1, default=str))
+
     # charts
     fig, ax = plt.subplots(figsize=(9, 5))
     for cfg, sub in g.groupby("config"):

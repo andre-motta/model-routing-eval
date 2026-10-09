@@ -1,0 +1,67 @@
+diff --git a/metrics/counter.py b/metrics/counter.py
+index 72d5d3b..a584fc0 100644
+--- a/metrics/counter.py
++++ b/metrics/counter.py
+@@ -1,25 +1,51 @@
+-import time
++import threading
+ 
+ 
+ class Counter:
+-    """Named counters. Intended to be shared across request-handler threads."""
++    """Named counters. Intended to be shared across request-handler threads.
++
++    Each name has its own lock, so increments to different counters do not
++    contend. ``_guard`` only protects the ``_locks`` map and is never held
++    while a per-name lock is acquired, so lock ordering cannot deadlock.
++    """
+ 
+     def __init__(self):
+         self._values = {}
++        self._locks = {}
++        self._guard = threading.Lock()
++
++    def _lock_for(self, name):
++        with self._guard:
++            lock = self._locks.get(name)
++            if lock is None:
++                lock = self._locks[name] = threading.Lock()
++            return lock
+ 
+     def incr(self, name, by=1):
+-        current = self._values.get(name, 0)
+-        time.sleep(0)  # yield, simulates real work between read and write
+-        self._values[name] = current + by
++        with self._lock_for(name):
++            self._values[name] = self._values.get(name, 0) + by
+ 
+     def get(self, name):
+-        return self._values.get(name, 0)
++        with self._lock_for(name):
++            return self._values.get(name, 0)
+ 
+     def snapshot(self):
+-        return dict(self._values)
++        with self._guard:
++            names = list(self._locks)
++        out = {}
++        for name in names:
++            with self._lock_for(name):
++                if name in self._values:
++                    out[name] = self._values[name]
++        return out
+ 
+     def reset(self, name=None):
+-        if name is None:
+-            self._values.clear()
+-        else:
+-            self._values.pop(name, None)
++        if name is not None:
++            with self._lock_for(name):
++                self._values.pop(name, None)
++            return
++        with self._guard:
++            names = list(self._locks)
++        for n in names:
++            with self._lock_for(n):
++                self._values.pop(n, None)

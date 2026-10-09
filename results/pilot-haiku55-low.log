@@ -3,4 +3,8 @@ run  t02_ini_to_toml__claude-haiku-5-5__low__r0 ... PASS  $0.006  11s  turns=7
 run  t03_add_type_hints__claude-haiku-5-5__low__r0 ... PASS  $0.005  10s  turns=3
 run  t04_lru_cache__claude-haiku-5-5__low__r0 ... PASS  $0.011  29s  turns=10
 run  t05_cli_json_flag__claude-haiku-5-5__low__r0 ... PASS  $0.006  12s  turns=4
-run  t06_log_parser__claude-haiku-5-5__low__r0 ...
+run  t06_log_parser__claude-haiku-5-5__low__r0 ... PASS  $0.009  24s  turns=8
+run  t07_mutable_default__claude-haiku-5-5__low__r0 ... PASS  $0.006  12s  turns=5
+run  t08_timezone_bug__claude-haiku-5-5__low__r0 ... PASS  $0.007  17s  turns=6
+run  t09_thread_safety__claude-haiku-5-5__low__r0 ... PASS  $0.008  28s  turns=6
+run  t10_plugin_registry__claude-haiku-5-5__low__r0 ...

@@ -1,0 +1,5 @@
+[
+ {"variant": "default (user env, 1 MCP server, plugins)", "model": "claude-haiku-5-5", "tokens": {"input": 2, "cached": 13009, "cache_write": 16331, "output": 71}, "cost_usd": 0.0034},
+ {"variant": "--strict-mcp-config with no MCP servers", "model": "claude-haiku-5-5", "tokens": {"input": 2, "cached": 13009, "cache_write": 14637, "output": 79}, "cost_usd": 0.0031},
+ {"variant": "no MCP + 9 built-in tools disallowed (tool list changed, cache prefix invalidated)", "model": "claude-haiku-5-5", "tokens": {"input": 2, "cached": 0, "cache_write": 28604, "output": 69}, "cost_usd": 0.0058}
+]
