@@ -10,6 +10,8 @@ cd "$(dirname "$0")"
 CONFIG=${1:?config}; shift || true
 export AGENT_EVAL_RUNS_DIR=${AGENT_EVAL_RUNS_DIR:-$PWD/eval/runs}
 export TMPDIR=${EVAL_TMPDIR:-$PWD/.work}; mkdir -p "$TMPDIR"
+# Cap per-process virtual memory (8 GB): an agent's own test run blew up to 5.7 GB once and starved the host.
+ulimit -v ${EVAL_ULIMIT_KB:-8388608} 2>/dev/null || true
 unset CLAUDE_CODE_USE_VERTEX ANTHROPIC_VERTEX_PROJECT_ID CLOUD_ML_REGION
 export CLAUDE_CONFIG_DIR=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
 PLUGIN=$(.venv/bin/python -c "import agent_eval, pathlib; print(pathlib.Path(agent_eval.__file__).resolve().parents[1])")

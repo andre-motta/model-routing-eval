@@ -10,6 +10,8 @@ export AGENT_EVAL_RUNS_DIR=${AGENT_EVAL_RUNS_DIR:-$PWD/eval/runs}
 # Workspaces go under TMPDIR/agent-eval. /tmp is RAM on some machines and a fromager case is ~120 MB,
 # so keep them on disk and delete them once the run's artifacts are collected.
 export TMPDIR=${EVAL_TMPDIR:-$PWD/.work}; mkdir -p "$TMPDIR"
+# Cap per-process virtual memory (8 GB): an agent's own test run blew up to 5.7 GB once and starved the host.
+ulimit -v ${EVAL_ULIMIT_KB:-8388608} 2>/dev/null || true
 # This machine's interactive Claude Code session runs on Vertex; the eval agent should use the
 # caller's normal Claude Code auth (CLAUDE_CONFIG_DIR is forwarded by runner.env in eval.yaml).
 unset CLAUDE_CODE_USE_VERTEX ANTHROPIC_VERTEX_PROJECT_ID CLOUD_ML_REGION

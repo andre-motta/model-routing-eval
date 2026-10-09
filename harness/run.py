@@ -166,7 +166,11 @@ def verify(task, work):
         cmd, shell = ["bash", str(custom)], False
     else:
         cmd, shell = [sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider", "hidden"], False
-    p = subprocess.run(cmd, cwd=work, shell=shell, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=1200)
+    # 6 GB cap on the verifier: a pathological solution (e.g. exhaustive search in the resolver task) must fail, not starve the host.
+    import resource
+    def _cap():
+        resource.setrlimit(resource.RLIMIT_AS, (6 * 1024 ** 3, 6 * 1024 ** 3))
+    p = subprocess.run(cmd, cwd=work, shell=shell, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=1200, preexec_fn=_cap)
     return p.returncode == 0, (p.stdout + p.stderr)[-3000:]
 
 
