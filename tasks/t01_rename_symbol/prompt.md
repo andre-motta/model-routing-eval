@@ -1,0 +1,2 @@
+Rename the function `calc` in the `shop` package to `compute_total`. Update every
+call site, the tests, and the docs. Keep behaviour identical. Run the tests when done.

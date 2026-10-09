@@ -1,0 +1,3 @@
+Implement `cachelib/lru.py` according to the spec in `cachelib/SPEC.md`. The stub
+already exists with the public interface. Add tests of your own under `tests/`.
+Run the tests when done.

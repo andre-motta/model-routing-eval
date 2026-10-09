@@ -1,0 +1,19 @@
+from decimal import Decimal
+
+from billing import build_invoice, percent_off, invoice_total, line_totals, TaxRule
+
+
+def test_simple_total():
+    inv = build_invoice("A1", [("x", "10.00", 2), ("y", "0.50", 1)])
+    assert invoice_total(inv) == Decimal("20.50")
+    assert sum(line_totals(inv)) == Decimal("20.50")
+
+
+def test_with_tax():
+    inv = build_invoice("A2", [("x", "100.00", 1)], TaxRule("DE", Decimal("0.19")))
+    assert invoice_total(inv) == Decimal("119.00")
+
+
+def test_discount_whole_numbers():
+    inv = build_invoice("A3", [("x", "100.00", 1, percent_off("TEN", "10"))])
+    assert invoice_total(inv) == Decimal("90.00")

@@ -1,0 +1,3 @@
+tier: 4
+title: Migrate a sync fetch-and-aggregate package to asyncio
+timeout: 1500

@@ -1,0 +1,35 @@
+diff --git a/app/config.py b/app/config.py
+index 94daf71..81b2b80 100644
+--- a/app/config.py
++++ b/app/config.py
+@@ -1,7 +1,6 @@
+-import configparser
++import tomllib
+ 
+ 
+-def load_config(path="config.ini"):
+-    cp = configparser.ConfigParser()
+-    cp.read(path)
+-    return {section: dict(cp[section]) for section in cp.sections()}
++def load_config(path="config.toml"):
++    with open(path, "rb") as f:
++        return tomllib.load(f)
+diff --git a/config.ini b/config.ini
+deleted file mode 100644
+index 5942898..0000000
+--- a/config.ini
++++ /dev/null
+@@ -1,13 +0,0 @@
+-[server]
+-host = 0.0.0.0
+-port = 8080
+-debug = false
+-
+-[database]
+-url = postgresql://localhost/app
+-pool_size = 5
+-timeout = 2.5
+-
+-[features]
+-beta = true
+-max_upload_mb = 25

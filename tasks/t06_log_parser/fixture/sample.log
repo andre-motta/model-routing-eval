@@ -1,0 +1,6 @@
+2026-10-01T12:00:00Z GET /api/users 200 12.5 843
+2026-10-01T12:00:01Z POST /api/users 201 40 120
+2026-10-01T12:00:02Z GET /api/users/7 404 3.1
+garbage line here
+2026-10-01T12:00:03Z GET /api/users 500 120.0 0
+2026-10-01T12:00:04Z GET /health 200 0.4

@@ -1,0 +1,3 @@
+tier: 3
+title: Debug lost updates in a metrics counter under threads
+timeout: 900

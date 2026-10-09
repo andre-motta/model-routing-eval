@@ -1,0 +1,3 @@
+tier: 3
+title: Debug a scheduler that fires on the wrong day near midnight and DST
+timeout: 900

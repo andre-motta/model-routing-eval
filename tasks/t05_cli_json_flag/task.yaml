@@ -1,0 +1,3 @@
+tier: 2
+title: Add a --json output mode to an argparse CLI
+timeout: 900

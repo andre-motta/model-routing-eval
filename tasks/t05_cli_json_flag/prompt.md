@@ -1,0 +1,6 @@
+`wc` is a small word-count CLI (`python -m wc FILE...`). Add a `--json` flag. With it,
+the tool prints one JSON object to stdout: `{"files": [{"path": ..., "lines": ..., "words":
+..., "chars": ...}, ...], "total": {"lines": ..., "words": ..., "chars": ...}}`. Without
+the flag, output must stay byte-for-byte identical to today. Missing files must still
+produce an error on stderr and exit code 1 in both modes, and in JSON mode a missing
+file must not appear in `files`. Run the tests.

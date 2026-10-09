@@ -1,0 +1,4 @@
+Users report that creating a second `Warehouse` sometimes shows stock from the first one,
+and that `restock` on one warehouse changes another. `tests/test_inv.py` has a failing
+reproduction. Find the root cause, fix it properly (not by working around it in the
+test), and make sure nothing else regresses. Run the tests.

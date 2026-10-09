@@ -1,0 +1,9 @@
+[project]
+name = "model-routing-eval"
+version = "0.1.0"
+description = "Cheapest model and effort that still passes, per coding task tier"
+requires-python = ">=3.11"
+dependencies = ["pyyaml>=6", "pandas>=2", "matplotlib>=3.8", "pytest>=8"]
+
+[tool.setuptools]
+packages = ["harness"]
