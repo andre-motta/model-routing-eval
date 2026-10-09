@@ -1,0 +1,23 @@
+diff --git a/inv/warehouse.py b/inv/warehouse.py
+index 29a3256..d370656 100644
+--- a/inv/warehouse.py
++++ b/inv/warehouse.py
+@@ -9,12 +9,14 @@ class Item:
+ 
+ 
+ class Warehouse:
+-    def __init__(self, name, stock={}, history=[]):
++    def __init__(self, name, stock=None, history=None):
+         self.name = name
+-        self.stock = stock
+-        self.history = history
++        self.stock = stock if stock is not None else {}
++        self.history = history if history is not None else []
+ 
+-    def restock(self, sku, qty, tags=[]):
++    def restock(self, sku, qty, tags=None):
++        if tags is None:
++            tags = []
+         item = self.stock.get(sku)
+         if item is None:
+             item = Item(sku, 0, tags)

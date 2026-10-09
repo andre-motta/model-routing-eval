@@ -1,0 +1,24 @@
+{
+ "task": "t06_log_parser",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-haiku-4-5-20251001",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "...                                                                      [100%]\n3 passed in 0.02s\n",
+ "ts": "2026-10-09T09:19:23",
+ "wall_s": 76.83153533935547,
+ "tokens": {
+  "input": 169,
+  "cached": 654640,
+  "cache_write": 23934,
+  "output": 7449,
+  "reasoning": 2492
+ },
+ "turns": 24,
+ "cost_usd": 0.150746,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

@@ -1,0 +1,85 @@
+diff --git a/export/__init__.py b/export/__init__.py
+index af41b91..754d4ab 100644
+--- a/export/__init__.py
++++ b/export/__init__.py
+@@ -1,3 +1,14 @@
+-from .core import export_records, export_to_file, UnknownFormat
++from . import formats  # noqa: F401  (registers built-in exporters)
++from .base import Exporter
++from .core import export_records, export_to_file
++from .registry import UnknownFormat, get, names, register
+ 
+-__all__ = ["export_records", "export_to_file", "UnknownFormat"]
++__all__ = [
++    "export_records",
++    "export_to_file",
++    "UnknownFormat",
++    "Exporter",
++    "register",
++    "get",
++    "names",
++]
+diff --git a/export/core.py b/export/core.py
+index 1f64e19..bd789a3 100644
+--- a/export/core.py
++++ b/export/core.py
+@@ -1,52 +1,17 @@
+-import csv
+-import io
+-import json
+-from xml.sax.saxutils import escape
+-
+-
+-class UnknownFormat(ValueError):
+-    pass
+-
+-
+-def _extension(fmt):
+-    if fmt == "csv":
+-        return ".csv"
+-    elif fmt == "json":
+-        return ".json"
+-    elif fmt == "xml":
+-        return ".xml"
+-    raise UnknownFormat(fmt)
++from . import registry
++from .registry import UnknownFormat
+ 
+ 
+ def export_records(records, fmt):
+     """records: list of dicts with identical keys. Returns bytes."""
+-    if fmt == "csv":
+-        buf = io.StringIO()
+-        if records:
+-            w = csv.DictWriter(buf, fieldnames=list(records[0].keys()), lineterminator="\n")
+-            w.writeheader()
+-            w.writerows(records)
+-        return buf.getvalue().encode()
+-    elif fmt == "json":
+-        return json.dumps(records, indent=2, sort_keys=True).encode() + b"\n"
+-    elif fmt == "xml":
+-        parts = ["<records>"]
+-        for r in records:
+-            parts.append("  <record>")
+-            for k, v in r.items():
+-                parts.append(f"    <{k}>{escape(str(v))}</{k}>")
+-            parts.append("  </record>")
+-        parts.append("</records>")
+-        return ("\n".join(parts) + "\n").encode()
+-    raise UnknownFormat(fmt)
++    return registry.get(fmt).dump(records)
+ 
+ 
+ def export_to_file(records, fmt, path):
+-    if fmt not in ("csv", "json", "xml"):
+-        raise UnknownFormat(fmt)
++    exporter = registry.get(fmt)
+     path = str(path)
+-    if not path.endswith(_extension(fmt)):
+-        path += _extension(fmt)
++    if not path.endswith(exporter.extension):
++        path += exporter.extension
+     with open(path, "wb") as f:
+-        f.write(export_records(records, fmt))
++        f.write(exporter.dump(records))
+     return path

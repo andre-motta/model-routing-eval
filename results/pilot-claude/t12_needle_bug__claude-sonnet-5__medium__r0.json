@@ -1,0 +1,24 @@
+{
+ "task": "t12_needle_bug",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-sonnet-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "....                                                                     [100%]\n4 passed in 0.02s\n",
+ "ts": "2026-10-09T09:21:46",
+ "wall_s": 73.05016541481018,
+ "tokens": {
+  "input": 30,
+  "cached": 660620,
+  "cache_write": 29637,
+  "output": 4448,
+  "reasoning": 663
+ },
+ "turns": 20,
+ "cost_usd": 0.29521200000000003,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

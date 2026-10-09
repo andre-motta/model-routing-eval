@@ -1,0 +1,24 @@
+{
+ "task": "t04_lru_cache",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-sonnet-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": ".....                                                                    [100%]\n5 passed in 0.02s\n",
+ "ts": "2026-10-09T09:16:47",
+ "wall_s": 35.29546284675598,
+ "tokens": {
+  "input": 12,
+  "cached": 208707,
+  "cache_write": 43887,
+  "output": 2807,
+  "reasoning": 65
+ },
+ "turns": 7,
+ "cost_usd": 0.2453834,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

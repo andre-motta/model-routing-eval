@@ -1,0 +1,7 @@
+run  t04_lru_cache__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.133  75s  turns=16
+run  t05_cli_json_flag__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.096  38s  turns=18
+run  t06_log_parser__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.151  77s  turns=24
+run  t07_mutable_default__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.068  28s  turns=10
+run  t08_timezone_bug__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.193  131s  turns=20
+run  t09_thread_safety__claude-haiku-4-5-20251001__low__r0 ... PASS  $0.054  30s  turns=8
+run  t10_plugin_registry__claude-haiku-4-5-20251001__low__r0 ...

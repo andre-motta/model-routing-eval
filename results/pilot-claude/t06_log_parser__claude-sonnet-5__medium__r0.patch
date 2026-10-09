@@ -1,0 +1,117 @@
+diff --git a/logstats/parse.py b/logstats/parse.py
+index fcc184a..692d737 100644
+--- a/logstats/parse.py
++++ b/logstats/parse.py
+@@ -1 +1,112 @@
+ """Implement parse_line and summarize here. See FORMAT.md."""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++from datetime import datetime, timezone
++from collections import Counter
++
++
++@dataclass
++class Record:
++    ts: datetime
++    method: str
++    path: str
++    status: int
++    latency_ms: float
++    bytes: int
++
++
++@dataclass
++class Summary:
++    total: int
++    malformed: int
++    by_status: dict[int, int]
++    by_method: dict[str, int]
++    p50_latency_ms: float
++    p95_latency_ms: float
++    bytes_total: int
++    error_rate: float
++    top_paths: list[tuple[str, int]]
++
++
++def parse_line(line: str) -> Record | None:
++    parts = line.split()
++    if len(parts) not in (5, 6):
++        return None
++
++    ts_raw, method, path, status_raw, latency_raw = parts[:5]
++    bytes_raw = parts[5] if len(parts) == 6 else "0"
++
++    try:
++        ts = datetime.fromisoformat(ts_raw.replace("Z", "+00:00"))
++        if ts.tzinfo is None:
++            ts = ts.replace(tzinfo=timezone.utc)
++        status = int(status_raw)
++        latency_ms = float(latency_raw)
++        num_bytes = int(bytes_raw)
++    except ValueError:
++        return None
++
++    return Record(
++        ts=ts,
++        method=method,
++        path=path,
++        status=status,
++        latency_ms=latency_ms,
++        bytes=num_bytes,
++    )
++
++
++def _percentile(sorted_values: list[float], pct: float) -> float:
++    if not sorted_values:
++        return 0.0
++    rank = max(1, round(pct / 100 * len(sorted_values)))
++    return sorted_values[rank - 1]
++
++
++def summarize(lines) -> Summary:
++    records: list[Record] = []
++    malformed = 0
++
++    for line in lines:
++        if not line.strip():
++            continue
++        record = parse_line(line)
++        if record is None:
++            malformed += 1
++        else:
++            records.append(record)
++
++    by_status: Counter[int] = Counter()
++    by_method: Counter[str] = Counter()
++    path_counts: Counter[str] = Counter()
++    bytes_total = 0
++    error_count = 0
++    latencies: list[float] = []
++
++    for record in records:
++        by_status[record.status] += 1
++        by_method[record.method] += 1
++        path_counts[record.path] += 1
++        bytes_total += record.bytes
++        latencies.append(record.latency_ms)
++        if record.status >= 500:
++            error_count += 1
++
++    latencies.sort()
++    total = len(records)
++    error_rate = error_count / total if total else 0.0
++    top_paths = sorted(path_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:5]
++
++    return Summary(
++        total=total,
++        malformed=malformed,
++        by_status=dict(by_status),
++        by_method=dict(by_method),
++        p50_latency_ms=_percentile(latencies, 50),
++        p95_latency_ms=_percentile(latencies, 95),
++        bytes_total=bytes_total,
++        error_rate=error_rate,
++        top_paths=top_paths,
++    )

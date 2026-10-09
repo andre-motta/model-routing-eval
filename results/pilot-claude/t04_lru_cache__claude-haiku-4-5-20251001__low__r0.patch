@@ -1,0 +1,86 @@
+diff --git a/cachelib/lru.py b/cachelib/lru.py
+index 783e3e0..2e7f7d6 100644
+--- a/cachelib/lru.py
++++ b/cachelib/lru.py
+@@ -1,24 +1,74 @@
+ import time
++from collections import OrderedDict
+ 
+ 
+ class LRUCache:
+     def __init__(self, capacity, ttl=None, clock=time.monotonic):
+-        raise NotImplementedError
++        if capacity <= 0:
++            raise ValueError("capacity must be positive")
++        self.capacity = capacity
++        self.ttl = ttl
++        self.clock = clock
++        self.cache = OrderedDict()
++        self.hits = 0
++        self.misses = 0
++        self.evictions = 0
++        self.expirations = 0
+ 
+     def get(self, key, default=None):
+-        raise NotImplementedError
++        if key not in self.cache:
++            self.misses += 1
++            return default
++
++        value, timestamp = self.cache[key]
++
++        if self.ttl is not None and self.clock() - timestamp > self.ttl:
++            del self.cache[key]
++            self.expirations += 1
++            self.misses += 1
++            return default
++
++        self.cache.move_to_end(key)
++        self.hits += 1
++        return value
+ 
+     def put(self, key, value):
+-        raise NotImplementedError
++        current_time = self.clock()
++
++        if key in self.cache:
++            self.cache[key] = (value, current_time)
++            self.cache.move_to_end(key)
++        else:
++            if len(self.cache) >= self.capacity:
++                self.cache.popitem(last=False)
++                self.evictions += 1
++
++            self.cache[key] = (value, current_time)
+ 
+     def delete(self, key):
+-        raise NotImplementedError
++        if key in self.cache:
++            del self.cache[key]
++            return True
++        return False
+ 
+     def stats(self):
+-        raise NotImplementedError
++        return {
++            "hits": self.hits,
++            "misses": self.misses,
++            "evictions": self.evictions,
++            "expirations": self.expirations,
++        }
+ 
+     def __len__(self):
+-        raise NotImplementedError
++        return len(self.cache)
+ 
+     def __contains__(self, key):
+-        raise NotImplementedError
++        if key not in self.cache:
++            return False
++
++        _, timestamp = self.cache[key]
++
++        if self.ttl is not None and self.clock() - timestamp > self.ttl:
++            return False
++
++        return True

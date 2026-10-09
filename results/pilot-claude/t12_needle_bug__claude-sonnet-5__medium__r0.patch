@@ -1,0 +1,48 @@
+diff --git a/billing/__pycache__/totals.cpython-314.pyc b/billing/__pycache__/totals.cpython-314.pyc
+index 858e67e..2b08c26 100644
+Binary files a/billing/__pycache__/totals.cpython-314.pyc and b/billing/__pycache__/totals.cpython-314.pyc differ
+diff --git a/billing/totals.py b/billing/totals.py
+index 7865b14..dd2d64d 100644
+--- a/billing/totals.py
++++ b/billing/totals.py
+@@ -14,10 +14,5 @@ def line_totals(inv: Invoice) -> list[Decimal]:
+ 
+ def invoice_total(inv: Invoice) -> Decimal:
+     """Amount charged: sum of lines after discount, plus tax on that sum."""
+-    gross = sum((li.unit_price * li.qty for li in inv.lines), Decimal("0"))
+-    discount_amount = Decimal("0")
+-    for li in inv.lines:
+-        if li.discount is not None:
+-            discount_amount += li.unit_price * li.qty * li.discount.percent / Decimal(100)
+-    net = round_money(gross - discount_amount)
++    net = sum(line_totals(inv), Decimal("0"))
+     return round_money(net + tax_for(net, inv.tax_rule))
+diff --git a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc
+index 6f56133..38fa763 100644
+Binary files a/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc and b/tests/__pycache__/test_billing.cpython-314-pytest-9.1.1.pyc differ
+diff --git a/tests/test_billing.py b/tests/test_billing.py
+index 0391358..141692b 100644
+--- a/tests/test_billing.py
++++ b/tests/test_billing.py
+@@ -17,3 +17,21 @@ def test_with_tax():
+ def test_discount_whole_numbers():
+     inv = build_invoice("A3", [("x", "100.00", 1, percent_off("TEN", "10"))])
+     assert invoice_total(inv) == Decimal("90.00")
++
++
++def test_multiline_discount_matches_pdf_line_sum():
++    """Regression: invoice_total must equal sum(line_totals) exactly.
++
++    Previously invoice_total rounded the aggregate discount once while the
++    PDF (line_totals) rounds each discounted line separately, so the two
++    could differ by a cent when per-line roundings landed on opposite sides.
++    """
++    inv = build_invoice(
++        "A4",
++        [
++            ("x", "3.33", 1, percent_off("D1", "10")),
++            ("y", "3.33", 1, percent_off("D2", "10")),
++        ],
++    )
++    assert invoice_total(inv) == sum(line_totals(inv), Decimal("0"))
++    assert invoice_total(inv) == Decimal("6.00")

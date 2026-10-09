@@ -1,0 +1,39 @@
+diff --git a/wc/cli.py b/wc/cli.py
+index 9bb48d5..9d2b425 100644
+--- a/wc/cli.py
++++ b/wc/cli.py
+@@ -1,4 +1,5 @@
+ import argparse
++import json
+ import sys
+ 
+ 
+@@ -11,9 +12,11 @@ def count(path):
+ def main(argv=None):
+     ap = argparse.ArgumentParser(prog="wc")
+     ap.add_argument("files", nargs="+")
++    ap.add_argument("--json", action="store_true")
+     args = ap.parse_args(argv)
+     total = {"lines": 0, "words": 0, "chars": 0}
+     rc = 0
++    files = []
+     for path in args.files:
+         try:
+             c = count(path)
+@@ -21,9 +24,14 @@ def main(argv=None):
+             print(f"wc: {path}: {e.strerror}", file=sys.stderr)
+             rc = 1
+             continue
+-        print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
++        if args.json:
++            files.append({"path": path, **c})
++        else:
++            print(f"{c['lines']:>8}{c['words']:>8}{c['chars']:>8} {path}")
+         for k in total:
+             total[k] += c[k]
+-    if len(args.files) > 1:
++    if args.json:
++        print(json.dumps({"files": files, "total": total}))
++    elif len(args.files) > 1:
+         print(f"{total['lines']:>8}{total['words']:>8}{total['chars']:>8} total")
+     return rc

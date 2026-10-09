@@ -1,0 +1,9 @@
+run  t04_lru_cache__claude-sonnet-5__medium__r0 ... PASS  $0.245  35s  turns=7
+run  t05_cli_json_flag__claude-sonnet-5__medium__r0 ... PASS  $0.161  29s  turns=9
+run  t06_log_parser__claude-sonnet-5__medium__r0 ... PASS  $0.213  41s  turns=12
+run  t07_mutable_default__claude-sonnet-5__medium__r0 ... PASS  $0.130  12s  turns=6
+run  t08_timezone_bug__claude-sonnet-5__medium__r0 ... PASS  $0.134  17s  turns=5
+run  t09_thread_safety__claude-sonnet-5__medium__r0 ... PASS  $0.142  30s  turns=6
+run  t10_plugin_registry__claude-sonnet-5__medium__r0 ... FAIL  $0.237  47s  turns=15
+run  t11_async_migration__claude-sonnet-5__medium__r0 ... PASS  $0.225  47s  turns=14
+run  t12_needle_bug__claude-sonnet-5__medium__r0 ... PASS  $0.295  73s  turns=20

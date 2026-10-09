@@ -1,0 +1,20 @@
+diff --git a/sched/__pycache__/core.cpython-314.pyc b/sched/__pycache__/core.cpython-314.pyc
+index 97eb68c..ae3ffa3 100644
+Binary files a/sched/__pycache__/core.cpython-314.pyc and b/sched/__pycache__/core.cpython-314.pyc differ
+diff --git a/sched/core.py b/sched/core.py
+index f434c9e..be1f461 100644
+--- a/sched/core.py
++++ b/sched/core.py
+@@ -7,9 +7,9 @@ def next_run(now: datetime, hour: int, minute: int, tz: str) -> datetime:
+     if now.tzinfo is None:
+         now = now.replace(tzinfo=timezone.utc)
+     zone = ZoneInfo(tz)
+-    today = now.date()
++    today = now.astimezone(zone).date()
+     candidate = datetime(today.year, today.month, today.day, hour, minute, tzinfo=zone)
+     if candidate <= now:
+-        # advance one day; do the arithmetic in UTC to avoid tz surprises
+-        candidate = (candidate.astimezone(timezone.utc) + timedelta(days=1)).astimezone(zone)
++        next_day = today + timedelta(days=1)
++        candidate = datetime(next_day.year, next_day.month, next_day.day, hour, minute, tzinfo=zone)
+     return candidate

@@ -1,0 +1,24 @@
+{
+ "task": "t10_plugin_registry",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-sonnet-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": false,
+ "verify_tail": ".F\n=================================== FAILURES ===================================\n_______________________ test_registry_api_and_discovery ________________________\n\n    def test_registry_api_and_discovery():\n        reg = _registry()\n        assert set(reg.names()) >= {\"csv\", \"json\", \"xml\"}\n        assert reg.get(\"csv\").extension == \".csv\"\n        pkg = pathlib.Path(export.__file__).parent\n        assert (pkg / \"formats\").is_dir()\n>       assert {p.stem for p in (pkg / \"formats\").glob(\"*.py\")} >= {\"csv\", \"json\", \"xml\"}\nE       AssertionError: assert {'__init__', ... 'xml_format'} >= {'csv', 'json', 'xml'}\nE         \nE         Extra items in the right set:\nE         'csv'\nE         'json'\nE         'xml'\n\nhidden/test_plugins.py:28: AssertionError\n=========================== short test summary info ============================\nFAILED hidden/test_plugins.py::test_registry_api_and_discovery - AssertionErr...\n!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 1 passed in 0.07s\n",
+ "ts": "2026-10-09T09:19:45",
+ "wall_s": 47.08735918998718,
+ "tokens": {
+  "input": 26,
+  "cached": 537619,
+  "cache_write": 25287,
+  "output": 2787,
+  "reasoning": 179
+ },
+ "turns": 15,
+ "cost_usd": 0.2365938,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}
