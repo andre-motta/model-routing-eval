@@ -1,0 +1,24 @@
+{
+ "task": "t15_perf_regression",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "...                                                                      [100%]\n3 passed in 0.21s\n",
+ "ts": "2026-10-09T09:39:31",
+ "wall_s": 36.94415998458862,
+ "tokens": {
+  "input": 20,
+  "cached": 313178,
+  "cache_write": 25312,
+  "output": 3805,
+  "reasoning": 969
+ },
+ "turns": 10,
+ "cost_usd": 0.01009868,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

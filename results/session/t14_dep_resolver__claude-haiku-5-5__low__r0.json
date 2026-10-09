@@ -1,0 +1,24 @@
+{
+ "task": "t14_dep_resolver",
+ "tier": 4,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "......                                                                   [100%]\n6 passed in 0.04s\n",
+ "ts": "2026-10-09T09:30:58",
+ "wall_s": 76.3967547416687,
+ "tokens": {
+  "input": 16,
+  "cached": 271280,
+  "cache_write": 31681,
+  "output": 11871,
+  "reasoning": 6550
+ },
+ "turns": 9,
+ "cost_usd": 0.0149861,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

@@ -1,0 +1,24 @@
+{
+ "task": "t09_thread_safety",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "....                                                                     [100%]\n4 passed in 0.04s\n",
+ "ts": "2026-10-09T09:28:16",
+ "wall_s": 27.84404706954956,
+ "tokens": {
+  "input": 12,
+  "cached": 167040,
+  "cache_write": 21493,
+  "output": 3772,
+  "reasoning": 2081
+ },
+ "turns": 6,
+ "cost_usd": 0.0078562,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

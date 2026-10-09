@@ -1,0 +1,23 @@
+{
+ "task": "r03t_fromager_dep_chain_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": false,
+ "quality": 3,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "smoke-opus-medium-tickets",
+ "wall_s": 127.3,
+ "tokens": {
+  "input": 40,
+  "cached": 1621839,
+  "cache_write": 124891,
+  "output": 11611,
+  "reasoning": 0
+ },
+ "turns": 20,
+ "cost_usd": 1.5558758000000001,
+ "error": null
+}

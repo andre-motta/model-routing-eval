@@ -1,0 +1,24 @@
+{
+ "task": "r05_fromager_version_prebuilt",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "........................................................................ [ 32%]\n........................................................................ [ 65%]\n........................................................................ [ 98%]\n...                                                                      [100%]\n219 passed, 1 deselected in 1.19s\n",
+ "ts": "2026-10-09T09:53:03",
+ "wall_s": 131.07179427146912,
+ "tokens": {
+  "input": 28,
+  "cached": 740907,
+  "cache_write": 58186,
+  "output": 12419,
+  "reasoning": 484
+ },
+ "turns": 26,
+ "cost_usd": 0.5051714,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

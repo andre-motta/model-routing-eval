@@ -1,0 +1,24 @@
+{
+ "task": "t02_ini_to_toml",
+ "tier": 1,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "..                                                                       [100%]\n2 passed in 0.02s\n",
+ "ts": "2026-10-09T09:26:01",
+ "wall_s": 10.795007467269897,
+ "tokens": {
+  "input": 8,
+  "cached": 101029,
+  "cache_write": 19538,
+  "output": 1708,
+  "reasoning": 253
+ },
+ "turns": 7,
+ "cost_usd": 0.00577269,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

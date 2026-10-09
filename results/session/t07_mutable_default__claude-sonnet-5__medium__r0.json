@@ -1,0 +1,24 @@
+{
+ "task": "t07_mutable_default",
+ "tier": 3,
+ "backend": "claude",
+ "model": "claude-sonnet-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": ".....                                                                    [100%]\n5 passed in 0.02s\n",
+ "ts": "2026-10-09T09:18:10",
+ "wall_s": 12.174326419830322,
+ "tokens": {
+  "input": 10,
+  "cached": 183934,
+  "cache_write": 21308,
+  "output": 804,
+  "reasoning": 14
+ },
+ "turns": 6,
+ "cost_usd": 0.13007880000000002,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

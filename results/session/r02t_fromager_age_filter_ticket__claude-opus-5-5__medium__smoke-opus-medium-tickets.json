@@ -1,0 +1,23 @@
+{
+ "task": "r02t_fromager_age_filter_ticket",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 5,
+ "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+ "run_id": "smoke-opus-medium-tickets",
+ "wall_s": 50.5,
+ "tokens": {
+  "input": 22,
+  "cached": 493495,
+  "cache_write": 60313,
+  "output": 4416,
+  "reasoning": 0
+ },
+ "turns": 11,
+ "cost_usd": 0.6696110000000001,
+ "error": null
+}

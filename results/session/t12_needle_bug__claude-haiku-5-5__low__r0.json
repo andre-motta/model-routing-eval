@@ -1,0 +1,24 @@
+{
+ "task": "t12_needle_bug",
+ "tier": 5,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "....                                                                     [100%]\n4 passed in 0.03s\n",
+ "ts": "2026-10-09T09:29:25",
+ "wall_s": 19.76623821258545,
+ "tokens": {
+  "input": 14,
+  "cached": 201933,
+  "cache_write": 23036,
+  "output": 3261,
+  "reasoning": 394
+ },
+ "turns": 10,
+ "cost_usd": 0.008258429999999999,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}

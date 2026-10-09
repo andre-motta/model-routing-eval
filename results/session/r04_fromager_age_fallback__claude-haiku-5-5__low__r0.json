@@ -1,0 +1,24 @@
+{
+ "task": "r04_fromager_age_fallback",
+ "tier": 6,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "verify_tail": "...............................................................          [100%]\n63 passed in 0.35s\n",
+ "ts": "2026-10-09T09:49:50",
+ "wall_s": 81.19392108917236,
+ "tokens": {
+  "input": 46,
+  "cached": 1305891,
+  "cache_write": 59312,
+  "output": 16485,
+  "reasoning": 3696
+ },
+ "turns": 34,
+ "cost_usd": 0.03316841,
+ "error": null,
+ "exit_code": 0,
+ "stderr_tail": ""
+}
