@@ -1,0 +1,23 @@
+{
+ "task": "t04_lru_cache",
+ "tier": 2,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "low",
+ "rep": 0,
+ "passed": true,
+ "quality": null,
+ "verify_tail": "hidden tests passed",
+ "run_id": "effort-demo-sonnet-5-5-low",
+ "wall_s": 20.0,
+ "tokens": {
+  "input": 6,
+  "cached": 49104,
+  "cache_write": 33605,
+  "output": 2660,
+  "reasoning": 0
+ },
+ "turns": 3,
+ "cost_usd": 0.1659424,
+ "error": null
+}

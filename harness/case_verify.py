@@ -16,6 +16,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from harness.run import TASKS, verify  # noqa: E402
 
 
+def reap_workspace_processes(work: Path):
+    """Kill anything the agent left running with its cwd inside the workspace (a runaway test once grew to 5.7 GB
+    and outlived the run). Only processes rooted in this workspace are touched."""
+    import signal
+    me = os.getpid()
+    for pid in os.listdir("/proc"):
+        if not pid.isdigit() or int(pid) == me:
+            continue
+        try:
+            cwd = os.readlink(f"/proc/{pid}/cwd")
+        except OSError:
+            continue
+        if cwd == str(work) or cwd.startswith(str(work) + "/"):
+            try:
+                os.kill(int(pid), signal.SIGTERM)
+                print(f"reaped leftover process {pid} in workspace")
+            except OSError:
+                pass
+
+
 def main():
     work = Path(os.environ["CASE_WORKSPACE"])
     task_id = yaml.safe_load(Path(os.environ["CASE_INPUT"]).read_text())["task"]
@@ -25,6 +45,7 @@ def main():
     task["dir"] = d
     out = work / "output"
     out.mkdir(exist_ok=True)
+    reap_workspace_processes(work)
     subprocess.run(["git", "add", "-A", "--", ".", ":!hidden", ":!output"], cwd=work, capture_output=True)
     diff = subprocess.run(["git", "diff", "--cached", "--", ".", ":!hidden", ":!output"], cwd=work,
                           capture_output=True, text=True).stdout
