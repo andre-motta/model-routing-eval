@@ -5,19 +5,19 @@
  "model": "gpt-6-luna",
  "effort": "xhigh",
  "rep": 0,
- "passed": false,
+ "passed": true,
  "quality": null,
- "verify_tail": "hidden tests failed",
+ "verify_tail": "hidden tests passed",
  "run_id": "effort-demo-gpt-6-luna-xhigh",
- "wall_s": 38.4,
+ "wall_s": 138.2,
  "tokens": {
-  "input": 11622,
-  "cached": 72704,
+  "input": 18147,
+  "cached": 212736,
   "cache_write": 0,
-  "output": 1430,
+  "output": 6740,
   "reasoning": 0
  },
  "turns": 1,
- "cost_usd": 0.001442,
+ "cost_usd": 0.005497,
  "error": null
 }
