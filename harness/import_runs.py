@@ -30,6 +30,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("runs_dir")
     ap.add_argument("--out", default=str(ROOT / "results" / "harness"))
+    ap.add_argument("--match", default=None, help="only runs whose directory name starts with this prefix")
+    ap.add_argument("--exclude-match", default="effort-demo", help="skip runs whose name starts with this prefix (default: the effort demo)")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -38,6 +40,10 @@ def main():
         rr = run / "run_result.json"
         sm = run / "summary.yaml"
         if not rr.exists():
+            continue
+        if args.match and not run.name.startswith(args.match):
+            continue
+        if not args.match and args.exclude_match and run.name.startswith(args.exclude_match):
             continue
         # pilot smoke runs duplicate grid cases on a handful of tasks; keep only the ticket-only pilots (extra judged runs)
         if run.name.startswith("smoke") and "tickets" not in run.name:

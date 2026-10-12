@@ -21,6 +21,20 @@ ANOVA = ROOT / "eval" / "anova"
 RESULTS = ROOT / "results" / "harness"
 
 TIER_NAMES = {1: "Mechanical", 2: "Bounded impl.", 3: "Debugging", 4: "Architecture", 5: "Long context", 6: "Real repo"}
+TIER_DEFS = {
+    1: ("Mechanical", "Edits with one right answer and no design decision. Small synthetic repo.",
+        "rename a function across a package; migrate INI to TOML with typed values; add complete type hints"),
+    2: ("Bounded implementation", "Implement a specified component from a written spec and the stub's interface. Small synthetic repo.",
+        "LRU cache with TTL and stats; add a --json flag to a CLI without changing text output; access-log parser and summary"),
+    3: ("Debugging", "A failing reproduction and a symptom; find the root cause, fix it without breaking the rest. Small synthetic repo.",
+        "shared mutable defaults; timezone and DST handling; lost updates under threads; unicode dedupe"),
+    4: ("Architecture", "Restructure or implement across several files under constraints the hidden tests check. Small synthetic repo.",
+        "if-chain to plugin registry; sync to asyncio with a concurrency limit; backtracking dependency resolver; RFC 6902 JSON Patch"),
+    5: ("Long context", "A vague ticket and a 40-module package; the bug is in one of them.",
+        "a one-cent rounding mismatch; a quadratic regression in a report pipeline"),
+    6: ("Real repository", "fromager, a production Python project, at the parent commit of a real change; the merged PR's own tests are the judge. Ticket-only variants give the agent only the issue text and are scored by an LLM judge against the merged PR.",
+        "#1146 dist-info metadata; age-filter bypass for pinned constraints; #1214 dependency chain in errors; the full PR #1289; an 8-commit version-specific pre_built series"),
+}
 PRETTY = {"glm-5-3": "GLM 5.3", "gpt-6-luna": "Luna", "gpt-6.1-sol": "Sol 6.1", "gpt-5.6-terra": "Terra 5.6",
           "gpt-6-astra": "Astra", "haiku-5-5": "Haiku 5.5", "sonnet-5-5": "Sonnet 5.5", "opus-5-5": "Opus 5.5", "fable-5-1": "Fable 5.1"}
 # Price tier of each model. Colour follows the tier (an entity attribute), never the rank.
@@ -193,7 +207,8 @@ def heatmap(spec, cfgs, tiers):
     H = T + ch * len(cfgs) + 6
     out = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Pass rate per tier and configuration">']
     for j, t in enumerate(tiers):
-        out.append(f'<text x="{L+j*cw+cw/2:.0f}" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)">T{t} {esc(TIER_NAMES[t])}</text>')
+        name, what, _ = TIER_DEFS[t]
+        out.append(f'<text x="{L+j*cw+cw/2:.0f}" y="22" text-anchor="middle" font-size="12" fill="var(--ink-2)" data-v="T{t} {esc(name)}" data-l="{esc(what)}">T{t} {esc(TIER_NAMES[t])}</text>')
     for i, c in enumerate(cfgs):
         y = T + i * ch
         out.append(f'<text x="{L-10}" y="{y+ch*0.68:.1f}" text-anchor="end" font-size="12.5" fill="var(--ink)">{esc(pretty(c))}</text>')
@@ -283,6 +298,7 @@ def main():
              (f"{ratio:.0f}x", f"cost gap, {pretty(priciest)} vs {pretty(cheapest)}, same tasks")]
     tiles_html = '<div class="tiles">' + "".join(f'<div class="tile"><div class="v">{esc(v)}</div><div class="l">{esc(l)}</div></div>' for v, l in tiles) + "</div>"
 
+    tiers_html = table(["tier", "what the agent has to do", "tasks"], [[f"<b>T{t} {esc(n)}</b>", esc(w), esc(x)] for t, (n, w, x) in TIER_DEFS.items()])
     fig1 = f'<figure><figcaption>Pass rate vs cost per case</figcaption><div class="sub">Spec tasks with hidden tests, configurations that ran the full set. Hover a dot for replications.</div>{dot_chart(by, order)}{legend()}</figure>'
     items = [(pretty(c), by[c]["cost"] / by[c]["n"], tier(c), f"{by[c]['n']} case-runs, {by[c]['p']/by[c]['n']:.0%} pass, {by[c]['wall']/by[c]['n']:.0f} s mean wall time") for c in all_order]
     fig2 = f'<figure><figcaption>Mean cost per case</figcaption><div class="sub">List prices, October 2026. Log scale. GLM via EnMaaS is free.</div>{bar_chart(items, 2.0, fmt_cost, log=True, vmin=0.002)}{legend()}</figure>'
@@ -350,6 +366,10 @@ for real-repository tasks Claude Opus 5.5 also scores the diff against the merge
 {tiles_html}
 <p class="note">Costs are list prices, October 2026, from token usage. Claude Code reports its own cost; Codex runs are priced from the repository rate
 table; GLM 5.3 via the EnMaaS gateway is free. Configurations are model@effort. Colour follows the price tier.</p>
+
+<h2>Task tiers</h2>
+<p class="note">Every configuration ran the same tasks. Tiers group them by what the agent has to do, not by size of the diff.</p>
+{tiers_html}
 
 <h2>Results</h2>
 {fig1}
