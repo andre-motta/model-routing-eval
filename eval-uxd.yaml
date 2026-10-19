@@ -1,0 +1,163 @@
+# Tier 7, skill pipeline: the UXD team's uxd-prototype-create skill run headlessly on a real RFE.
+# Same hooks as eval.yaml (fixture staging, verifier, pricing) with the rh-uxd/ai-helpers plugin loaded
+# and a structural checker as the objective gate. Cases live in eval/uxd-cases/ (tasks with `dataset: uxd`).
+#   ./run_eval.sh claude-sonnet-5-5 medium eval-uxd.yaml
+#   ./run_eval.sh gpt-6-luna low eval-uxd-codex.yaml
+#   RESCORE_CONFIG=eval-uxd.yaml ./rescore.sh
+name: model-routing-eval-uxd
+description: >
+  The uxd-prototype-create skill (rh-uxd/ai-helpers, plugin uxd-prototype) run end to end on
+  RHAISTRAT-1527 (Multimodal Support in Gen AI Studio Playground) in standalone mode. The RFE is
+  staged as a local artifact so no Jira access is needed. A before_each hook stages the fixture;
+  an after_each hook runs hidden/check_prototype.py, which verifies every artifact the skill
+  promises (journeys, scenarios, metadata, changeset, summary, PatternFly 6 HTML, ?scenario=
+  wiring, Prototype Bar) and writes output/tests.json. An LLM judge scores MVP coverage.
+
+execution:
+  mode: case
+  prompt: "{{ input.prompt }}"
+  timeout: 2400
+  max_budget_usd: 8.0
+
+runner:
+  type: claude-code
+  effort: medium
+  permission_mode: acceptEdits
+  plugin_dirs:
+    - .deps/ai-helpers/plugins/uxd-prototype
+  env:
+    CLAUDE_CONFIG_DIR: $CLAUDE_CONFIG_DIR
+
+models:
+  skill: claude-sonnet-5-5
+  judge: runner:/claude-opus-5-5
+
+permissions:
+  allow:
+    - "Bash"
+    - "Read"
+    - "Edit"
+    - "Write"
+    - "MultiEdit"
+    - "Glob"
+    - "Grep"
+    - "Skill"
+  deny:
+    - "mcp__*"
+    - "WebFetch"
+    - "WebSearch"
+    - { path: "hidden/", tools: ["Read", "Bash", "Glob", "Grep"] }
+
+dataset:
+  path: eval/uxd-cases
+  schema: |
+    Each case directory has input.yaml with a 'task' id and the 'prompt' the agent receives, and
+    annotations.yaml with 'tier', 'title', 'skill' and 'rubric: true'. The fixture (the RFE snapshot
+    under .artifacts/<ID>/) is staged by the before_each hook from tasks/<task>/fixture.
+  workspace:
+    files:
+      - input.yaml
+
+hooks:
+  before_each:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_prepare.py"
+      description: "Stage the task fixture (RFE snapshot) and leave a git baseline"
+      timeout: 600
+  after_each:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_verify.py"
+      description: "Run hidden/check_prototype.py, write output/tests.json, verify.log and solution.diff"
+      timeout: 600
+      on_failure: continue
+  before_scoring:
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/price_runs.py"
+      description: "Re-price Codex cases from harness/pricing.py list prices"
+      on_failure: continue
+
+outputs:
+  - path: output
+    schema: |
+      tests.json ({"passed": bool}), verify.log (one line per structural check plus a JSON
+      summary), solution.diff (everything the agent wrote).
+  - path: .artifacts/RHAISTRAT-1527
+    schema: |
+      The skill's artifacts: journeys.json, scenarios.json, metadata.json, changeset.md,
+      prototype-summary.yaml, prototype-bar.json, prototype/*.html and the Prototype Bar assets.
+
+traces:
+  stdout: true
+  stderr: true
+  events: false
+  metrics: true
+
+judges:
+  - name: artifacts_complete
+    description: Every artifact the skill promises exists and the ?scenario= wiring is present (structural checker).
+    check: |
+      import json
+      for path, content in outputs.get("files", {}).items():
+          if path.endswith("tests.json") and isinstance(content, str):
+              try:
+                  d = json.loads(content)
+              except json.JSONDecodeError as exc:
+                  return False, f"malformed tests.json: {exc}"
+              return bool(d.get("passed")), ("all structural checks passed" if d.get("passed") else "structural checks failed, see verify.log")
+      return False, "no tests.json in outputs (verifier did not run)"
+
+  - name: prototype_quality
+    description: LLM judge. Does the prototype cover the RFE's MVP scope with distinct, reachable scenarios, as a UX designer would expect from the skill?
+    if: "annotations.get('rubric')"
+    feedback_type: int
+    score_range: [1, 5]
+    prompt: |
+      You are reviewing the output of the uxd-prototype-create skill, run headlessly by a coding agent on
+      RHAISTRAT-1527 "Multimodal Support in Gen AI Studio Playground". The MVP scope of that RFE is:
+      image upload and vision inference with supported models; audio file upload with basic speech-to-text
+      where supported; text combined with a single additional modality in one session; a simple input-type
+      selector; results shown in the existing chat transcript. Requirements also ask for guardrails when a
+      model does not support a modality, feedback for processing status and large files, and browser
+      microphone permission UX. Expected page scenarios include at least: a default text-only playground,
+      a vision-model variant with the image upload control visible, a file-too-large error, an
+      unsupported-modality state (controls hidden or disabled), and a microphone permission flow.
+
+      ## Structural checker log (output/verify.log)
+      {{ outputs.files["output/verify.log"] }}
+
+      ## scenarios.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/scenarios.json", "(missing)") }}
+
+      ## journeys.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/journeys.json", "(missing)") }}
+
+      ## metadata.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/metadata.json", "(missing)") }}
+
+      ## Prototype HTML (Prototype Bar assets omitted; each file truncated to 60k characters)
+      {% for path, content in outputs.files.items() if path.endswith(".html") and "uxd-prototype-bar" not in path and "/decisions/" not in path %}
+      ### {{ path }}
+      {{ content[:60000] }}
+      {% endfor %}
+
+      Score 1 to 5:
+      1 = the skill did not run to completion or produced no usable prototype;
+      2 = a prototype exists but scenarios are missing, not wired to ?scenario=, or not distinct;
+      3 = covers part of the MVP scope with working scenario wiring, but a designer would need to redo
+          significant parts (missing modality guardrails, missing error or permission states, weak PatternFly use);
+      4 = covers the MVP scope with distinct, reachable scenarios and sound PatternFly 6 structure, minor gaps;
+      5 = a designer could present this as is: every expected scenario present and visually distinct on load,
+          journeys match the RFE, artifacts consistent with each other.
+      Respond with JSON: {"score": <int 1-5>, "rationale": "<two sentences naming the strongest and weakest point>"}
+
+thresholds:
+  artifacts_complete:
+    min_pass_rate: 0.8
+
+matrix:
+  factors:
+    model:
+      - claude-haiku-5-5
+      - claude-sonnet-5-5
+      - claude-opus-5-5
+    effort:
+      - low
+      - medium
+  replications: 1

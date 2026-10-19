@@ -1,0 +1,23 @@
+{
+ "task": "u01_uxd_prototype_create",
+ "tier": null,
+ "backend": "codex",
+ "model": "rits/zai-org/glm-5-3",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": 3,
+ "verify_tail": "all structural checks passed",
+ "run_id": "2026-10-19-glm-5-3-effort-medium-r1",
+ "wall_s": 657.6,
+ "tokens": {
+  "input": 141941,
+  "cached": 3729920,
+  "cache_write": 0,
+  "output": 32614,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": null,
+ "error": null
+}

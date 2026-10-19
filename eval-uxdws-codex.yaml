@@ -1,0 +1,31 @@
+# Codex profile for the workspace-mode suite (eval-uxdws.yaml).
+#   ./run_eval.sh gpt-6-luna low eval-uxdws-codex.yaml
+extends: ./eval-uxdws.yaml
+runner:
+  type: codex
+  effort: medium
+  # The rhoai repo ships its own .agents/skills tree, which the Codex runner refuses to overwrite; the
+  # stage_skills hook copies the plugin's skills in next to it instead (see harness/stage_skills.py).
+  plugin_dirs: !replace []
+models:
+  skill: gpt-6-luna
+matrix:
+  factors:
+    model: !replace
+      - gpt-6-luna
+      - gpt-6.1-sol
+      - gpt-6-astra
+    effort: !replace
+      - low
+      - medium
+hooks:
+  before_each: !replace
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_prepare.py"
+      description: "Stage the rhoai checkout, npm ci, copy the RFE snapshot, leave a git baseline"
+      timeout: 1800
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/stage_skills.py"
+      description: "Copy the uxd-prototype plugin skills into .agents/skills for Codex"
+      timeout: 120
+judges:
+  - name: prototype_quality
+    if: "False"

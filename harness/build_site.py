@@ -20,7 +20,7 @@ RUNS = ROOT / "eval" / "runs" / "model-routing-eval"
 ANOVA = ROOT / "eval" / "anova"
 RESULTS = ROOT / "results" / "harness"
 
-TIER_NAMES = {1: "Mechanical", 2: "Bounded impl.", 3: "Debugging", 4: "Architecture", 5: "Long context", 6: "Real repo"}
+TIER_NAMES = {1: "Mechanical", 2: "Bounded impl.", 3: "Debugging", 4: "Architecture", 5: "Long context", 6: "Real repo", 7: "Skill pipeline"}
 TIER_DEFS = {
     1: ("Mechanical", "Edits with one right answer and no design decision. Small synthetic repo.",
         "rename a function across a package; migrate INI to TOML with typed values; add complete type hints"),
@@ -34,6 +34,8 @@ TIER_DEFS = {
         "a one-cent rounding mismatch; a quadratic regression in a report pipeline"),
     6: ("Real repository", "fromager, a production Python project, at the parent commit of a real change; the merged PR's own tests are the judge. Ticket-only variants give the agent only the issue text and are scored by an LLM judge against the merged PR.",
         "#1146 dist-info metadata; age-filter bypass for pinned constraints; #1214 dependency chain in errors; the full PR #1289; an 8-commit version-specific pre_built series"),
+    7: ("Skill pipeline", "Run a team's multi-step skill end to end, headless, from a real RFE: the UXD uxd-prototype-create skill on RHAISTRAT-1527 (Multimodal Playground). A structural checker verifies every promised artifact and the ?scenario= wiring; an LLM judge scores MVP coverage against the RFE.",
+        "journeys.json, scenarios.json, PatternFly 6 standalone prototype, Prototype Bar install"),
 }
 PRETTY = {"glm-5-3": "GLM 5.3", "gpt-6-luna": "Luna", "gpt-6.1-sol": "Sol 6.1", "gpt-5.6-terra": "Terra 5.6",
           "gpt-6-astra": "Astra", "haiku-5-5": "Haiku 5.5", "sonnet-5-5": "Sonnet 5.5", "opus-5-5": "Opus 5.5", "fable-5-1": "Fable 5.1"}
@@ -370,6 +372,8 @@ table; GLM 5.3 via the EnMaaS gateway is free. Configurations are model@effort. 
 <h2>Task tiers</h2>
 <p class="note">Every configuration ran the same tasks. Tiers group them by what the agent has to do, not by size of the diff.</p>
 {tiers_html}
+<p class="note">Tier 7 has its own page with every run's generated prototype, screenshots per scenario and the judge's verdict:
+<a href="uxd/">one team skill, every model</a>.</p>
 
 <h2>Results</h2>
 {fig1}

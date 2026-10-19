@@ -1,0 +1,23 @@
+{
+ "task": "u01_uxd_prototype_create",
+ "tier": null,
+ "backend": "codex",
+ "model": "gpt-6-astra",
+ "effort": "medium",
+ "rep": 1,
+ "passed": true,
+ "quality": 3,
+ "verify_tail": "all structural checks passed",
+ "run_id": "2026-10-19-gpt-6-astra-effort-medium-r1",
+ "wall_s": 266.6,
+ "tokens": {
+  "input": 53105,
+  "cached": 503936,
+  "cache_write": 0,
+  "output": 9299,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 2.767397,
+ "error": null
+}

@@ -1,0 +1,23 @@
+{
+ "task": "u02_uxd_prototype_workspace",
+ "tier": null,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "low",
+ "rep": 1,
+ "passed": false,
+ "quality": 3,
+ "verify_tail": "failed: scenarios:cover-journey-routes, metadata:valid",
+ "run_id": "2026-10-19-claude-opus-5-5-effort-low-r1",
+ "wall_s": 546.0,
+ "tokens": {
+  "input": 44,
+  "cached": 1925843,
+  "cache_write": 124323,
+  "output": 26162,
+  "reasoning": 0
+ },
+ "turns": 22,
+ "cost_usd": 1.9031685999999997,
+ "error": null
+}

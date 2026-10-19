@@ -6,6 +6,20 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 CONFIG=${1:?config}; REP=${2:-r1}
+NAME=$(.venv/bin/python - "$CONFIG" <<'PY'
+import sys, pathlib
+p = pathlib.Path(sys.argv[1])
+while True:
+    txt = p.read_text()
+    name = next((l.split(":", 1)[1].strip() for l in txt.splitlines() if l.startswith("name:")), None)
+    if name:
+        print(name); break
+    ext = next((l.split(":", 1)[1].strip() for l in txt.splitlines() if l.startswith("extends:")), None)
+    if not ext:
+        print("model-routing-eval"); break
+    p = (p.parent / ext).resolve()
+PY
+)
 .venv/bin/python - "$CONFIG" "$REP" <<'PY' | while read -r model effort; do
 import sys, yaml
 cfg = sys.argv[1]
@@ -25,6 +39,6 @@ PY
   RUN_ID="$id-$REP" ./run_eval.sh "$model" "$effort" "$CONFIG"
   # Runs sharing the same factor levels are treated as replications by eval-anova; reuse the
   # first pass's condition.json so the analyzer groups this run with its sibling.
-  src=eval/runs/model-routing-eval/$id/condition.json
-  [ -f "$src" ] && cp "$src" "eval/runs/model-routing-eval/$id-$REP/condition.json" && echo "condition.json copied for $id-$REP"
+  src=eval/runs/$NAME/$id/condition.json
+  [ -f "$src" ] && cp "$src" "eval/runs/$NAME/$id-$REP/condition.json" && echo "condition.json copied for $id-$REP"
 done

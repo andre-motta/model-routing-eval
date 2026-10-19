@@ -1,0 +1,23 @@
+{
+ "task": "u02_uxd_prototype_workspace",
+ "tier": null,
+ "backend": "claude",
+ "model": "claude-opus-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 4,
+ "verify_tail": "all checks passed",
+ "run_id": "2026-10-19-claude-opus-5-5-effort-medium",
+ "wall_s": 820.1,
+ "tokens": {
+  "input": 98,
+  "cached": 10843129,
+  "cache_write": 322193,
+  "output": 72199,
+  "reasoning": 0
+ },
+ "turns": 49,
+ "cost_usd": 6.1905418,
+ "error": null
+}

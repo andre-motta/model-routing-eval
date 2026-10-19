@@ -7,6 +7,9 @@ cd "$(dirname "$0")"
 HARNESS_REPO=${HARNESS_REPO:-https://github.com/opendatahub-io/agent-eval-harness.git}
 HARNESS_COMMIT=${HARNESS_COMMIT:-bf531fc042d1c0391da241cd55ee4281621b891c}
 HARNESS_DIR=${HARNESS_DIR:-}
+# rh-uxd/ai-helpers supplies the uxd-prototype plugin for the tier 7 skill-pipeline task (eval-uxd.yaml).
+AI_HELPERS_REPO=${AI_HELPERS_REPO:-https://github.com/rh-uxd/ai-helpers.git}
+AI_HELPERS_COMMIT=${AI_HELPERS_COMMIT:-9ced7a1}
 
 [ -d .venv ] || uv venv -q .venv
 if [ -z "$HARNESS_DIR" ]; then
@@ -25,6 +28,10 @@ if [ -z "$HARNESS_DIR" ]; then
     fi
   done
 fi
+if [ ! -d .deps/ai-helpers/.git ]; then
+  mkdir -p .deps && git clone -q "$AI_HELPERS_REPO" .deps/ai-helpers
+fi
+git -C .deps/ai-helpers fetch -q origin && git -C .deps/ai-helpers checkout -q "$AI_HELPERS_COMMIT"
 VIRTUAL_ENV=.venv uv pip install -q -e . -e "$HARNESS_DIR[mlflow,anova]" litellm
 .venv/bin/python harness/export_cases.py
 echo "ready: .venv, harness at $HARNESS_DIR ($(git -C "$HARNESS_DIR" rev-parse --short HEAD)), run ./run_eval.sh <model> <effort>"

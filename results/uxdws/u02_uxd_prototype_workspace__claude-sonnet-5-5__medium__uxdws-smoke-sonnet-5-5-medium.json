@@ -1,0 +1,23 @@
+{
+ "task": "u02_uxd_prototype_workspace",
+ "tier": null,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 3,
+ "verify_tail": "all checks passed",
+ "run_id": "uxdws-smoke-sonnet-5-5-medium",
+ "wall_s": 307.9,
+ "tokens": {
+  "input": 48,
+  "cached": 2804043,
+  "cache_write": 186635,
+  "output": 30160,
+  "reasoning": 0
+ },
+ "turns": 24,
+ "cost_usd": 1.3286402999999998,
+ "error": null
+}

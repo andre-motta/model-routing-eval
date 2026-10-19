@@ -1,0 +1,23 @@
+{
+ "task": "u01_uxd_prototype_create",
+ "tier": null,
+ "backend": "claude",
+ "model": "claude-haiku-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 3,
+ "verify_tail": "all structural checks passed",
+ "run_id": "2026-10-19-claude-haiku-5-5-effort-medium",
+ "wall_s": 245.2,
+ "tokens": {
+  "input": 22,
+  "cached": 1028244,
+  "cache_write": 154409,
+  "output": 59729,
+  "reasoning": 0
+ },
+ "turns": 11,
+ "cost_usd": 0.16443538000000002,
+ "error": null
+}

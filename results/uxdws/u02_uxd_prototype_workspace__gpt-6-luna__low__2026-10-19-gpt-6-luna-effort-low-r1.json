@@ -1,0 +1,23 @@
+{
+ "task": "u02_uxd_prototype_workspace",
+ "tier": null,
+ "backend": "codex",
+ "model": "gpt-6-luna",
+ "effort": "low",
+ "rep": 1,
+ "passed": false,
+ "quality": 1,
+ "verify_tail": "failed: scenarios:cover-journey-routes, verify:type-check, verify:lint-no-new-errors",
+ "run_id": "2026-10-19-gpt-6-luna-effort-low-r1",
+ "wall_s": 610.5,
+ "tokens": {
+  "input": 101282,
+  "cached": 3773184,
+  "cache_write": 0,
+  "output": 11651,
+  "reasoning": 0
+ },
+ "turns": 1,
+ "cost_usd": 0.10445833000000002,
+ "error": null
+}

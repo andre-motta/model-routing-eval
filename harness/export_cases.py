@@ -25,11 +25,18 @@ def main():
         if not (d / "task.yaml").exists():
             continue
         meta = yaml.safe_load((d / "task.yaml").read_text())
-        case = CASES / d.name
+        # Tasks with `dataset: <name>` go to eval/<name>-cases/ so they run under their own config
+        # (eval-<name>.yaml) instead of the default hidden-test suite.
+        cases_dir = ROOT / "eval" / f"{meta['dataset']}-cases" if meta.get("dataset") else CASES
+        cases_dir.mkdir(parents=True, exist_ok=True)
+        case = cases_dir / d.name
         case.mkdir(exist_ok=True)
         (case / "input.yaml").write_text(yaml.safe_dump({"task": d.name, "prompt": (d / "prompt.md").read_text()},
                                                         sort_keys=False, width=1000))
         ann = {"tier": meta["tier"], "title": meta["title"], "category": f"tier{meta['tier']}"}
+        for key in ("rubric", "skill"):
+            if meta.get(key):
+                ann[key] = meta[key]
         if meta.get("ticket_only"):
             ann["ticket_only"] = True
             ann["variant_of"] = meta.get("variant_of")

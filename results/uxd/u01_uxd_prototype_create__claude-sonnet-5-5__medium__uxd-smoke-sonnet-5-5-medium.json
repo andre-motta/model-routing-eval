@@ -1,0 +1,23 @@
+{
+ "task": "u01_uxd_prototype_create",
+ "tier": null,
+ "backend": "claude",
+ "model": "claude-sonnet-5-5",
+ "effort": "medium",
+ "rep": 0,
+ "passed": true,
+ "quality": 4,
+ "verify_tail": "all structural checks passed",
+ "run_id": "uxd-smoke-sonnet-5-5-medium",
+ "wall_s": 153.6,
+ "tokens": {
+  "input": 26,
+  "cached": 915094,
+  "cache_write": 121672,
+  "output": 21699,
+  "reasoning": 0
+ },
+ "turns": 13,
+ "cost_usd": 0.7952394,
+ "error": null
+}

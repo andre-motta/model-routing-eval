@@ -1,0 +1,23 @@
+# Codex profile for the tier 7 skill-pipeline suite (eval-uxd.yaml): same case, hooks and checker,
+# Codex CLI as the agent. The harness stages the plugin's skills under .agents/skills/ for Codex.
+#   ./run_eval.sh gpt-6-luna low eval-uxd-codex.yaml
+extends: ./eval-uxd.yaml
+runner:
+  type: codex
+  effort: medium
+models:
+  skill: gpt-6-luna
+matrix:
+  factors:
+    model: !replace
+      - gpt-6-luna
+      - gpt-6.1-sol
+      - gpt-6-astra
+    effort: !replace
+      - low
+      - medium
+judges:
+  # A runner:/ judge inside a Codex profile would run Opus through Codex. Skip during the run;
+  # RESCORE_CONFIG=eval-uxd.yaml ./rescore.sh re-judges every run with the claude-code judge.
+  - name: prototype_quality
+    if: "False"

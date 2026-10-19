@@ -1,0 +1,28 @@
+task,tier,backend,model,effort,rep,passed,cost,wall,turns,tok_in,tok_cached,tok_out,tok_reason,error,quality,verify_tail,config
+u02_uxd_prototype_workspace,,claude,claude-haiku-5-5,low,0,True,0.66092604,750.7,37,74,6379236,45966,0,,3,all checks passed,haiku-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-haiku-5-5,low,1,False,0.4514203,610.3,28,56,3976772,44969,0,,3,failed: metadata:valid,haiku-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-haiku-5-5,medium,0,True,0.9435104699999999,663.6,42,84,9437021,81783,0,,3,all checks passed,haiku-5-5@medium
+u02_uxd_prototype_workspace,,claude,claude-haiku-5-5,medium,1,True,1.1644422900000002,743.2,43,86,10194099,117179,0,,3,all checks passed,haiku-5-5@medium
+u02_uxd_prototype_workspace,,claude,claude-opus-5-5,low,0,True,2.1619577999999997,307.8,22,44,1979489,22923,0,,3,all checks passed,opus-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-opus-5-5,low,1,False,1.9031685999999997,546.0,22,44,1925843,26162,0,,3,"failed: scenarios:cover-journey-routes, metadata:valid",opus-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-opus-5-5,medium,0,True,6.1905418,820.1,49,98,10843129,72199,0,,4,all checks passed,opus-5-5@medium
+u02_uxd_prototype_workspace,,claude,claude-opus-5-5,medium,1,True,6.815334599999998,1204.1,59,118,9422848,84100,0,,3,all checks passed,opus-5-5@medium
+u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,low,0,True,1.1953982999999997,307.3,18,36,2222803,23881,0,,3,all checks passed,sonnet-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,low,1,True,1.0136526000000001,253.0,17,34,1783346,19335,0,,3,all checks passed,sonnet-5-5@low
+u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,medium,0,True,1.4420787000000002,521.2,29,58,3282267,38198,0,,3,all checks passed,sonnet-5-5@medium
+u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,medium,1,True,3.3776894700000017,720.4,63,126,14102441,71823,0,,3,all checks passed,sonnet-5-5@medium
+u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,medium,0,False,0.0,1255.2,1,351463,10355200,37051,0,,3,"failed: scenarios:cover-journey-routes, workspace-analysis:valid",glm-5-3@medium
+u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,medium,1,True,0.0,2060.7,1,263042,21659136,58889,0,,3,all checks passed,glm-5-3@medium
+u02_uxd_prototype_workspace,,codex,gpt-6-astra,low,0,True,8.333206,405.2,1,92018,2763648,12874,0,,3,all checks passed,gpt-6-astra@low
+u02_uxd_prototype_workspace,,codex,gpt-6-astra,medium,0,True,8.503296,431.5,1,106103,2579968,16284,0,,3,all checks passed,gpt-6-astra@medium
+u02_uxd_prototype_workspace,,codex,gpt-6-luna,low,0,True,0.43060428,1874.8,1,185130,17412864,60428,0,,3,all checks passed,gpt-6-luna@low
+u02_uxd_prototype_workspace,,codex,gpt-6-luna,low,1,False,0.10445833000000002,610.5,1,101282,3773184,11651,0,,1,"failed: scenarios:cover-journey-routes, verify:type-check, verify:lint-no-new-errors",gpt-6-luna@low
+u02_uxd_prototype_workspace,,codex,gpt-6-luna,medium,0,True,0.34929797000000007,1735.0,1,200568,13488256,52559,0,,3,all checks passed,gpt-6-luna@medium
+u02_uxd_prototype_workspace,,codex,gpt-6-luna,medium,1,True,0.21399882,922.5,1,120229,8475776,27250,0,,3,all checks passed,gpt-6-luna@medium
+u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,low,0,True,1.4878475999999998,621.8,1,98874,3959808,20026,0,,3,all checks passed,gpt-6.1-sol@low
+u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,medium,0,True,1.6783458,695.0,1,114094,4311424,23979,0,,3,all checks passed,gpt-6.1-sol@medium
+u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,medium,0,True,1.3286402999999998,307.9,24,48,2804043,30160,0,,3,all checks passed,sonnet-5-5@medium
+u02_uxd_prototype_workspace,,codex,gpt-6-astra,low,1,True,6.79136,380.3,1,98608,1872000,14336,0,,3,all checks passed,gpt-6-astra@low
+u02_uxd_prototype_workspace,,codex,gpt-6-astra,medium,1,True,10.694885,528.3,1,110434,3584640,17559,0,,3,all checks passed,gpt-6-astra@medium
+u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,low,1,True,1.3326622,518.5,1,94557,3552896,16257,0,,3,all checks passed,gpt-6.1-sol@low
+u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,medium,1,True,1.5050375999999999,627.2,1,117777,3349248,24272,0,,3,all checks passed,gpt-6.1-sol@medium

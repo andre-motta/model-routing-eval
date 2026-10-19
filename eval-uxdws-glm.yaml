@@ -1,0 +1,36 @@
+# GLM 5.3 via EnMaaS for the workspace-mode suite.
+#   ./run_eval.sh rits/zai-org/glm-5-3 medium eval-uxdws-glm.yaml
+extends: ./eval-uxdws.yaml
+runner:
+  type: codex
+  effort: medium
+  # The rhoai repo ships its own .agents/skills tree, which the Codex runner refuses to overwrite; the
+  # stage_skills hook copies the plugin's skills in next to it instead (see harness/stage_skills.py).
+  plugin_dirs: !replace []
+  settings:
+    model_provider: enmaas
+    model_providers.enmaas.name: EnMaaS
+    model_providers.enmaas.base_url: https://api.enmaas.devshift.net/v1
+    model_providers.enmaas.env_key: ENMAAS_KEY
+    model_providers.enmaas.wire_api: responses
+  env:
+    ENMAAS_KEY: $ENMAAS_KEY
+models:
+  skill: rits/zai-org/glm-5-3
+matrix:
+  factors:
+    model: !replace
+      - rits/zai-org/glm-5-3
+    effort: !replace
+      - medium
+hooks:
+  before_each: !replace
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_prepare.py"
+      description: "Stage the rhoai checkout, npm ci, copy the RFE snapshot, leave a git baseline"
+      timeout: 1800
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/stage_skills.py"
+      description: "Copy the uxd-prototype plugin skills into .agents/skills for Codex"
+      timeout: 120
+judges:
+  - name: prototype_quality
+    if: "False"

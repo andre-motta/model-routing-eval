@@ -1,0 +1,25 @@
+# GLM 5.3 through the EnMaaS gateway for the tier 7 skill-pipeline suite, driven by Codex CLI.
+#   ./run_eval.sh rits/zai-org/glm-5-3 medium eval-uxd-glm.yaml
+extends: ./eval-uxd.yaml
+runner:
+  type: codex
+  effort: medium
+  settings:
+    model_provider: enmaas
+    model_providers.enmaas.name: EnMaaS
+    model_providers.enmaas.base_url: https://api.enmaas.devshift.net/v1
+    model_providers.enmaas.env_key: ENMAAS_KEY
+    model_providers.enmaas.wire_api: responses
+  env:
+    ENMAAS_KEY: $ENMAAS_KEY
+models:
+  skill: rits/zai-org/glm-5-3
+matrix:
+  factors:
+    model: !replace
+      - rits/zai-org/glm-5-3
+    effort: !replace
+      - medium
+judges:
+  - name: prototype_quality
+    if: "False"

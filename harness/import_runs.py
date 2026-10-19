@@ -59,13 +59,24 @@ def main():
             rep = int(m.group(1))
         for case_id, c in (R.get("per_case") or {}).items():
             j = per_judge.get(case_id, {})
-            tp = j.get("tests_pass", {}).get("value")
-            sq = j.get("solution_quality", {}).get("value")
+            tp = (j.get("tests_pass") or j.get("artifacts_complete") or {}).get("value")
+            sq = (j.get("solution_quality") or j.get("prototype_quality") or {}).get("value")
             passed = bool(tp) if tp is not None else (sq is not None and sq >= 4)
             tk = c.get("token_usage") or {}
+            # For checker-based suites (tier 7) record which required checks failed, from the verify.log summary line.
+            vtail = (j.get("tests_pass") or j.get("artifacts_complete") or {}).get("rationale", "")
+            vlog = run / "cases" / case_id / "output" / "verify.log"
+            if "artifacts_complete" in j and vlog.exists():
+                for line in vlog.read_text().splitlines():
+                    if line.startswith("{"):
+                        try:
+                            failed = json.loads(line).get("failed_required", [])
+                            vtail = "failed: " + ", ".join(failed) if failed else "all checks passed"
+                        except json.JSONDecodeError:
+                            pass
             rec = dict(task=case_id, tier=tier_of(case_id), backend="codex" if agent == "codex" else "claude",
                        model=model, effort=effort, rep=rep, passed=passed, quality=sq,
-                       verify_tail=j.get("tests_pass", {}).get("rationale", ""), run_id=run.name,
+                       verify_tail=vtail, run_id=run.name,
                        wall_s=c.get("duration_s") or c.get("wall_clock_s") or 0,
                        tokens=dict(input=tk.get("input", 0), cached=tk.get("cache_read", 0),
                                    cache_write=tk.get("cache_create", 0), output=tk.get("output", 0), reasoning=0),

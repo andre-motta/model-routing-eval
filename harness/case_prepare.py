@@ -35,7 +35,7 @@ def main():
     if not (work / ".git").exists():
         git(work, "init", "-q")
     (work / ".git" / "info").mkdir(parents=True, exist_ok=True)
-    (work / ".git" / "info" / "exclude").write_text(".venv/\nhidden/\noutput/\n.claude/\ninput.yaml\n")
+    (work / ".git" / "info" / "exclude").write_text(".venv/\nhidden/\noutput/\n.claude/\ninput.yaml\nnode_modules/\ndist/\n")
     git(work, "add", "-A")
     git(work, "commit", "-q", "-m", "fixture", "--allow-empty")
     print(f"prepared {task_id} in {work}")

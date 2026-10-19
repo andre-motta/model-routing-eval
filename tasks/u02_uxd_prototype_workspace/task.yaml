@@ -1,0 +1,14 @@
+tier: 7
+title: 'skill pipeline, workspace mode: uxd-prototype-create on RHAISTRAT-1527 inside the UXD rhoai prototype codebase (React, PatternFly 6)'
+dataset: uxdws
+timeout: 3600
+source:
+  repo: https://gitlab.cee.redhat.com/uxd/prototypes/rhoai.git
+  commit: 9281b7c2fdf5ef5badcf2cd28e7c9641a52c89c4
+setup:
+- npm ci --no-audit --no-fund --prefer-offline
+hidden_dest: hidden
+verify: python3 hidden/check_workspace.py .artifacts/RHAISTRAT-1527
+rubric: true
+skill: uxd-prototype:uxd-prototype-create
+plugin: .deps/ai-helpers/plugins/uxd-prototype

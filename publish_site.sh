@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 .venv/bin/python harness/build_site.py --out site
+.venv/bin/python harness/build_uxd.py --out site/uxd
 W=$PWD/.work/gh-pages
 /bin/rm -rf "$W"; git worktree prune; git branch -D gh-pages >/dev/null 2>&1 || true
 git worktree add -q --detach "$W"

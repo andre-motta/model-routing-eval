@@ -1,0 +1,75 @@
+# Tier 7, workspace mode: uxd-prototype-create builds inside the UXD team's rhoai prototype codebase
+# (React, PatternFly 6) instead of a standalone HTML page. The before_each hook stages the repo at a
+# pinned commit and runs npm ci; the checker also runs type-check and lint on the changed files.
+#   ./run_eval.sh claude-sonnet-5-5 medium eval-uxdws.yaml
+#   RESCORE_CONFIG=eval-uxdws.yaml ./rescore.sh
+extends: ./eval-uxd.yaml
+name: model-routing-eval-uxdws
+description: >
+  uxd-prototype-create on RHAISTRAT-1527 in workspace mode: the agent builds the multimodal
+  Playground prototype inside gitlab.cee.redhat.com/uxd/prototypes/rhoai (branch 3.6, pinned),
+  following the codebase conventions, with the skill's mandatory type-check and lint verification.
+
+execution:
+  timeout: 3600
+  max_budget_usd: 12.0
+
+dataset:
+  path: eval/uxdws-cases
+
+hooks:
+  before_each: !replace
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_prepare.py"
+      description: "Stage the rhoai checkout, npm ci, copy the RFE snapshot, leave a git baseline"
+      timeout: 1800
+  after_each: !replace
+    - command: "$AGENT_EVAL_PROJECT_ROOT/.venv/bin/python $AGENT_EVAL_PROJECT_ROOT/harness/case_verify.py"
+      description: "Run hidden/check_workspace.py (artifacts, src wiring, type-check, lint), write output/tests.json and solution.diff"
+      timeout: 1800
+      on_failure: continue
+
+judges:
+  - name: prototype_quality
+    description: LLM judge. Does the in-codebase prototype cover the RFE's MVP scope with distinct, reachable scenarios, following the repo's conventions?
+    if: "annotations.get('rubric')"
+    feedback_type: int
+    score_range: [1, 5]
+    prompt: |
+      You are reviewing the output of the uxd-prototype-create skill, run headlessly by a coding agent in
+      workspace mode inside the UXD team's Red Hat OpenShift AI prototype codebase (React 18, TypeScript,
+      PatternFly 6, react-router; existing Gen AI Studio Playground under src/app/GenAIStudio). The RFE is
+      RHAISTRAT-1527 "Multimodal Support in Gen AI Studio Playground". Its MVP scope: image upload and vision
+      inference with supported models; audio file upload with basic speech-to-text where supported; text
+      combined with a single additional modality in one session; a simple input-type selector; results shown
+      in the existing chat transcript. Requirements also ask for guardrails when a model does not support a
+      modality, feedback for processing status and large files, and browser microphone permission UX.
+      Expected page scenarios include at least: a default text-only playground, a vision-model variant with
+      the image upload control visible, a file-too-large error, an unsupported-modality state, and a
+      microphone permission flow.
+
+      ## Structural checker log (output/verify.log; includes type-check and lint results)
+      {{ outputs.files["output/verify.log"] }}
+
+      ## The agent's diff against the pinned codebase (output/solution.diff, truncated to 120k characters)
+      {{ outputs.files["output/solution.diff"][:120000] }}
+
+      ## scenarios.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/scenarios.json", "(missing)") }}
+
+      ## journeys.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/journeys.json", "(missing)") }}
+
+      ## workspace-analysis.json
+      {{ outputs.files.get(".artifacts/RHAISTRAT-1527/workspace-analysis.json", "(missing)") }}
+
+      Score 1 to 5:
+      1 = the skill did not run to completion, or the codebase no longer type-checks;
+      2 = code exists but scenarios are missing, not wired to ?scenario=, or the new screens are unreachable;
+      3 = covers part of the MVP scope with working scenario wiring and passing verification, but a designer
+          would redo significant parts (missing guardrails, error or permission states, or it ignores the
+          existing Playground and codebase conventions);
+      4 = covers the MVP scope with distinct reachable scenarios, extends the existing Playground following
+          the repo's patterns, verification passes, minor gaps;
+      5 = a designer could open an MR from this: every expected scenario present and distinct, journeys match
+          the RFE, artifacts consistent, idiomatic PatternFly 6 and codebase conventions throughout.
+      Respond with JSON: {"score": <int 1-5>, "rationale": "<two sentences naming the strongest and weakest point>"}
