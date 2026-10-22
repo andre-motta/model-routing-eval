@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Playground | Gen AI Studio</title>
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+<style>
+  .chat { min-height: 300px; display: flex; flex-direction: column; gap: 1rem; }
+  .msg-user { align-self: flex-end; background: var(--pf-t--global--background--color--secondary--default); padding: .75rem 1rem; border-radius: 12px; max-width: 70%; }
+  .msg-bot { align-self: flex-start; max-width: 80%; }
+  .thumb { width: 220px; height: 140px; border-radius: 8px; background: linear-gradient(135deg,#8bc1f7,#06c 55%,#003366); display:flex; align-items:center; justify-content:center; color:#fff; font-size:.85rem; }
+  .composer { border-top: 1px solid var(--pf-t--global--border--color--default); padding-top: 1rem; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead"><div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand pf-v6-u-font-weight-bold">Gen AI Studio</span></div></header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded"><div class="pf-v6-c-page__sidebar-body">
+    <nav class="pf-v6-c-nav" aria-label="Global"><ul class="pf-v6-c-nav__list">
+      <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="playground.html" aria-current="page">Playground</a></li>
+      <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="ai-assets.html">AI asset endpoints</a></li>
+    </ul></nav>
+  </div></div>
+  <main class="pf-v6-c-page__main">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">Playground</h1>
+      <p>Chat with models. Input controls follow the selected model's capabilities.</p>
+    </section>
+    <section class="pf-v6-c-page__main-section">
+      <div class="pf-v6-c-card"><div class="pf-v6-c-card__body">
+        <div class="pf-v6-l-flex pf-m-align-items-flex-end pf-m-space-items-lg">
+          <div class="pf-v6-c-form__group">
+            <label class="pf-v6-c-form__label" for="model"><span class="pf-v6-c-form__label-text">Model</span></label>
+            <select id="model" class="pf-v6-c-form-control" data-ouia-component-id="model-select" style="min-width:260px">
+              <option value="llama-3.2-vision">llama-3.2-11b-vision (image)</option>
+              <option value="granite-text">granite-3.3-8b-instruct (text)</option>
+              <option value="qwen-omni">qwen2.5-omni-7b (image, audio)</option>
+            </select>
+          </div>
+          <div class="pf-v6-c-form__group" id="asr-group" hidden>
+            <label class="pf-v6-c-form__label" for="asr"><span class="pf-v6-c-form__label-text">Audio model (ASR)</span></label>
+            <select id="asr" class="pf-v6-c-form-control" data-ouia-component-id="asr-select" style="min-width:260px"></select>
+          </div>
+          <span id="cap-labels" class="pf-v6-l-flex pf-m-space-items-sm"></span>
+        </div>
+      </div></div>
+
+      <div class="pf-v6-c-card pf-v6-u-mt-md"><div class="pf-v6-c-card__body">
+        <div id="alerts" aria-live="polite"></div>
+        <div id="chat" class="chat" data-ouia-component-id="chat-transcript"></div>
+        <form class="composer pf-v6-u-mt-md" id="composer" onsubmit="return false">
+          <div class="pf-v6-l-flex pf-m-space-items-sm pf-v6-u-mb-sm" id="attachments"></div>
+          <div class="pf-v6-l-flex pf-m-align-items-flex-start pf-m-space-items-sm">
+            <div class="pf-v6-l-flex pf-m-column pf-m-space-items-sm" id="modality-controls" role="group" aria-label="Input type">
+              <button class="pf-v6-c-button pf-m-secondary" type="button" id="btn-image" data-ouia-component-id="attach-image" hidden>Attach image</button>
+              <button class="pf-v6-c-button pf-m-secondary" type="button" id="btn-audio" data-ouia-component-id="attach-audio" hidden>Attach audio</button>
+            </div>
+            <textarea class="pf-v6-c-form-control" id="prompt" rows="3" style="flex:1" aria-label="Message" placeholder="Send a message"></textarea>
+            <button class="pf-v6-c-button pf-m-primary" type="button" id="send" data-ouia-component-id="send">Send</button>
+          </div>
+          <div class="pf-v6-c-helper-text pf-v6-u-mt-sm" id="hint"><div class="pf-v6-c-helper-text__item"><span class="pf-v6-c-helper-text__item-text">JPG or PNG, WAV or MP3 up to 10 MB. One image or audio file per conversation.</span></div></div>
+        </form>
+      </div></div>
+    </section>
+  </main>
+</div>
+
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+<script>
+(function () {
+  var sc = (window.UxdScenario && window.UxdScenario.get()) || new URLSearchParams(location.search).get('scenario') || 'default';
+  var MODELS = {
+    'llama-3.2-vision': { caps: ['text', 'image'] },
+    'granite-text': { caps: ['text'] },
+    'qwen-omni': { caps: ['text', 'image', 'audio'] }
+  };
+  // scenario seeds: model, asrAssets, chat, attachment, alert
+  var ASR_ASSETS = [{ id: 'whisper-large-v3', name: 'whisper-large-v3 (ASR)' }];
+  var SEEDS = {
+    'default': { model: 'llama-3.2-vision' },
+    'text-only': { model: 'granite-text' },
+    'image-response': { model: 'llama-3.2-vision', limitReached: true, chat: [
+      { role: 'user', image: 'invoice-scan.png', text: 'What is the total amount on this invoice?' },
+      { role: 'bot', text: 'The invoice total is $1,284.50, due on 2026-11-02.' } ] },
+    'file-too-large': { model: 'llama-3.2-vision', alert: { variant: 'danger', title: 'File too large', text: 'sunset-panorama.png is 24.8 MB. The limit is 10 MB. Nothing was uploaded.' } },
+    'one-file-limit': { model: 'llama-3.2-vision', limitReached: true, attachment: 'invoice-scan.png', alert: { variant: 'warning', title: 'One file per conversation', text: 'This conversation already has an image. Start a new chat to attach a different file.' } },
+    'audio-no-asr': { model: 'qwen-omni', asr: [], attachment: 'standup.wav', alert: { variant: 'warning', title: 'No transcription model registered', text: 'Audio needs an ASR model. Register one as an AI asset and mark it as ASR-capable.', link: ['Go to AI asset endpoints', 'ai-assets.html'] }, blockSend: true },
+    'audio-transcribed': { model: 'qwen-omni', asr: ASR_ASSETS, limitReached: true, chat: [
+      { role: 'user', audio: 'standup.wav', transcript: 'Let us move the release to Thursday and ask QE to re-run the smoke suite.', text: 'Summarize the action items.' },
+      { role: 'bot', text: 'Action items: 1) Move the release to Thursday. 2) Ask QE to re-run the smoke suite.' } ] },
+    'asr-error': { model: 'qwen-omni', asr: ASR_ASSETS, attachment: 'standup.wav', alert: { variant: 'danger', title: 'Transcription failed', text: 'whisper-large-v3 is unreachable. Your message was not sent to the model.' } }
+  };
+  var seed = SEEDS[sc] || SEEDS['default'];
+  var $ = function (id) { return document.getElementById(id); };
+  var asrAssets = seed.asr !== undefined ? seed.asr : ASR_ASSETS;
+
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function label(t) { return '<span class="pf-v6-c-label pf-m-outline"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">' + t + '</span></span></span>'; }
+
+  function renderControls() {
+    var caps = MODELS[$('model').value].caps;
+    $('btn-image').hidden = caps.indexOf('image') < 0;
+    $('btn-audio').hidden = caps.indexOf('audio') < 0;
+    $('asr-group').hidden = caps.indexOf('audio') < 0;
+    $('cap-labels').innerHTML = caps.map(label).join('');
+    $('modality-controls').hidden = caps.length < 2;
+    var lim = !!seed.limitReached;
+    $('btn-image').disabled = lim; $('btn-audio').disabled = lim;
+    $('btn-image').setAttribute('aria-disabled', lim);
+    $('btn-audio').setAttribute('aria-disabled', lim);
+  }
+  function renderAsr() {
+    var s = $('asr');
+    s.innerHTML = asrAssets.length ? asrAssets.map(function (a) { return '<option value="' + a.id + '">' + esc(a.name) + '</option>'; }).join('') : '<option value="">No ASR assets registered</option>';
+    s.disabled = !asrAssets.length;
+  }
+  function renderAlert() {
+    var a = seed.alert; if (!a) return;
+    $('alerts').innerHTML = '<div class="pf-v6-c-alert pf-m-' + a.variant + ' pf-m-inline pf-v6-u-mb-md" aria-label="' + esc(a.title) + '" data-ouia-component-id="scenario-alert"><div class="pf-v6-c-alert__title">' + esc(a.title) + '</div><div class="pf-v6-c-alert__description">' + esc(a.text) + (a.link ? ' <a href="' + a.link[1] + '">' + a.link[0] + '</a>' : '') + '</div></div>';
+  }
+  function renderAttachment() {
+    var f = seed.attachment; if (!f) return;
+    $('attachments').innerHTML = '<span class="pf-v6-c-label" data-ouia-component-id="attachment-chip"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__text">' + esc(f) + '</span></span></span>';
+  }
+  function renderChat() {
+    var c = seed.chat || [];
+    if (!c.length) { $('chat').innerHTML = '<div class="pf-v6-u-text-align-center pf-v6-u-color-200 pf-v6-u-m-auto">Send a message to start. Image and audio inputs appear when the model supports them.</div>'; return; }
+    $('chat').innerHTML = c.map(function (m) {
+      if (m.role === 'bot') return '<div class="msg-bot"><strong>Assistant</strong><p>' + esc(m.text) + '</p></div>';
+      var h = '<div class="msg-user">';
+      if (m.image) h += '<div class="thumb" role="img" aria-label="Uploaded image: ' + esc(m.image) + '">' + esc(m.image) + '</div>';
+      if (m.audio) h += '<audio controls aria-label="Uploaded audio ' + esc(m.audio) + '"></audio><div class="pf-v6-u-font-size-sm"><em>Transcription:</em> ' + esc(m.transcript) + '</div>';
+      return h + '<p>' + esc(m.text) + '</p></div>';
+    }).join('');
+  }
+
+  $('model').value = seed.model;
+  $('model').addEventListener('change', function () { renderControls(); });
+  $('btn-image').addEventListener('click', function () { seed.attachment = 'photo.png'; renderAttachment(); });
+  $('btn-audio').addEventListener('click', function () { seed.attachment = 'clip.wav'; renderAttachment(); });
+  $('send').addEventListener('click', function () {
+    if (seed.blockSend) { renderAlert(); }
+  });
+  if (seed.blockSend) $('send').setAttribute('aria-describedby', 'alerts');
+  renderControls(); renderAsr(); renderAlert(); renderAttachment(); renderChat();
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Vision model, ready","default":true},{"route":"/playground.html","id":"text-only","name":"Text-only model"},{"route":"/playground.html","id":"image-response","name":"Image answered"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"one-file-limit","name":"One-file limit"},{"route":"/playground.html","id":"audio-no-asr","name":"Audio, no ASR asset"},{"route":"/playground.html","id":"audio-transcribed","name":"Audio transcribed"},{"route":"/playground.html","id":"asr-error","name":"Transcription failed"},{"route":"/ai-assets.html","id":"default","name":"Assets with ASR flag","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR assets"},{"route":"/ai-assets.html","id":"empty","name":"No assets"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

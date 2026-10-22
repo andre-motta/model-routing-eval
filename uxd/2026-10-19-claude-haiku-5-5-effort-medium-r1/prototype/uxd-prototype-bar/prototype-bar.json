@@ -1,0 +1,71 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/",
+      "id": "default",
+      "name": "Vision model, empty chat",
+      "default": true
+    },
+    {
+      "route": "/",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/",
+      "id": "image-exchange",
+      "name": "Image answered, image locked"
+    },
+    {
+      "route": "/",
+      "id": "audio-no-asr",
+      "name": "Audio model, no ASR registered"
+    },
+    {
+      "route": "/",
+      "id": "audio-transcribed",
+      "name": "Audio transcribed and answered"
+    },
+    {
+      "route": "/",
+      "id": "asr-failure",
+      "name": "Transcription endpoint unreachable"
+    },
+    {
+      "route": "/",
+      "id": "asr-empty",
+      "name": "Silent audio, empty transcript"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "default",
+      "name": "Assets with ASR flagged",
+      "default": true
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "no-asr",
+      "name": "Whisper registered but not flagged"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "empty",
+      "name": "No AI Assets"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "pages": [
+    {"route":"/index.html","screen":"Playground","scenarios":[
+      {"id":"default","name":"Vision and audio ready","description":"Vision model selected; image and audio controls visible; ASR endpoint available","default":true},
+      {"id":"text-only","name":"Text-only model","description":"Text model selected; multimodal controls hidden","default":false},
+      {"id":"vision-only","name":"Vision-only model","description":"Vision model selected; image upload available; audio control hidden","default":false},
+      {"id":"audio-no-asr","name":"Audio model, no ASR asset","description":"Audio capable model selected; audio upload is visible but blocked with guidance to register a transcription model","default":false},
+      {"id":"image-response","name":"Image response","description":"A single image appears in the transcript with a non-empty model response","default":false},
+      {"id":"audio-error","name":"Transcription failed","description":"Audio attachment remains visible with a persistent transcription failure alert","default":false},
+      {"id":"file-too-large","name":"File exceeds limit","description":"Selected image is rejected with the 10 MB size limit alert","default":false},
+      {"id":"silent-audio","name":"Empty transcription","description":"Audio attachment is visible with an empty-transcription message and no model response","default":false}
+    ]},
+    {"route":"/ai-assets.html","screen":"AI Asset Endpoints","scenarios":[
+      {"id":"default","name":"ASR asset registered","description":"Endpoint table contains a transcription-capable Whisper AI Asset","default":true},
+      {"id":"no-asr","name":"No ASR assets","description":"Endpoint table has regular assets but none marked transcription-capable","default":false},
+      {"id":"empty","name":"No endpoints yet","description":"Endpoint table is empty with a create endpoint call to action","default":false},
+      {"id":"load-error","name":"Endpoint load error","description":"Endpoint table shows a persistent load failure and retry control","default":false}
+    ]}
+  ]
+}

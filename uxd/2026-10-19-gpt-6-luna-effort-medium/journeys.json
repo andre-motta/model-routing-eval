@@ -1,0 +1,68 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "journeys": [
+    {
+      "id": "image-question",
+      "title": "Ask a vision model about an image",
+      "persona": "playground-user",
+      "source": "jira",
+      "ac_ids": ["US-1", "US-3"],
+      "steps": [
+        { "id": "playground-ready", "name": "Playground ready", "route": "/", "export": true },
+        {
+          "id": "attach-image",
+          "name": "Attach image",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"image-preview\"]" }
+          ]
+        },
+        {
+          "id": "send-image-prompt",
+          "name": "Send image prompt",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "fill", "selector": "[data-testid=\"prompt-input\"]", "value": "What is in this image?" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-prompt\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"assistant-response\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-transcription",
+      "title": "Submit audio through an ASR model",
+      "persona": "playground-user",
+      "source": "jira",
+      "ac_ids": ["US-2", "US-3"],
+      "steps": [
+        { "id": "playground-ready", "name": "Playground ready", "route": "/", "export": true },
+        {
+          "id": "attach-audio",
+          "name": "Choose ASR model and attach audio",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-audio\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"audio-preview\"]" }
+          ]
+        },
+        {
+          "id": "send-audio-prompt",
+          "name": "Transcribe and send prompt",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "fill", "selector": "[data-testid=\"prompt-input\"]", "value": "Summarize this recording." },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-prompt\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"assistant-response\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

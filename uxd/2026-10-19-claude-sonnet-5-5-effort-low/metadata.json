@@ -1,0 +1,27 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {"type":"jira","reference":"RHAISTRAT-1527","rfe_count":1},
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype/",
+  "screens": ["Playground", "AIAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {"path": ".artifacts/RHAISTRAT-1527/exports", "count": 0},
+  "assumptions": [
+    "Source is the local rfe-snapshot.md (Jira unreachable); the strategy section's scope (input only, one file per conversation, no mic, no PDF, no audio output) overrides the broader RFE text.",
+    "Routes are separate HTML files (/index.html, /ai-assets.html) since the prototype is static.",
+    "Model switcher reloads with a scenario rather than live-updating; the 500ms AC is simulated.",
+    "Persona ids ai-engineer and ai-admin are inferred, not checked against the persona catalog.",
+    "10 MB limit is the proposed default pending PM confirmation."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

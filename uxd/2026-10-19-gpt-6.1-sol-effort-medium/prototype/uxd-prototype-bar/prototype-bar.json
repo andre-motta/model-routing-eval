@@ -1,0 +1,71 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE snapshot source",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready for image input",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "image-complete",
+      "name": "Image response complete"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-complete",
+      "name": "Audio response complete"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "upload-error",
+      "name": "File too large"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/assets.html",
+      "id": "default",
+      "name": "Registered endpoints",
+      "default": true
+    },
+    {
+      "route": "/assets.html",
+      "id": "empty",
+      "name": "No registered endpoints"
+    },
+    {
+      "route": "/assets.html",
+      "id": "load-error",
+      "name": "Endpoint loading failed"
+    }
+  ]
+}

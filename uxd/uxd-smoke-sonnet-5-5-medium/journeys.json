@@ -1,0 +1,58 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-7", "AC-13"],
+      "steps": [
+        { "id": "playground-vision-model", "name": "Playground with vision model (image control only)", "route": "/index.html", "export": true },
+        { "id": "image-answered", "name": "Image rendered in chat with answer", "route": "/index.html", "export": true }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Ask a question about an audio file via transcription",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-10"],
+      "steps": [
+        { "id": "audio-blocked", "name": "Audio attached, no ASR model registered", "route": "/index.html", "export": true },
+        { "id": "audio-answered", "name": "Audio transcribed and answered", "route": "/index.html", "export": true }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Register a transcription (ASR) endpoint",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": ["AC-6"],
+      "steps": [
+        { "id": "asset-list", "name": "AI asset endpoints table", "route": "/ai-assets.html", "export": true },
+        {
+          "id": "flag-asr",
+          "name": "Edit endpoint dialog with ASR flag",
+          "route": "/ai-assets.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"edit-asset-whisper\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-4",
+      "title": "Model without multimodal support",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-2", "AC-9"],
+      "steps": [
+        { "id": "text-only", "name": "Text-only model, no modality controls", "route": "/index.html", "export": true }
+      ]
+    }
+  ]
+}

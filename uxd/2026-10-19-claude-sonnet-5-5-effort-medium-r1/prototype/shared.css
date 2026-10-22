@@ -1,0 +1,31 @@
+html, body { height: 100%; margin: 0; }
+.pf-v6-c-page { height: 100%; }
+.mm-brand { font-weight: 600; font-size: 1.1rem; color: #fff; }
+.mm-main { display: flex; flex-direction: column; height: 100%; }
+.mm-playground { display: grid; grid-template-columns: 300px 1fr; gap: 0; flex: 1; min-height: 0; background: var(--pf-t--global--background--color--secondary--default); }
+.mm-config { padding: 1.25rem; background: var(--pf-t--global--background--color--primary--default); border-right: 1px solid var(--pf-t--global--border--color--default); overflow: auto; }
+.mm-config .pf-v6-c-form__group { margin-bottom: 1rem; }
+.mm-chat { display: flex; flex-direction: column; min-height: 0; }
+.mm-transcript { flex: 1; overflow: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.mm-msg { max-width: 640px; padding: .75rem 1rem; border-radius: 12px; background: var(--pf-t--global--background--color--primary--default); border: 1px solid var(--pf-t--global--border--color--default); }
+.mm-msg.user { align-self: flex-end; background: #e7f1fa; border-color: #b9dafc; }
+.mm-msg .mm-role { font-size: .75rem; font-weight: 600; color: var(--pf-t--global--text--color--subtle); margin-bottom: .25rem; }
+.mm-msg img { display: block; max-width: 280px; border-radius: 8px; margin-bottom: .5rem; border: 1px solid #d2d2d2; }
+.mm-audio { display: flex; align-items: center; gap: .75rem; padding: .5rem .75rem; background: #fff; border: 1px solid #d2d2d2; border-radius: 8px; margin-bottom: .5rem; }
+.mm-wave { display: flex; align-items: center; gap: 2px; height: 24px; }
+.mm-wave i { display: block; width: 3px; background: #0066cc; border-radius: 2px; }
+.mm-transcription { font-style: italic; border-left: 3px solid #0066cc; padding-left: .75rem; margin-bottom: .5rem; }
+.mm-empty { margin: auto; text-align: center; color: var(--pf-t--global--text--color--subtle); max-width: 420px; }
+.mm-composer { padding: 1rem 1.5rem 1.5rem; background: var(--pf-t--global--background--color--primary--default); border-top: 1px solid var(--pf-t--global--border--color--default); }
+.mm-composer-row { display: flex; gap: .5rem; align-items: flex-end; }
+.mm-composer textarea { flex: 1; resize: none; }
+.mm-chips { display: flex; gap: .5rem; margin-bottom: .5rem; flex-wrap: wrap; }
+.mm-chip { display: inline-flex; align-items: center; gap: .5rem; padding: .25rem .5rem; border: 1px solid #d2d2d2; border-radius: 8px; background: #f5f5f5; }
+.mm-chip img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; }
+.mm-tools { display: flex; gap: .5rem; align-items: center; margin-bottom: .5rem; flex-wrap: wrap; }
+.mm-hint { font-size: .8rem; color: var(--pf-t--global--text--color--subtle); }
+.mm-asr { display: flex; align-items: center; gap: .5rem; margin-left: auto; }
+.mm-progress { margin-bottom: .75rem; }
+.mm-content { padding: 1.5rem; }
+.mm-proto-note { font-size: .75rem; color: var(--pf-t--global--text--color--subtle); }
+.mm-hidden { display: none !important; }

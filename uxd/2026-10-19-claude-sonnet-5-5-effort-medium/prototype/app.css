@@ -1,0 +1,10 @@
+.pg-chat { max-width: 60rem; }
+#transcript { min-height: 18rem; max-height: 28rem; overflow: auto; }
+.pg-msg { margin-bottom: var(--pf-t--global--spacer--md); max-width: 44rem; }
+.pg-msg.user { margin-left: auto; background: var(--pf-t--global--background--color--secondary--default); padding: var(--pf-t--global--spacer--md); border-radius: 8px; }
+.pg-msg.assistant { padding: var(--pf-t--global--spacer--sm) 0; }
+.pg-img { width: 220px; height: 150px; border-radius: 6px; display: block; margin-bottom: 8px; }
+.pg-audio { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.pg-transcript { border-left: 3px solid var(--pf-t--global--border--color--default); padding-left: 12px; margin-bottom: 8px; font-style: italic; }
+.pg-composer { border-top: 1px solid var(--pf-t--global--border--color--default); }
+.pf-m-flex-1 { flex: 1; }

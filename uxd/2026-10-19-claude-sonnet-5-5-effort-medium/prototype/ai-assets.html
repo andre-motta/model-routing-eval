@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI asset endpoints - Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body data-page="assets">
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand pf-v6-u-font-weight-bold">Red Hat OpenShift AI</span></div>
+    <div class="pf-v6-c-masthead__content"><span class="pf-v6-u-ml-auto">platform-admin</span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="index.html" data-ouia-component-id="nav-playground">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" aria-current="page" href="ai-assets.html" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+      <p class="pf-v6-u-mb-md">Endpoints available to the Playground. Flag a transcription endpoint as ASR to use it for audio input.</p>
+      <div id="alerts" aria-live="polite"></div>
+      <div id="assets-root"></div>
+    </section>
+  </main>
+</div>
+<div id="modal-root"></div>
+<script src="./app.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Text-only model","default":true},{"route":"/index.html","id":"vision-ready","name":"Vision model ready"},{"route":"/index.html","id":"image-response","name":"Image answered"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR model"},{"route":"/index.html","id":"audio-ready","name":"Audio ready to send"},{"route":"/index.html","id":"audio-result","name":"Audio transcribed"},{"route":"/index.html","id":"asr-failure","name":"ASR failure"},{"route":"/ai-assets.html","id":"default","name":"Assets with ASR flag","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR assets"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

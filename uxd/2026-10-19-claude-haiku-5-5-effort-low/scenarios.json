@@ -1,0 +1,70 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:45:52Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Text chat",
+          "description": "Vision-capable model selected, no attachment, prior text exchange",
+          "default": true
+        },
+        {
+          "id": "image-attached",
+          "name": "Image attached",
+          "description": "Image chip with thumbnail and vision prompt staged; send enabled"
+        },
+        {
+          "id": "transcribing",
+          "name": "Audio transcribing",
+          "description": "Audio file staged; status reads Transcribing audio with ASR model chosen"
+        },
+        {
+          "id": "audio-no-asr",
+          "name": "No ASR model",
+          "description": "Audio control visible; submission blocked with banner to register an ASR AI Asset"
+        },
+        {
+          "id": "limit-reached",
+          "name": "One-per-conversation limit",
+          "description": "Conversation already holds an image; image control disabled with notice"
+        },
+        {
+          "id": "file-too-large",
+          "name": "File over size limit",
+          "description": "Upload rejected with 10 MB limit error in the attachment area"
+        },
+        {
+          "id": "text-only-model",
+          "name": "Text-only model",
+          "description": "Model lacks image and audio tags; no multimodal controls rendered"
+        }
+      ]
+    },
+    {
+      "route": "/ai-assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "No ASR assets",
+          "description": "Two chat endpoints registered, none flagged ASR-capable",
+          "default": true
+        },
+        {
+          "id": "asr-flagged",
+          "name": "Whisper flagged ASR",
+          "description": "Whisper endpoint shows ASR badge and appears in playground audio dropdown"
+        },
+        {
+          "id": "empty",
+          "name": "No AI Assets",
+          "description": "No endpoints registered; empty state with register CTA"
+        }
+      ]
+    }
+  ]
+}

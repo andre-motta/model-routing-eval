@@ -1,0 +1,29 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": { "type": "jira", "reference": "RHAISTRAT-1527", "rfe_count": 1 },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    { "kind": "rfe", "key": "RHAISTRAT-1527", "label": "RFE", "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527" }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground", "AIAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": { "path": ".artifacts/RHAISTRAT-1527/exports", "count": 0 },
+  "assumptions": [
+    "Jira unreachable; RFE read from local rfe-snapshot.md",
+    "Persona catalog unavailable; personas ai-engineer and platform-admin inferred",
+    "Strategy scope (staff engineer direction) overrides RFE text: input only, one image or audio per conversation, no microphone, no audio output, no PDF",
+    "Native file pickers are simulated with sample image and sample audio buttons",
+    "Playground model list and AI asset data are mocked; 10 MB limit is the proposed default pending PM confirmation"
+  ],
+  "created_at": "2026-10-19T14:19:04Z",
+  "updated_at": null,
+  "refinement_history": []
+}

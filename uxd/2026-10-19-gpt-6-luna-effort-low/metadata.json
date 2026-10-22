@@ -1,0 +1,21 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {"type":"jira","reference":"RHAISTRAT-1527","rfe_count":1},
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground","AIAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {"path":".artifacts/RHAISTRAT-1527/exports","count":0},
+  "assumptions": ["Mock data only; no live model inference, asset API, or file persistence.","10 MB upload limit is proposed in the RFE and awaits PM confirmation.","ASR catalog tag shown as audio-asr and vision tag as image-inferencing, as proposed in the RFE."],
+  "created_at": "2026-10-19T16:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

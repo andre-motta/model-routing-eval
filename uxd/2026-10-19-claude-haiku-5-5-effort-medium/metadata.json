@@ -1,0 +1,42 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": null,
+  "screens": ["Playground", "AIAssetEndpoints"],
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "Jira MCP and fetch script were not used: Jira is unreachable from this environment, so the local snapshot .artifacts/RHAISTRAT-1527/rfe-snapshot.md is the source.",
+    "The RFE acceptance criteria have no IDs. AC-1 to AC-17 were assigned in document order in user-stories.json.",
+    "The persona catalog (knowledge/personas/catalog.yaml) is not present in this plugin install. Persona ids ai-engineer and platform-admin are descriptive.",
+    "Model names (qwen2.5-vl-7b-instruct, omni-audio-chat-7b, whisper-large-v3) are placeholders. Which RHOAI models support vision is an open SPIKE in the RFE.",
+    "Tag names image-inferencing and audio-asr are the RFE's proposed names, pending agreement with the model registry team.",
+    "The 10 MB size limit is the RFE's proposed default, pending PM confirmation.",
+    "Backend and non-visual criteria are not demonstrated by the prototype: AC-8, AC-11, AC-12, AC-13, AC-15, AC-16, and the axe-core scan in AC-17. Visible accessible labels are built in.",
+    "Out of scope and not prototyped: microphone capture, audio output, video, PDF as image, multiple images per conversation, and chat persistence.",
+    "The Playground's send action is a stub. The prototype shows end-states and does not call a model."
+  ],
+  "created_at": "2026-10-19T13:53:19Z",
+  "updated_at": null,
+  "refinement_history": []
+}

@@ -1,0 +1,83 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:55:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Send an image to a vision-capable model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-14"],
+      "steps": [
+        {
+          "id": "playground-vision",
+          "name": "Playground with vision model selected",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "image-input-active",
+          "name": "Image input active",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"input-type-image\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"attach\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe an audio file through a registered ASR AI Asset",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-10"],
+      "steps": [
+        {
+          "id": "audio-no-transcription-model",
+          "name": "Audio input with no ASR AI Asset registered",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "audio-asr-selected",
+          "name": "Audio input with ASR AI Asset selected and WAV attached",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "audio-asr-failed",
+          "name": "ASR transcription failed",
+          "route": "/",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Flag an AI Asset as an ASR / transcription endpoint",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": ["AC-6"],
+      "steps": [
+        {
+          "id": "ai-assets-table",
+          "name": "AI Asset Endpoints table",
+          "route": "/ai-asset-endpoints.html",
+          "export": true
+        },
+        {
+          "id": "asr-flag-dialog",
+          "name": "Edit AI Asset dialog with ASR flag",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"edit-asset-whisper-large\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

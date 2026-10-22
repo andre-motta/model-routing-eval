@@ -1,0 +1,46 @@
+prototype_summary:
+  prototype_id: RHAISTRAT-1527
+  title: Multimodal Support in Gen AI Studio Playground
+
+  source:
+    type: jira
+    reference: RHAISTRAT-1527
+    rfe_count: 1
+
+  build_mode: standalone-html
+  decision_mode: skip
+
+  files_created: 6            # prototype source files (excludes copied uxd-prototype-bar assets)
+  files_modified: 1           # rfe-snapshot.md frontmatter
+  screens:
+    - Playground
+    - AiAssetEndpoints
+    - EditEndpointUseModal
+  routes:
+    - /index.html
+    - /ai-asset-endpoints.html
+  journeys_path: .artifacts/RHAISTRAT-1527/journeys.json
+  journeys_count: 4
+  scenarios_path: .artifacts/RHAISTRAT-1527/scenarios.json
+  scenarios_count: 17
+  user_stories_path: .artifacts/RHAISTRAT-1527/user-stories.json
+  prototype_bar: true
+  prototype_bar_config: .artifacts/RHAISTRAT-1527/prototype-bar.json
+  prototype_path: .artifacts/RHAISTRAT-1527/prototype/
+
+  reachability_check:
+    status: pass
+    scenarios_checked: 17       # each ?scenario= lands on its end state with no clicks; DOMs distinct
+    journey_steps_checked: 13   # all journeys.json actions replayed in headless Chrome
+    interactive_checks:
+      - model switch removes controls in under 500 ms
+      - oversized and wrong-type files rejected before upload
+      - zero-byte audio rejected; audio blocked until a transcription model is selected
+      - audio transcribe then answer; second file blocked; New chat resets
+      - Edit endpoint use modal marks an endpoint as Transcription (ASR)
+
+  iteration: 0
+  status: draft
+
+  created_at: "2026-10-19T14:24:17Z"
+  updated_at: null

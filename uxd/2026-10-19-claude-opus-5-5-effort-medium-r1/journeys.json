@@ -1,0 +1,186 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:24:17Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-16"],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Playground with vision model selected",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "image-menu-open",
+          "name": "Image input menu open",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attach-image-menu\"]" }
+          ]
+        },
+        {
+          "id": "image-attached",
+          "name": "Sample image uploaded and ready to send",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-ready\"]" }
+          ]
+        },
+        {
+          "id": "image-sent",
+          "name": "Image prompt sent and answered",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-ready\"]" },
+            { "type": "fill", "selector": "#prompt-input", "value": "What objects are in this image?" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-message\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-response\"]", "timeout_ms": 15000 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe an audio file and send it to a model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-9", "AC-16"],
+      "steps": [
+        {
+          "id": "model-menu-open",
+          "name": "Model selector open",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-select\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"model-select-menu\"]" }
+          ]
+        },
+        {
+          "id": "audio-model-selected",
+          "name": "Image + audio model selected; audio control and transcription model dropdown shown",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-select\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-option-gemma-3-12b-it\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attach-audio\"]" }
+          ]
+        },
+        {
+          "id": "asr-menu-open",
+          "name": "Transcription model dropdown open",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-select\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-option-gemma-3-12b-it\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"asr-select\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"asr-select-menu\"]" }
+          ]
+        },
+        {
+          "id": "audio-attached",
+          "name": "Sample WAV uploaded and ready to send",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-select\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-option-gemma-3-12b-it\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-audio\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"sample-audio\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-ready\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Register a transcription (ASR) endpoint as an AI asset",
+      "persona": "ai-asset-owner",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-6", "AC-13"],
+      "steps": [
+        {
+          "id": "assets-list",
+          "name": "AI asset endpoints table",
+          "route": "/ai-asset-endpoints.html",
+          "export": true
+        },
+        {
+          "id": "row-actions-open",
+          "name": "Row actions menu open",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"row-actions-whisper-large-v3\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"row-actions-menu-whisper-large-v3\"]" }
+          ]
+        },
+        {
+          "id": "edit-use-modal",
+          "name": "Edit endpoint use modal open",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"row-actions-whisper-large-v3\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"edit-endpoint-use-whisper-large-v3\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-4",
+      "title": "Recover from the one-file limit by starting a new chat",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-14", "AC-15"],
+      "steps": [
+        {
+          "id": "limit-reached",
+          "name": "Conversation already has a file; second attach attempted",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-ready\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-message\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-response\"]", "timeout_ms": 15000 },
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"file-limit-alert\"]" }
+          ]
+        },
+        {
+          "id": "new-chat",
+          "name": "New chat started; controls reset",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-ready\"]" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-message\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-response\"]", "timeout_ms": 15000 },
+            { "type": "click", "selector": "[data-ouia-component-id=\"new-chat\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"chat-empty-state\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

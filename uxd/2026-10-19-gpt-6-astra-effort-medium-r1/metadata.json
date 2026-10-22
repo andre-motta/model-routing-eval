@@ -1,0 +1,51 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "created_at": "2026-10-19T14:47:44.254863+00:00",
+  "updated_at": null,
+  "refinement_history": [],
+  "assumptions": [
+    "Local snapshot is authoritative for this run; clarified strategy takes precedence over broader original business request.",
+    "10 MB is a provisional demo file limit, pending PM and proxy-capacity validation.",
+    "Model names and capabilities are illustrative fixtures, not claims about actual deployed models.",
+    "No persona catalog was present in the staged plugin; model-explorer and endpoint-owner are inferred roles.",
+    "Backend file IDs, server-side encoding, ASR, Responses API, timing, storage isolation and replicas are simulated, not implemented or validated.",
+    "Endpoint registrations persist only in browser sessionStorage. Chats are not persisted.",
+    "Model selection is locked after attachment selection or submission; New chat resets it.",
+    "Microphone, PDFs, audio output, multiple attachments, comparison and chat persistence are excluded per clarified strategy."
+  ],
+  "reachability_check": ".artifacts/RHAISTRAT-1527/reachability-check.json",
+  "limitations": [
+    "Local HTTP server blocked by permission controls; browser rendering and interaction checks were not performed.",
+    "PatternFly styling requires access to the CDN.",
+    "Prototype Bar Eval points to a future evaluation report; no evaluation or batch export was requested."
+  ]
+}

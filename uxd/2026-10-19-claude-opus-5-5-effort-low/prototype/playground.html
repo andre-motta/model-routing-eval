@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Playground - Gen AI Studio</title>
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="./shared.css" />
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand app-brand">Red Hat OpenShift AI</span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Global">
+        <section class="pf-v6-c-nav__section"><h2 class="pf-v6-c-nav__section-title">Gen AI Studio</h2>
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item"><a href="./playground.html" class="pf-v6-c-nav__link pf-m-current" aria-current="page" data-ouia-component-id="nav-playground">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a href="./ai-asset-endpoints.html" class="pf-v6-c-nav__link" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul></section>
+      </nav>
+    </div>
+  </div>
+  <div class="pf-v6-c-page__main-container">
+  <main class="pf-v6-c-page__main" tabindex="-1">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">Playground</h1>
+      <p class="pf-v6-u-color-200">Chat with deployed models. Image and audio inputs appear when the selected model supports them.</p>
+    </section>
+    <section class="pf-v6-c-page__main-section pg-layout">
+      <!-- Settings panel -->
+      <div class="pf-v6-c-card pg-settings">
+        <div class="pf-v6-c-card__title"><h2 class="pf-v6-c-card__title-text">Model</h2></div>
+        <div class="pf-v6-c-card__body">
+          <div class="pf-v6-c-toggle-group pf-m-compact model-group" role="radiogroup" aria-label="Model" id="model-group"></div>
+          <div id="model-caps" class="pf-v6-u-mt-md"></div>
+          <div id="asr-region" class="pf-v6-u-mt-lg" hidden>
+            <label class="pf-v6-c-form__label" for="asr-select"><span class="pf-v6-c-form__label-text">Audio transcription (ASR) model</span></label>
+            <span class="pf-v6-c-form-control pf-v6-u-mt-xs">
+              <select id="asr-select" data-ouia-component-id="asr-select" aria-describedby="asr-help"></select>
+            </span>
+            <div class="pf-v6-c-helper-text pf-v6-u-mt-xs" id="asr-help"><div class="pf-v6-c-helper-text__item"><span class="pf-v6-c-helper-text__item-text">Lists AI asset endpoints flagged as ASR. Audio is transcribed first, then the text is sent to the selected model.</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat panel -->
+      <div class="pf-v6-c-card pg-chat">
+        <div class="pf-v6-c-card__body chat-transcript" id="transcript" aria-live="polite" aria-label="Conversation"></div>
+        <div class="pf-v6-c-card__footer">
+          <div id="alerts"></div>
+          <div id="chips" class="pf-v6-u-mb-sm"></div>
+          <div class="composer">
+            <div id="modality-controls" class="modality-controls" role="group" aria-label="Attach input"></div>
+            <span class="pf-v6-c-form-control pf-m-textarea composer-input">
+              <textarea id="prompt" rows="2" aria-label="Message" placeholder="Send a message..."></textarea>
+            </span>
+            <button class="pf-v6-c-button pf-m-primary" type="button" id="send" data-ouia-component-id="send-button">Send</button>
+          </div>
+          <div class="pf-v6-c-helper-text pf-v6-u-mt-xs"><div class="pf-v6-c-helper-text__item"><span class="pf-v6-c-helper-text__item-text" id="limit-hint">Images: JPG, PNG. Audio: WAV, MP3. Max 10 MB. One image or audio file per conversation.</span></div></div>
+          <input type="file" id="file-image" accept="image/jpeg,image/png" hidden />
+          <input type="file" id="file-audio" accept="audio/wav,audio/x-wav,audio/mpeg" hidden />
+          <button class="pf-v6-c-button pf-m-link pf-m-inline pf-v6-u-mt-sm" type="button" id="new-chat" data-ouia-component-id="new-chat">Start new conversation</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  </div>
+</div>
+<script src="./playground.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://issues.example.com/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Vision model, empty chat","default":true},{"route":"/playground.html","id":"text-only","name":"Text-only model"},{"route":"/playground.html","id":"image-response","name":"Image answered"},{"route":"/playground.html","id":"audio-transcribed","name":"Audio transcribed and answered"},{"route":"/playground.html","id":"audio-no-asr","name":"No ASR model registered"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"asr-error","name":"Transcription failed"},{"route":"/playground.html","id":"limit-reached","name":"Second file blocked"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Endpoints with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"No ASR endpoint flagged"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No endpoints"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

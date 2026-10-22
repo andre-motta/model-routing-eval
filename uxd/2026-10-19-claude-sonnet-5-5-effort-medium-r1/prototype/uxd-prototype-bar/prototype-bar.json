@@ -1,0 +1,96 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Image+audio model, empty chat",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "image-staged",
+      "name": "Image staged"
+    },
+    {
+      "route": "/index.html",
+      "id": "file-too-large",
+      "name": "Image too large"
+    },
+    {
+      "route": "/index.html",
+      "id": "image-conversation",
+      "name": "Image answered"
+    },
+    {
+      "route": "/index.html",
+      "id": "model-rejected",
+      "name": "Model rejected image"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-no-asr",
+      "name": "Audio, no ASR model"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-staged",
+      "name": "Audio staged"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-transcribing",
+      "name": "Transcribing audio"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-conversation",
+      "name": "Audio answered"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-error",
+      "name": "ASR unreachable"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "default",
+      "name": "Table with one ASR asset",
+      "default": true
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "no-asr",
+      "name": "No ASR assets"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "empty",
+      "name": "No assets"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "load-error",
+      "name": "Load error"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": ".artifacts/RHAISTRAT-1527/exports",
+    "count": 0
+  },
+  "assumptions": [
+    "The prototype demonstrates the confirmed input-only scope: image and audio in, text out.",
+    "Microphone capture, PDF image input, multimodal output, streaming, and model comparison are out of scope.",
+    "One image or one audio file is allowed per conversation history.",
+    "The browser validates file type, empty files, and size; the BFF performs temporary storage and base64 encoding.",
+    "Audio inference is represented as ASR transcription followed by a Responses API text request."
+  ],
+  "created_at": "2026-10-19T14:37:34Z",
+  "updated_at": null,
+  "refinement_history": []
+}

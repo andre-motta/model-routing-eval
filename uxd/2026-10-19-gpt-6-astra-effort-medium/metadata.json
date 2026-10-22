@@ -1,0 +1,52 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace": "standalone",
+  "target": "none",
+  "workspace_path": "/home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/prototype",
+  "prototype_path": "/home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": "/home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": "/home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "Final Staff Engineer scope overrides the broad business request: input only, one image OR audio per conversation; no microphone, PDF, comparison, streaming, generated audio, or chat persistence.",
+    "10 MB is an illustrative configurable prototype limit, not an agreed production limit.",
+    "Model names and capability fixtures are illustrative; the production catalog is not modified. Unknown metadata allows attempted submission and displays rejection.",
+    "ASR endpoint registration is tab-scoped sessionStorage mock data; no services or authentication are contacted.",
+    "Sample audio is a one-second silent WAV placeholder; displayed transcription is a synthetic scenario fixture.",
+    "Persona catalog and overlays are not staged; ai-engineer is an inferred persona.",
+    "Production upload, server file IDs, encoding, ASR routing, replica safety, and latency are not implemented in the standalone UI."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": [],
+  "reachability": {
+    "static": "pass",
+    "browser": "blocked",
+    "report_path": ".artifacts/RHAISTRAT-1527/reachability-check.json"
+  }
+}

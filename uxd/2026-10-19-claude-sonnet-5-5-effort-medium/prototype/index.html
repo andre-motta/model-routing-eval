@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground - Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body data-page="playground">
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand pf-v6-u-font-weight-bold">Red Hat OpenShift AI</span></div>
+    <div class="pf-v6-c-masthead__content"><span class="pf-v6-u-ml-auto">ai-engineer</span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" aria-current="page" href="index.html" data-ouia-component-id="nav-playground">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="ai-assets.html" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main">
+    <section class="pf-v6-c-page__main-section pf-m-fill">
+      <h1 class="pf-v6-c-title pf-m-2xl">Playground</h1>
+      <div class="pf-v6-l-flex pf-m-align-items-center pf-v6-u-mt-md pf-v6-u-mb-md">
+        <label for="model-select" class="pf-v6-c-form__label"><span class="pf-v6-c-form__label-text">Model</span></label>
+        <select id="model-select" class="pf-v6-c-form-control" data-ouia-component-id="model-select" style="max-width:22rem"></select>
+        <span id="model-tags" class="pf-v6-l-flex"></span>
+        <a href="ai-assets.html" class="pf-v6-u-ml-auto">Manage AI assets</a>
+      </div>
+
+      <div id="alerts" aria-live="polite"></div>
+
+      <div class="pf-v6-c-card pg-chat">
+        <div class="pf-v6-c-card__body" id="transcript" role="log" aria-label="Chat transcript"></div>
+        <div class="pf-v6-c-card__footer pg-composer">
+          <div id="chips" class="pf-v6-l-flex pf-v6-u-mb-sm"></div>
+          <div id="progress" class="pf-v6-u-mb-sm" hidden></div>
+          <div id="modality-controls" class="pf-v6-l-flex pf-m-align-items-center pf-v6-u-mb-sm" role="group" aria-label="Input types">
+            <button class="pf-v6-c-button pf-m-secondary" type="button" id="btn-image" data-ouia-component-id="attach-image" hidden>Attach image</button>
+            <button class="pf-v6-c-button pf-m-secondary" type="button" id="btn-audio" data-ouia-component-id="attach-audio" hidden>Attach audio</button>
+            <span id="asr-wrap" hidden>
+              <label for="asr-select" class="pf-v6-u-mr-sm">Transcription model</label>
+              <select id="asr-select" class="pf-v6-c-form-control" data-ouia-component-id="asr-select" style="width:auto"></select>
+            </span>
+            <span class="pf-v6-u-font-size-sm pf-v6-u-color-200" id="limit-hint" hidden>JPG, PNG, WAV, MP3 up to 10 MB. One file per conversation.</span>
+          </div>
+          <input type="file" id="file-input" hidden />
+          <div class="pf-v6-l-flex pf-m-nowrap">
+            <textarea id="prompt" class="pf-v6-c-form-control pf-m-flex-1" rows="2" aria-label="Message" placeholder="Send a message"></textarea>
+            <button class="pf-v6-c-button pf-m-primary" type="button" id="btn-send" data-ouia-component-id="send">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="./app.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Text-only model","default":true},{"route":"/index.html","id":"vision-ready","name":"Vision model ready"},{"route":"/index.html","id":"image-response","name":"Image answered"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR model"},{"route":"/index.html","id":"audio-ready","name":"Audio ready to send"},{"route":"/index.html","id":"audio-result","name":"Audio transcribed"},{"route":"/index.html","id":"asr-failure","name":"ASR failure"},{"route":"/ai-assets.html","id":"default","name":"Assets with ASR flag","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR assets"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

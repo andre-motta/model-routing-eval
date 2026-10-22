@@ -1,0 +1,138 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:43:24.267569+00:00",
+  "journeys": [
+    {
+      "id": "image-input",
+      "title": "Explore an image",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-7",
+        "AC-8",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "compose",
+          "name": "Compose an image prompt",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "attach",
+          "name": "Choose image",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"attach-image\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-input",
+      "title": "Transcribe audio",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-10",
+        "AC-11"
+      ],
+      "steps": [
+        {
+          "id": "audio",
+          "name": "Select audio-enabled model",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Home"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "ArrowDown"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Enter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register transcription endpoint",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "assets",
+          "name": "Review endpoints",
+          "route": "/assets.html",
+          "export": true
+        },
+        {
+          "id": "register",
+          "name": "Register endpoint dialog",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"register-endpoint\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "dialog[open]"
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "name": "Return to Playground",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "text-recovery",
+      "title": "Start a fresh text chat",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-9",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "new-chat",
+          "name": "Clear conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

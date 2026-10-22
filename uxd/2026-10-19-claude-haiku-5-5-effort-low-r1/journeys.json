@@ -1,0 +1,74 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an uploaded image",
+      "source": "jira",
+      "ac_ids": ["US-1", "US-2", "US-3"],
+      "steps": [
+        {
+          "id": "playground-vision",
+          "name": "Playground with vision model and image attached",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "attach-image",
+          "name": "Attach an image from the composer",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"attach-image\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"image-attachment\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe audio with a registered ASR model",
+      "source": "jira",
+      "ac_ids": ["US-4", "US-5", "US-6"],
+      "steps": [
+        {
+          "id": "audio-blocked",
+          "name": "Audio model without a registered ASR model",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "audio-ready",
+          "name": "Audio transcript ready to send",
+          "route": "/playground.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Flag an AI Asset as ASR-capable",
+      "source": "jira",
+      "ac_ids": ["US-7"],
+      "steps": [
+        {
+          "id": "asset-list",
+          "name": "AI Asset Endpoints table",
+          "route": "/ai-asset-endpoints.html",
+          "export": true
+        },
+        {
+          "id": "open-asr-edit",
+          "name": "Edit dialog for an AI Asset",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"edit-asset-whisper\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

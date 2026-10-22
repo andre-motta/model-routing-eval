@@ -1,0 +1,172 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:51:28.387555+00:00",
+  "journeys": [
+    {
+      "id": "image-chat",
+      "title": "Explore an image and continue with text",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "US-1-AC-1",
+        "US-1-AC-2",
+        "US-1-AC-3"
+      ],
+      "steps": [
+        {
+          "id": "open",
+          "name": "Open Playground",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "attach",
+          "name": "Attach sample image",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            }
+          ]
+        },
+        {
+          "id": "answer",
+          "name": "Generate a text response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#assistant-response"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-chat",
+      "title": "Transcribe audio with a registered endpoint",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "US-2-AC-1",
+        "US-2-AC-2"
+      ],
+      "steps": [
+        {
+          "id": "audio",
+          "name": "Attach sample audio",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-audio"
+            }
+          ]
+        },
+        {
+          "id": "transcript",
+          "name": "Read transcription and response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-audio"
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#assistant-response"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register an ASR AI Asset and return to Playground",
+      "persona": "platform-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "US-3-AC-1",
+        "US-3-AC-2"
+      ],
+      "steps": [
+        {
+          "id": "assets",
+          "name": "Review AI Asset Endpoints",
+          "route": "/endpoints.html",
+          "export": true
+        },
+        {
+          "id": "register",
+          "name": "Open registration form",
+          "route": "/endpoints.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#register-dialog"
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "name": "Use registered endpoint",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "recover",
+      "title": "Recover an input error and start a new conversation",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "US-4-AC-1",
+        "US-4-AC-2",
+        "US-4-AC-3"
+      ],
+      "steps": [
+        {
+          "id": "model",
+          "name": "Choose input capability",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "reset",
+          "name": "Start a fresh conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

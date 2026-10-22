@@ -1,0 +1,40 @@
+prototype_summary:
+  prototype_id: RHAISTRAT-1527
+  title: Multimodal Support in Gen AI Studio Playground
+
+  source:
+    type: jira
+    reference: RHAISTRAT-1527
+    rfe_count: 1
+    snapshot: .artifacts/RHAISTRAT-1527/rfe-snapshot.md
+
+  build_mode: standalone-html
+  decision_mode: skip
+
+  files_created: 13
+  files_modified: 1
+  screens:
+    - Playground
+    - AiAssetEndpoints
+    - EditCapabilitiesModal
+  entry: playground.html
+  journeys_path: .artifacts/RHAISTRAT-1527/journeys.json
+  journeys_count: 5
+  scenarios_path: .artifacts/RHAISTRAT-1527/scenarios.json
+  scenarios_count: 21
+  user_stories_path: .artifacts/RHAISTRAT-1527/user-stories.json
+  prototype_bar: true
+  prototype_bar_config: .artifacts/RHAISTRAT-1527/prototype-bar.json
+  prototype_path: .artifacts/RHAISTRAT-1527/prototype/
+
+  reachability_check:
+    status: pass
+    method: headless Chrome DOM dump per page x scenario; marker text present and DOM distinct per page
+    scenarios_checked: 21
+    failures: 0
+
+  iteration: 0
+  status: draft
+
+  created_at: "2026-10-19T12:00:00Z"
+  updated_at: null

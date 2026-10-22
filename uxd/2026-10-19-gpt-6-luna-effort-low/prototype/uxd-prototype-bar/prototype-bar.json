@@ -1,0 +1,69 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "RHAISTRAT-1527",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/playground",
+      "id": "default",
+      "name": "Vision ready",
+      "default": true
+    },
+    {
+      "route": "/playground",
+      "id": "audio-ready",
+      "name": "ASR ready"
+    },
+    {
+      "route": "/playground",
+      "id": "no-asr-assets",
+      "name": "No ASR model registered"
+    },
+    {
+      "route": "/playground",
+      "id": "unsupported-model",
+      "name": "Model lacks image capability"
+    },
+    {
+      "route": "/playground",
+      "id": "upload-too-large",
+      "name": "Upload exceeds limit"
+    },
+    {
+      "route": "/playground",
+      "id": "inference-error",
+      "name": "Multimodal inference rejected"
+    },
+    {
+      "route": "/playground",
+      "id": "file-limit-reached",
+      "name": "Conversation already has a file"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "default",
+      "name": "Assets with ASR model",
+      "default": true
+    },
+    {
+      "route": "/ai-assets",
+      "id": "no-assets",
+      "name": "No AI Assets registered"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "unmarked-assets",
+      "name": "No ASR capability marked"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "asset-load-error",
+      "name": "Asset list failed to load"
+    }
+  ]
+}

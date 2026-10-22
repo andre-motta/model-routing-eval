@@ -1,0 +1,184 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:37:34Z",
+  "journeys": [
+    {
+      "id": "vision-inference",
+      "title": "Run image-based vision inference",
+      "persona": "data-scientist",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-2",
+        "AC-3",
+        "AC-9",
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "playground-ready",
+          "name": "Playground ready with model catalog",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "select-vision-model",
+          "name": "Vision model selected",
+          "route": "/",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"model-selector\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"option-qwen3-vl\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"image-upload-control\"]"
+            }
+          ]
+        },
+        {
+          "id": "attach-sample-image",
+          "name": "JPG image attached and vision response returned",
+          "route": "/",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"use-sample-image\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"image-thumbnail\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"assistant-response\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-asr-inference",
+      "title": "Run audio inference through ASR",
+      "persona": "data-scientist",
+      "source": "jira",
+      "ac_ids": [
+        "AC-5",
+        "AC-6",
+        "AC-10",
+        "AC-11",
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "playground-ready",
+          "name": "Playground ready with model catalog",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "select-audio-model",
+          "name": "Audio-capable model selected",
+          "route": "/",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"model-selector\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"option-granite-audio\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"audio-upload-control\"]"
+            }
+          ]
+        },
+        {
+          "id": "select-asr-asset",
+          "name": "ASR AI Asset selected",
+          "route": "/",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"asr-model-selector\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"option-whisper-aas\"]"
+            }
+          ]
+        },
+        {
+          "id": "attach-sample-audio",
+          "name": "MP3 audio transcribed and response returned",
+          "route": "/",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"use-sample-audio\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"audio-attachment\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"assistant-response\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register-asr-asset",
+      "title": "Register an AI Asset as ASR-capable",
+      "persona": "platform-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-6",
+        "AC-7"
+      ],
+      "steps": [
+        {
+          "id": "asset-list",
+          "name": "AI Asset Endpoints list",
+          "route": "/ai-assets",
+          "export": true
+        },
+        {
+          "id": "mark-asr-capable",
+          "name": "ASR capability enabled",
+          "route": "/ai-assets",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"asr-toggle-whisper-micro\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"save-asr-capability\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"asset-alert\"]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

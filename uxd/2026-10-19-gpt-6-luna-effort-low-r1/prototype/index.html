@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Playground | Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css">
+  <link rel="stylesheet" href="./prototype.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="./index.html"><span class="brand-mark">AI</span> Gen AI Studio</a><div class="top-actions"><span class="pf-v6-c-label pf-m-green"><span class="pf-v6-c-label__content">Connected</span></span><button class="pf-v6-c-button pf-m-plain" aria-label="Help">?</button><span class="avatar">JD</span></div></header>
+  <aside class="sidebar"><div class="workspace-label">WORKSPACE</div><a class="nav-item" href="./index.html"><span>▣</span> Playground</a><a class="nav-item" href="./ai-assets.html"><span>◈</span> AI Asset Endpoints</a><div class="sidebar-bottom"><span class="avatar">JD</span><span>Jordan Davis<br><small>Data scientist</small></span><span class="more">•••</span></div></aside>
+  <main class="page-content">
+    <div class="breadcrumb">Gen AI Studio <span>/</span> Playground</div>
+    <div class="page-heading"><div><h1>Playground</h1><p>Explore model behavior with text, images, and audio.</p></div><button class="pf-v6-c-button pf-m-secondary" id="new-chat">＋ New chat</button></div>
+    <section class="playground-layout">
+      <div class="chat-column">
+        <div class="chat-toolbar"><div><strong>Untitled chat</strong><span class="pf-v6-c-label pf-m-blue"><span class="pf-v6-c-label__content">Unsaved</span></span></div><button class="icon-button" aria-label="More chat options">•••</button></div>
+        <div class="chat-body" id="chat-body" aria-live="polite">
+          <div class="welcome" id="welcome"><div class="welcome-icon">✦</div><h2>What would you like to explore?</h2><p>Choose a model and start a conversation. Add an image or audio file when your model supports it.</p><div class="suggestions"><button class="suggestion" data-prompt="Summarize the key points in this image">Summarize an image <span>↗</span></button><button class="suggestion" data-prompt="Transcribe and summarize this recording">Summarize a recording <span>↗</span></button><button class="suggestion" data-prompt="Explain this concept clearly">Explain a concept <span>↗</span></button></div></div>
+          <div id="scenario-content"></div>
+        </div>
+        <div id="persistent-alert" class="inline-alert" role="alert" hidden></div>
+        <div class="composer-wrap">
+          <div id="attachment-preview" class="attachment-preview" hidden></div>
+          <div class="composer"><textarea id="prompt" rows="2" aria-label="Your message" placeholder="Ask a question or give the model an instruction..."></textarea><div class="composer-bottom"><div class="attach-controls"><label id="image-control" class="attach-button" for="image-file" title="Attach JPG or PNG"><span>▧</span> Add image</label><input id="image-file" type="file" accept="image/png,image/jpeg" hidden><label id="audio-control" class="attach-button" for="audio-file" title="Attach WAV or MP3"><span>◖</span> Add audio</label><input id="audio-file" type="file" accept="audio/wav,audio/mpeg,audio/mp3" hidden><select id="asr-model" aria-label="Audio transcription model"><option value="whisper">Whisper · transcription</option></select></div><button class="pf-v6-c-button pf-m-primary send-button" data-ouia-component-id="send-prompt" id="send"><span>Send</span><span>↑</span></button></div></div>
+          <div class="composer-note">One image or audio file per conversation · JPG, PNG, WAV, MP3 · Max 10 MB</div>
+        </div>
+      </div>
+      <aside class="settings-panel"><div class="panel-title"><strong>Settings</strong><button class="icon-button" aria-label="Collapse settings">⌄</button></div><label class="field-label" for="model">Model</label><select id="model" class="pf-v6-c-form-control"><option value="vision-audio">Llama 4 Scout · Vision + audio</option><option value="vision">Llama 3.2 Vision · Vision</option><option value="text">Granite 3.3 8B · Text</option></select><div class="model-meta"><span class="pf-v6-c-label pf-m-blue"><span class="pf-v6-c-label__content">Vision</span></span><span class="pf-v6-c-label"><span class="pf-v6-c-label__content">Text</span></span><span class="pf-v6-c-label pf-m-purple"><span class="pf-v6-c-label__content">Audio</span></span></div><div class="setting-divider"></div><label class="field-label" for="system-prompt">System instructions</label><textarea id="system-prompt" class="system-prompt" rows="4" placeholder="Add instructions to guide the model..."></textarea><label class="field-label range-label" for="temperature">Temperature <strong id="temp-value">0.7</strong></label><input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7"><p class="field-help">Controls randomness in the response.</p><div class="setting-divider"></div><div class="capability-title">Model capabilities</div><div id="capability-list" class="capability-list"></div></aside>
+    </section>
+    <footer class="page-foot">Responses are generated by AI and may be inaccurate. Review outputs before use.</footer>
+  </main>
+  <script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script><script src="./app.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Vision and audio ready","default":true},{"route":"/index.html","id":"text-only","name":"Text-only model"},{"route":"/index.html","id":"vision-only","name":"Vision-only model"},{"route":"/index.html","id":"audio-no-asr","name":"Audio model, no ASR asset"},{"route":"/index.html","id":"image-response","name":"Image response"},{"route":"/index.html","id":"audio-error","name":"Transcription failed"},{"route":"/index.html","id":"file-too-large","name":"File exceeds limit"},{"route":"/index.html","id":"silent-audio","name":"Empty transcription"},{"route":"/ai-assets.html","id":"default","name":"ASR asset registered","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR assets"},{"route":"/ai-assets.html","id":"empty","name":"No endpoints yet"},{"route":"/ai-assets.html","id":"load-error","name":"Endpoint load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body></html>

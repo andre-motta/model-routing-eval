@@ -1,0 +1,18 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "pages": [
+    {
+      "route": "/",
+      "screen": "Playground",
+      "scenarios": [
+        { "id": "default", "name": "Text ready", "description": "Playground empty and ready for a text prompt with a chat model selected", "default": true },
+        { "id": "image-attached", "name": "Image attached", "description": "JPG image preview is attached to a vision-capable model and ready to send" },
+        { "id": "audio-ready", "name": "Audio ready", "description": "MP3 preview and registered ASR model are selected, ready for transcription" },
+        { "id": "no-asr-model", "name": "No ASR model", "description": "Audio upload is unavailable because no ASR AI Asset is registered" },
+        { "id": "upload-error", "name": "Upload error", "description": "File upload failed with a visible retry message and no attached file" },
+        { "id": "inference-error", "name": "Inference error", "description": "Unsupported modality response is visible with the image attachment retained for recovery" }
+      ]
+    }
+  ]
+}

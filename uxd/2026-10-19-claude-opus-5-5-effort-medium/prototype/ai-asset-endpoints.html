@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI asset endpoints · Gen AI studio · RHAISTRAT-1527 prototype</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main">
+      <div class="pf-v6-c-masthead__brand">
+        <a class="mm-brand" href="playground.html">Red Hat OpenShift AI<small>Prototype · RHAISTRAT-1527</small></a>
+      </div>
+    </div>
+    <div class="pf-v6-c-masthead__content"></div>
+  </header>
+
+  <div class="pf-v6-c-page__sidebar">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Global">
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded">
+            <button class="pf-v6-c-nav__link" type="button" aria-expanded="true">
+              <span class="pf-v6-c-nav__link-text">Gen AI studio</span>
+            </button>
+            <section class="pf-v6-c-nav__subnav" aria-label="Gen AI studio">
+              <ul class="pf-v6-c-nav__list" role="list">
+                <li class="pf-v6-c-nav__item"><a href="ai-asset-endpoints.html" class="pf-v6-c-nav__link pf-m-current" aria-current="page" data-ouia-component-id="nav-ai-asset-endpoints"><span class="pf-v6-c-nav__link-text">AI asset endpoints</span></a></li>
+                <li class="pf-v6-c-nav__item"><a href="playground.html" class="pf-v6-c-nav__link" data-ouia-component-id="nav-playground"><span class="pf-v6-c-nav__link-text">Playground</span></a></li>
+              </ul>
+            </section>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-page__main-container">
+    <main class="pf-v6-c-page__main" tabindex="-1">
+      <section class="pf-v6-c-page__main-section">
+        <div class="pf-v6-c-page__main-body">
+          <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+          <p class="pf-v6-u-color-200 pf-v6-u-mt-xs">Models and endpoints available to the Playground in the genai-team project. Mark a transcription model as an ASR endpoint to enable audio input.</p>
+        </div>
+      </section>
+      <section class="pf-v6-c-page__main-section pf-m-fill">
+        <div class="pf-v6-c-page__main-body">
+          <div class="mm-page-alerts" id="page-alerts"></div>
+          <div class="mm-toolbar" id="assets-toolbar">
+            <label class="pf-v6-c-form__label" for="asset-filter"><span class="pf-v6-c-form__label-text">Show</span></label>
+            <span class="pf-v6-c-form-control" style="max-width: 280px">
+              <select id="asset-filter" data-ouia-component-id="asset-filter">
+                <option value="all">All AI assets</option>
+                <option value="asr">Transcription (ASR) endpoints</option>
+              </select>
+              <span class="pf-v6-c-form-control__utilities"><span class="pf-v6-c-form-control__toggle-icon">▾</span></span>
+            </span>
+          </div>
+          <div id="assets-content"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="pf-v6-c-backdrop mm-backdrop" id="capabilities-modal" hidden>
+  <div class="pf-v6-c-modal-box pf-m-md" role="dialog" aria-modal="true" aria-labelledby="capabilities-modal-title" aria-describedby="capabilities-modal-desc" data-ouia-component-id="capabilities-modal">
+    <div class="pf-v6-c-modal-box__close">
+      <button class="pf-v6-c-button pf-m-plain" type="button" aria-label="Close" data-modal-close><span class="pf-v6-c-button__icon">✕</span></button>
+    </div>
+    <header class="pf-v6-c-modal-box__header">
+      <h1 class="pf-v6-c-modal-box__title" id="capabilities-modal-title">Edit capabilities</h1>
+    </header>
+    <div class="pf-v6-c-modal-box__body" id="capabilities-modal-desc">
+      <form class="pf-v6-c-form" novalidate onsubmit="return false">
+        <div class="pf-v6-c-form__group">
+          <div class="pf-v6-c-form__group-label"><span class="pf-v6-c-form__label"><span class="pf-v6-c-form__label-text">Input capabilities from model catalog</span></span></div>
+          <div class="pf-v6-c-form__group-control">
+            <p id="catalog-capabilities"></p>
+            <div class="pf-v6-c-helper-text"><div class="pf-v6-c-helper-text__item"><span class="pf-v6-c-helper-text__item-text">Read only. Image and audio input come from the model catalog's supported modalities.</span></div></div>
+          </div>
+        </div>
+        <div class="pf-v6-c-form__group">
+          <div class="pf-v6-c-form__group-control">
+            <div class="pf-v6-c-check">
+              <input class="pf-v6-c-check__input" type="checkbox" id="asr-flag" aria-describedby="asr-flag-desc" data-ouia-component-id="asr-flag" />
+              <label class="pf-v6-c-check__label" for="asr-flag">Transcription endpoint (ASR)</label>
+              <span class="pf-v6-c-check__description" id="asr-flag-desc">Lists this asset in the Playground's Audio transcription model dropdown. The endpoint must be OpenAI-compatible and serve /v1/audio/transcriptions (for example, Whisper).</span>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <footer class="pf-v6-c-modal-box__footer">
+      <button class="pf-v6-c-button pf-m-primary" type="button" id="capabilities-save" data-ouia-component-id="capabilities-save"><span class="pf-v6-c-button__text">Save</span></button>
+      <button class="pf-v6-c-button pf-m-link" type="button" data-modal-close><span class="pf-v6-c-button__text">Cancel</span></button>
+    </footer>
+  </div>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/endpoints.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Vision model, new chat","default":true},{"route":"/playground.html","id":"text-only-model","name":"Text-only model"},{"route":"/playground.html","id":"image-response","name":"Image answered"},{"route":"/playground.html","id":"image-processing","name":"Image processing"},{"route":"/playground.html","id":"audio-ready","name":"Audio ready to send"},{"route":"/playground.html","id":"audio-transcribing","name":"Transcribing audio"},{"route":"/playground.html","id":"audio-response","name":"Audio answered"},{"route":"/playground.html","id":"no-asr-asset","name":"No ASR model registered"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"unsupported-file-type","name":"Unsupported file type"},{"route":"/playground.html","id":"empty-file","name":"Empty file"},{"route":"/playground.html","id":"conversation-limit","name":"One-file limit reached"},{"route":"/playground.html","id":"asr-error","name":"Transcription failed"},{"route":"/playground.html","id":"empty-transcription","name":"No speech detected"},{"route":"/playground.html","id":"model-rejected-input","name":"Model rejected image"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Assets with ASR endpoints","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr-flagged","name":"No ASR endpoints"},{"route":"/ai-asset-endpoints.html","id":"asr-flag-saved","name":"ASR flag saved"},{"route":"/ai-asset-endpoints.html","id":"asr-filter","name":"Filtered to ASR endpoints"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI assets"},{"route":"/ai-asset-endpoints.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

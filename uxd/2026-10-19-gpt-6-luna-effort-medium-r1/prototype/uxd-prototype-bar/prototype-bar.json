@@ -1,0 +1,45 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/",
+      "id": "default",
+      "name": "Vision ready",
+      "default": true
+    },
+    {
+      "route": "/",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/",
+      "id": "no-asr",
+      "name": "No ASR asset registered"
+    },
+    {
+      "route": "/",
+      "id": "asr-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/",
+      "id": "oversized",
+      "name": "File exceeds limit"
+    }
+  ]
+}

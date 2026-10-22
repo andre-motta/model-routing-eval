@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground | Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    .chat { max-width: 52rem; margin: 0 auto; }
+    .bubble { border-radius: 12px; padding: .75rem 1rem; max-width: 80%; }
+    .bubble.user { background: var(--pf-t--global--background--color--secondary--default); margin-left: auto; }
+    .bubble.assistant { border: 1px solid var(--pf-t--global--border--color--default); }
+    .msg { display: flex; margin-bottom: 1rem; }
+    .thumb { width: 220px; height: 140px; border-radius: 8px; display: block; margin-bottom: .5rem; }
+    .transcript { margin-top: .5rem; font-style: italic; }
+    .composer { max-width: 52rem; margin: 0 auto; width: 100%; }
+    .pf-v6-c-page__main-container { min-height: 0; }
+    .main-col { display: flex; flex-direction: column; height: calc(100vh - 4.5rem); }
+    .scroll { flex: 1; overflow: auto; padding: 1.5rem; }
+    .bottom { padding: 1rem 1.5rem; border-top: 1px solid var(--pf-t--global--border--color--default); }
+    .progress-line { display: flex; gap: .5rem; align-items: center; }
+  </style>
+</head>
+<body>
+<div class="pf-v6-c-page" id="page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand pf-v6-u-font-weight-bold">Red Hat OpenShift AI</span></div>
+    <div class="pf-v6-c-masthead__content"><span class="pf-v6-u-ml-auto">Project: <strong>genai-demo</strong></span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-list pf-m-plain" style="padding:0">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="index.html" aria-current="page">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="ai-assets.html">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main" tabindex="-1">
+    <div class="main-col">
+      <section class="pf-v6-c-page__main-section pf-m-padding" style="padding-bottom:0">
+        <div class="pf-v6-l-flex pf-m-align-items-flex-end pf-m-gap-md" id="toolbar">
+          <div>
+            <label class="pf-v6-c-form__label" for="model-select"><span class="pf-v6-c-form__label-text">Model</span></label><br />
+            <select class="pf-v6-c-form-control" id="model-select" data-ouia-component-id="model-select" aria-label="Model"></select>
+          </div>
+          <div id="asr-wrap" hidden>
+            <label class="pf-v6-c-form__label" for="asr-select"><span class="pf-v6-c-form__label-text">Transcription model</span></label><br />
+            <select class="pf-v6-c-form-control" id="asr-select" data-ouia-component-id="asr-select" aria-label="Transcription model"></select>
+          </div>
+          <div id="caps" class="pf-v6-l-flex pf-m-gap-sm"></div>
+          <div class="pf-v6-u-ml-auto"><button class="pf-v6-c-button pf-m-secondary" id="new-chat" type="button">New chat</button></div>
+        </div>
+      </section>
+      <div class="scroll"><div class="chat" id="chat" role="log" aria-live="polite"></div></div>
+      <div class="bottom">
+        <div class="composer">
+          <div id="alerts"></div>
+          <div id="attachment" class="pf-v6-u-mb-sm"></div>
+          <div class="pf-v6-l-flex pf-m-gap-sm pf-m-align-items-center">
+            <div id="attach-controls" class="pf-v6-l-flex pf-m-gap-xs"></div>
+            <input class="pf-v6-c-form-control" style="flex:1" id="prompt-input" data-ouia-component-id="prompt-input" type="text" placeholder="Send a message" aria-label="Message" />
+            <button class="pf-v6-c-button pf-m-primary" id="send" data-ouia-component-id="send" type="button">Send</button>
+          </div>
+          <div class="pf-v6-u-font-size-sm pf-v6-u-color-200 pf-v6-u-mt-xs" id="hint"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+<script>
+(function () {
+  var scenario = (window.UxdScenario && window.UxdScenario.get && window.UxdScenario.get()) ||
+    new URLSearchParams(location.search).get('scenario') || 'default';
+
+  var MODELS = {
+    vision: { id: 'qwen2.5-vl-7b-instruct', label: 'Qwen2.5-VL-7B-Instruct', modalities: ['image'] },
+    text:   { id: 'llama-3.1-8b-instruct', label: 'Llama-3.1-8B-Instruct', modalities: [] },
+    audio:  { id: 'granite-speech-3.3', label: 'Granite-Speech-3.3-8B', modalities: ['audio'] }
+  };
+  var ASR_ASSETS = ['whisper-large-v3 (ASR)', 'whisper-small-cpu (ASR)'];
+
+  var IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280"><rect width="440" height="280" fill="#d2e5f5"/>' +
+    '<circle cx="350" cy="70" r="34" fill="#f4c145"/><polygon points="0,280 150,110 260,220 320,160 440,280" fill="#4a7c59"/></svg>');
+
+  var BANNED = { asr: 'No transcription model is registered. Register one in AI asset endpoints and mark it as an ASR endpoint to send audio.' };
+
+  // Scenario => end-state. Everything is seeded on load, no clicks needed.
+  var S = {
+    'default': { model: 'vision', messages: [], attach: null, alerts: [] },
+    'image-answered': {
+      model: 'vision', attach: null, alerts: [],
+      messages: [
+        { role: 'user', image: true, name: 'harbor.png', text: 'What is in this picture?' },
+        { role: 'assistant', text: 'The image shows a green mountain range under a pale blue sky with a bright yellow sun in the upper right. There is no text or people visible.' }
+      ]
+    },
+    'text-only-model': { model: 'text', messages: [], attach: null, alerts: [] },
+    'audio-no-asr': {
+      model: 'audio', asr: [], messages: [], attach: { kind: 'audio', name: 'standup-recording.mp3', size: '3.1 MB' },
+      alerts: [{ v: 'danger', t: 'Cannot send audio', d: BANNED.asr, link: true }]
+    },
+    'audio-answered': {
+      model: 'audio', asr: ASR_ASSETS, asrSel: 0, attach: null, alerts: [],
+      messages: [
+        { role: 'user', audio: 'standup-recording.mp3', text: 'Summarize the action items.',
+          steps: ['Uploaded (3.1 MB)', 'Transcribed with whisper-large-v3'],
+          transcript: '"…so Priya will update the Helm chart by Friday, and Marco is checking the gateway body size limits…"' },
+        { role: 'assistant', text: 'Action items: (1) Priya updates the Helm chart by Friday. (2) Marco verifies gateway request body size limits.' }
+      ]
+    },
+    'file-too-large': {
+      model: 'vision', messages: [], attach: null,
+      alerts: [{ v: 'danger', t: 'File too large', d: 'city-panorama.png is 14.2 MB. The limit is 10 MB. The file was not uploaded.' }]
+    },
+    'second-file-blocked': {
+      model: 'vision', locked: true, attach: null,
+      messages: [
+        { role: 'user', image: true, name: 'harbor.png', text: 'What is in this picture?' },
+        { role: 'assistant', text: 'A mountain landscape with a yellow sun.' }
+      ],
+      alerts: [{ v: 'warning', t: 'One file per conversation', d: 'A conversation can include one image or one audio file. Start a new chat to attach another.' }]
+    },
+    'asr-failed': {
+      model: 'audio', asr: ASR_ASSETS, asrSel: 0, attach: null,
+      alerts: [],
+      messages: [
+        { role: 'user', audio: 'customer-call.wav', text: 'What did the customer ask for?', steps: ['Uploaded (2.4 MB)'] },
+        { role: 'assistant', error: { t: 'Transcription failed', d: 'whisper-large-v3 could not be reached (503). Your message was not sent to the model. Check the endpoint in AI asset endpoints, or choose another transcription model.' } }
+      ]
+    }
+  };
+  var st = S[scenario] || S['default'];
+  var model = MODELS[st.model];
+  var asr = st.asr !== undefined ? st.asr : ASR_ASSETS;
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // Model select
+  el('model-select').innerHTML = Object.keys(MODELS).map(function (k) {
+    return '<option value="' + k + '"' + (k === st.model ? ' selected' : '') + '>' + MODELS[k].label + '</option>';
+  }).join('');
+  el('model-select').addEventListener('change', function (e) {
+    var map = { vision: 'default', text: 'text-only-model', audio: asr.length ? 'audio-answered' : 'audio-no-asr' };
+    // Switching model re-renders controls without a reload in the full product; prototype navigates via scenario.
+    window.UxdScenario && window.UxdScenario.set ? window.UxdScenario.set(map[e.target.value]) : (location.search = '?scenario=' + map[e.target.value]);
+  });
+
+  // Capability chips
+  var caps = el('caps');
+  caps.innerHTML = '<span class="pf-v6-c-label pf-m-outline"><span class="pf-v6-c-label__content">text</span></span>' +
+    model.modalities.map(function (m) { return '<span class="pf-v6-c-label pf-m-blue"><span class="pf-v6-c-label__content">' + (m === 'image' ? 'image-inferencing' : 'audio-asr') + '</span></span>'; }).join('');
+
+  // ASR dropdown only when audio is enabled
+  if (model.modalities.indexOf('audio') > -1) {
+    el('asr-wrap').hidden = false;
+    var sel = el('asr-select');
+    if (asr.length) {
+      sel.innerHTML = asr.map(function (a, i) { return '<option' + (i === st.asrSel ? ' selected' : '') + '>' + a + '</option>'; }).join('');
+    } else {
+      sel.innerHTML = '<option>No ASR endpoints registered</option>';
+      sel.disabled = true;
+    }
+  }
+
+  // Attach controls
+  var ac = el('attach-controls');
+  var btns = '';
+  function attachBtn(kind, label, icon) {
+    return '<button class="pf-v6-c-button pf-m-secondary" type="button" data-ouia-component-id="attach-' + kind + '"' +
+      (st.locked ? ' disabled aria-disabled="true"' : '') + ' aria-label="' + label + '">' + icon + ' ' + label + '</button>';
+  }
+  if (model.modalities.indexOf('image') > -1) btns += attachBtn('image', 'Image', '&#128444;');
+  if (model.modalities.indexOf('audio') > -1) btns += attachBtn('audio', 'Audio', '&#127925;');
+  ac.innerHTML = btns;
+  if (!btns) ac.hidden = true;
+
+  // Hint
+  var hint = [];
+  if (!model.modalities.length) hint.push('This model accepts text only.');
+  else {
+    hint.push('One image or audio file per conversation. Max 10 MB.');
+    if (model.modalities.indexOf('image') > -1) hint.push('JPG or PNG.');
+    if (model.modalities.indexOf('audio') > -1) hint.push('WAV or MP3.');
+  }
+  el('hint').textContent = hint.join(' ');
+
+  // Alerts
+  el('alerts').innerHTML = st.alerts.map(function (a) {
+    return '<div class="pf-v6-c-alert pf-m-inline pf-m-' + a.v + ' pf-v6-u-mb-sm" aria-label="' + a.t + '" role="alert">' +
+      '<div class="pf-v6-c-alert__icon"></div><p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">' + a.v + ' alert:</span>' + a.t + '</p>' +
+      '<div class="pf-v6-c-alert__description">' + esc(a.d) + (a.link ? ' <a href="ai-assets.html">Go to AI asset endpoints</a>' : '') + '</div></div>';
+  }).join('');
+
+  // Attachment chip
+  if (st.attach) {
+    el('attachment').innerHTML = '<span class="pf-v6-c-label pf-m-outline"><span class="pf-v6-c-label__content">' +
+      (st.attach.kind === 'audio' ? '&#127925; ' : '&#128444; ') + esc(st.attach.name) + ' (' + st.attach.size + ')</span></span>';
+    if (st.alerts.length) el('send').disabled = true;
+  }
+  if (st.locked) el('prompt-input').placeholder = 'Send a message';
+
+  // Transcript
+  var chat = el('chat');
+  if (!st.messages.length) {
+    chat.innerHTML = '<div class="pf-v6-c-empty-state"><div class="pf-v6-c-empty-state__content"><div class="pf-v6-c-empty-state__body">' +
+      '<h2 class="pf-v6-c-title pf-m-lg">Chat with ' + esc(model.label) + '</h2>' +
+      '<p>' + (model.modalities.length ? 'Attach a file to ask about it, or type a message.' : 'Type a message to start.') + '</p></div></div></div>';
+  } else {
+    chat.innerHTML = st.messages.map(function (m) {
+      if (m.error) {
+        return '<div class="msg"><div class="pf-v6-c-alert pf-m-inline pf-m-danger" role="alert"><div class="pf-v6-c-alert__icon"></div>' +
+          '<p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">danger alert:</span>' + esc(m.error.t) + '</p>' +
+          '<div class="pf-v6-c-alert__description">' + esc(m.error.d) + '</div></div></div>';
+      }
+      var h = '<div class="msg"><div class="bubble ' + m.role + '">';
+      if (m.image) h += '<img class="thumb" src="' + IMG + '" alt="Uploaded image ' + esc(m.name) + ': a green mountain range under a blue sky" />';
+      if (m.audio) h += '<audio controls style="width:100%;max-width:300px" aria-label="Uploaded audio ' + esc(m.audio) + '"></audio><div class="pf-v6-u-font-size-sm">' + esc(m.audio) + '</div>';
+      h += '<div>' + esc(m.text) + '</div>';
+      if (m.steps) h += '<div class="pf-v6-u-mt-sm pf-v6-u-font-size-sm">' + m.steps.map(function (s) { return '&#10003; ' + esc(s); }).join('<br />') + '</div>';
+      if (m.transcript) h += '<div class="transcript">Transcript: ' + esc(m.transcript) + '</div>';
+      return h + '</div></div>';
+    }).join('');
+  }
+
+  el('new-chat').addEventListener('click', function () {
+    window.UxdScenario && window.UxdScenario.set ? window.UxdScenario.set('default') : (location.search = '');
+  });
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Vision model, empty chat","default":true},{"route":"/index.html","id":"image-answered","name":"Image answered"},{"route":"/index.html","id":"text-only-model","name":"Text-only model"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR model"},{"route":"/index.html","id":"audio-answered","name":"Audio transcribed"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"second-file-blocked","name":"Second file blocked"},{"route":"/index.html","id":"asr-failed","name":"Transcription failed"},{"route":"/ai-assets.html","id":"default","name":"Endpoints with one ASR","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR endpoint"},{"route":"/ai-assets.html","id":"empty","name":"No endpoints"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

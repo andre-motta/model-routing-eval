@@ -1,0 +1,84 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:43:24.267569+00:00",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to explore",
+          "description": "Empty conversation; vision model selected; image control available.",
+          "default": true
+        },
+        {
+          "id": "image-success",
+          "name": "Image response",
+          "description": "Image and text response visible; attachment quota used.",
+          "default": false
+        },
+        {
+          "id": "audio-success",
+          "name": "Audio response",
+          "description": "Audio filename, transcription, and text response visible; quota used.",
+          "default": false
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio controls visible; no ASR endpoint available; registration guidance shown.",
+          "default": false
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Text-only model selected; no modality controls in DOM.",
+          "default": false
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failure",
+          "description": "ASR unreachable alert visible; no model response present.",
+          "default": false
+        },
+        {
+          "id": "empty-transcription",
+          "name": "No speech detected",
+          "description": "Empty transcription alert visible; no model response present.",
+          "default": false
+        }
+      ]
+    },
+    {
+      "route": "/assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered ASR endpoint",
+          "description": "Registered Whisper endpoint marked as ASR.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty endpoint table with registration call to action.",
+          "default": false
+        },
+        {
+          "id": "unflagged",
+          "name": "Endpoint without ASR flag",
+          "description": "Endpoint exists but transcription capability is unchecked.",
+          "default": false
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoint load failure",
+          "description": "Endpoint table unavailable with retry action and error alert.",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

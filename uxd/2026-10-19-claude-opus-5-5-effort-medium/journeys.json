@@ -1,0 +1,106 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-NFR-1"],
+      "steps": [
+        { "id": "playground-vision-model", "name": "Playground with vision model selected (image control only)", "route": "/playground.html", "export": true },
+        {
+          "id": "type-image-prompt",
+          "name": "Prompt typed for an image question",
+          "route": "/playground.html",
+          "export": false,
+          "actions": [
+            { "type": "fill", "selector": "#chat-input", "value": "What trend does this chart show?" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Model switch updates per-modality controls",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-2", "AC-3", "AC-9"],
+      "steps": [
+        { "id": "model-controls", "name": "Per-modality controls for the selected model (vision / image+audio / text-only via scenarios default, audio-ready, text-only-model)", "route": "/playground.html", "export": true },
+        {
+          "id": "focus-model-select",
+          "name": "Model selector focused (switching with the keyboard updates controls in place)",
+          "route": "/playground.html",
+          "export": false,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"model-select\"]" },
+            { "type": "press", "key": "Escape" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Register a transcription model, then send audio",
+      "persona": "ai-platform-admin",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-NFR-2"],
+      "steps": [
+        { "id": "playground-no-asr", "name": "Playground: audio attached but no ASR endpoint registered", "route": "/playground.html", "export": true },
+        { "id": "endpoints-list", "name": "AI asset endpoints table", "route": "/ai-asset-endpoints.html", "export": true },
+        {
+          "id": "edit-capabilities-modal",
+          "name": "Edit capabilities modal with ASR flag",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"edit-capabilities-whisper-large-v3\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        },
+        { "id": "playground-audio-ready", "name": "Playground: ASR model selected, audio ready to send", "route": "/playground.html", "export": true },
+        {
+          "id": "send-audio",
+          "name": "Audio sent: upload and transcription progress",
+          "route": "/playground.html",
+          "export": false,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-message\"]" },
+            { "type": "wait_for", "selector": "[data-testid=\"processing-status\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-4",
+      "title": "File validation and one-file-per-conversation limit",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-7", "AC-8", "AC-12", "AC-14", "AC-15"],
+      "steps": [
+        { "id": "validation-and-limit", "name": "Composer alerts for invalid files and the conversation limit", "route": "/playground.html", "export": true },
+        {
+          "id": "new-chat-reset",
+          "name": "New chat clears attachments and alerts",
+          "route": "/playground.html",
+          "export": false,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"new-chat\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-5",
+      "title": "Recover from transcription and inference errors",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-10", "AC-11", "AC-G1"],
+      "steps": [
+        { "id": "error-transcript", "name": "Transcript with error alert (no model call made)", "route": "/playground.html", "export": true }
+      ]
+    }
+  ]
+}

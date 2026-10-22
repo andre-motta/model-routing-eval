@@ -1,0 +1,68 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1,
+    "local_artifact": ".artifacts/RHAISTRAT-1527/rfe-snapshot.md"
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "Local RFE snapshot",
+      "url": "../rfe-snapshot.md"
+    },
+    {
+      "kind": "jira",
+      "key": "RHAISTRAT-1527",
+      "label": "Jira source",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace": "standalone",
+  "target": "none",
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {
+    "count": 0
+  },
+  "assumptions": [
+    "The Strategy and final Staff Engineer clarifications override the broader original RFE wishlist.",
+    "The proposed 10 MB image/audio limit is used for demonstration; PM confirmation is pending.",
+    "Model labels and modality combinations are illustrative, not certified catalog data.",
+    "Persona catalog and overlays were not staged; model-explorer is inferred from Playground experimentation tasks.",
+    "ASR capability is represented as an endpoint checkbox; this is an open design question in the source.",
+    "Assets persist in sessionStorage for cross-page mock registration. Chat history is in memory only.",
+    "Backend uploads, temporary storage, base64 encoding, OGX routing, authentication, transcription, inference, and timing are simulated. No network model calls are made.",
+    "The local sample WAV is a silent audio fixture used only to demonstrate playback controls; transcription text is mocked.",
+    "Eight Playground scenarios cover primary visible states. MIME, size, zero-byte, second-file, unknown-capability, and vision-only branches are exercised interactively.",
+    "No microphone, PDF image input, generated audio playback, streaming, model comparison, or chat persistence is implemented."
+  ],
+  "created_at": "2026-10-19T14:36:22.114962Z",
+  "updated_at": "2026-10-19T14:39:53.356979Z",
+  "refinement_history": [],
+  "reachability_self_check_path": ".artifacts/RHAISTRAT-1527/reachability-self-check.json",
+  "verification_limits": {
+    "local_checks": "31 passed",
+    "scenario_count": 11,
+    "browser": "unavailable",
+    "http": "blocked by socket permissions",
+    "production_integration": "not run"
+  }
+}

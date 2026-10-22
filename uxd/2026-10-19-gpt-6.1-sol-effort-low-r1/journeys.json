@@ -1,0 +1,137 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:30:27.129561+00:00",
+  "journeys": [
+    {
+      "id": "vision",
+      "title": "Analyze an image and continue with text",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Select a model and attach an image",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "image-demo",
+          "name": "Image attached",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            }
+          ]
+        },
+        {
+          "id": "response",
+          "name": "Read image analysis",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            },
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Describe this image"
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".response"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "title": "Register an ASR endpoint and transcribe audio",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "endpoints",
+          "name": "AI Asset Endpoints",
+          "route": "/endpoints.html",
+          "export": true
+        },
+        {
+          "id": "register",
+          "name": "Register transcription endpoint",
+          "route": "/endpoints.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            }
+          ]
+        },
+        {
+          "id": "audio-playground",
+          "name": "Use an audio model",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#audio-model"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "title": "Recover from file or transcription errors",
+      "source": "jira",
+      "ac_ids": [
+        "AC-7",
+        "AC-8",
+        "AC-10",
+        "AC-11",
+        "AC-12"
+      ],
+      "steps": [
+        {
+          "id": "upload",
+          "name": "Validate a file",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "new-chat",
+          "name": "Start a clean conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:51:28.387555+00:00",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to experiment",
+          "description": "Empty conversation; vision model and registered ASR endpoint selected.",
+          "default": true
+        },
+        {
+          "id": "image-result",
+          "name": "Image response",
+          "description": "An image is visible with a text response; further attachments are disabled."
+        },
+        {
+          "id": "audio-result",
+          "name": "Audio response",
+          "description": "An audio attachment, transcription and model text response are visible."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio mode is visible with a registration alert and submission blocked."
+        },
+        {
+          "id": "processing",
+          "name": "Transcribing audio",
+          "description": "Audio attachment is present with a persistent transcription progress indicator."
+        },
+        {
+          "id": "upload-error",
+          "name": "Upload failed",
+          "description": "Upload failure alert is visible with retry and remove actions."
+        },
+        {
+          "id": "unsupported",
+          "name": "Unsupported inference",
+          "description": "Unknown-capability model is selected and an inference error offers model recovery."
+        }
+      ]
+    },
+    {
+      "route": "/endpoints.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered endpoints",
+          "description": "Vision, text and ASR endpoints are listed with capability labels.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty endpoint table offers registration and guidance."
+        },
+        {
+          "id": "load-error",
+          "name": "Unable to load",
+          "description": "Endpoint fetch error offers a retry action."
+        },
+        {
+          "id": "registered",
+          "name": "ASR endpoint registered",
+          "description": "Success alert and newly registered transcription endpoint are visible."
+        }
+      ]
+    }
+  ]
+}

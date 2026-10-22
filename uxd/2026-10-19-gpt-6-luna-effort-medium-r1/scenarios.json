@@ -1,0 +1,17 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/",
+      "screen": "Playground",
+      "scenarios": [
+        {"id": "default", "name": "Vision ready", "description": "Vision model selected; image and audio input available; no attachment yet", "default": true},
+        {"id": "text-only", "name": "Text-only model", "description": "Text-only model selected; modality upload controls are absent and text composer remains ready"},
+        {"id": "no-asr", "name": "No ASR asset registered", "description": "Audio-capable model selected; audio upload remains visible with a registration notice and submission unavailable"},
+        {"id": "asr-error", "name": "Transcription failed", "description": "Audio attachment is visible with a persistent ASR endpoint failure message and retry guidance"},
+        {"id": "oversized", "name": "File exceeds limit", "description": "Vision model selected; persistent file size validation error is visible before upload"}
+      ]
+    }
+  ]
+}

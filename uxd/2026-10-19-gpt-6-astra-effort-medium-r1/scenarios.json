@@ -1,0 +1,84 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:47:44.254863+00:00",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to explore",
+          "description": "Empty chat with all input controls and registered ASR choices.",
+          "default": true
+        },
+        {
+          "id": "image-complete",
+          "name": "Image response",
+          "description": "Vision model selected; sample image and complete text response visible; second attachment blocked.",
+          "default": false
+        },
+        {
+          "id": "audio-complete",
+          "name": "Audio response",
+          "description": "Audio conversation with transcription and complete text response visible; second attachment blocked.",
+          "default": false
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio controls visible with empty ASR dropdown and registration guidance.",
+          "default": false
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Text model selected; no image or audio controls in the DOM.",
+          "default": false
+        },
+        {
+          "id": "file-too-large",
+          "name": "File rejected",
+          "description": "Persistent size validation error for a 14 MB image; no attachment uploaded.",
+          "default": false
+        },
+        {
+          "id": "transcription-error",
+          "name": "Transcription failed",
+          "description": "Audio message visible with endpoint failure and recovery guidance; no model response.",
+          "default": false
+        }
+      ]
+    },
+    {
+      "route": "/assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered ASR endpoint",
+          "description": "Whisper demo endpoint listed with ASR capability checked.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty endpoint list with registration guidance.",
+          "default": false
+        },
+        {
+          "id": "unmarked",
+          "name": "ASR flag absent",
+          "description": "Registered endpoint listed with ASR capability unchecked.",
+          "default": false
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoints unavailable",
+          "description": "Endpoint retrieval error with Retry action; table absent.",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

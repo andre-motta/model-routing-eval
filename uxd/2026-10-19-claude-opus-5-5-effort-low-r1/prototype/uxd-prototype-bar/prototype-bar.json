@@ -1,0 +1,83 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://issues.example.com/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "strat",
+      "key": "RHAISTRAT-1527",
+      "label": "Strategy",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "rfe",
+      "key": "RHAIRFE-913",
+      "label": "RFE",
+      "url": "https://issues.redhat.com/browse/RHAIRFE-913"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/playground.html",
+      "id": "default",
+      "name": "Image conversation",
+      "default": true
+    },
+    {
+      "route": "/playground.html",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/playground.html",
+      "id": "audio-transcribed",
+      "name": "Audio transcribed"
+    },
+    {
+      "route": "/playground.html",
+      "id": "no-asr-asset",
+      "name": "No ASR model"
+    },
+    {
+      "route": "/playground.html",
+      "id": "file-too-large",
+      "name": "File too large"
+    },
+    {
+      "route": "/playground.html",
+      "id": "one-file-limit",
+      "name": "Second file blocked"
+    },
+    {
+      "route": "/playground.html",
+      "id": "transcription-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "default",
+      "name": "ASR endpoints flagged",
+      "default": true
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "no-asr-flagged",
+      "name": "No ASR flagged"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "empty",
+      "name": "No endpoints"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:49:30Z",
+  "journeys": [
+    {
+      "id": "configure-asr-asset",
+      "title": "Register an ASR-capable AI Asset",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": ["AC-5", "AC-6"],
+      "steps": [
+        {
+          "id": "asset-list",
+          "name": "AI Asset Endpoints list",
+          "route": "/ai-assets/",
+          "export": true
+        },
+        {
+          "id": "register-modal-open",
+          "name": "Register AI Asset modal open",
+          "route": "/ai-assets/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"register-ai-asset\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        },
+        {
+          "id": "asr-asset-saved",
+          "name": "ASR-capable asset saved",
+          "route": "/ai-assets/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"register-ai-asset\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" },
+            { "type": "fill", "selector": "[data-ouia-component-id=\"asset-name-input\"]", "value": "Whisper Production" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"save-ai-asset\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"asr-asset-row\"]" }
+          ]
+        },
+        {
+          "id": "playground-after-asset",
+          "name": "Playground with ASR asset available",
+          "route": "/playground/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"nav-playground\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"asr-model-select\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vision-image-inference",
+      "title": "Run image inference",
+      "persona": "ai-builder",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-2", "AC-3", "AC-7"],
+      "steps": [
+        {
+          "id": "playground-ready",
+          "name": "Multimodal Playground ready",
+          "route": "/playground/",
+          "export": true
+        },
+        {
+          "id": "image-response",
+          "name": "Image response complete",
+          "route": "/playground/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"image-response-message\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-transcription-inference",
+      "title": "Transcribe audio and run inference",
+      "persona": "ai-builder",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-8", "AC-9", "AC-10", "AC-11"],
+      "steps": [
+        {
+          "id": "audio-controls-ready",
+          "name": "Audio controls ready",
+          "route": "/playground/",
+          "export": true
+        },
+        {
+          "id": "audio-response",
+          "name": "Audio transcription and response complete",
+          "route": "/playground/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-sample-audio\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"audio-response-message\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

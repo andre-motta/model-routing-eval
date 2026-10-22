@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gen AI Studio · AI Asset Endpoints (RHAISTRAT-1527 prototype)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    .pf-v6-c-page__main { min-height: 100vh; }
+    .ai-wrap { padding: 24px; }
+    .ai-hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand"><strong>Gen AI Studio</strong></span></div>
+  </header>
+  <div class="pf-v6-c-page__body">
+    <nav class="pf-v6-c-nav" aria-label="Global">
+      <ul class="pf-v6-c-nav__list">
+        <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="playground.html">Playground</a></li>
+        <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="ai-assets.html" aria-current="page">AI Asset Endpoints</a></li>
+      </ul>
+    </nav>
+
+    <main class="ai-wrap">
+      <div class="pf-v6-c-toolbar">
+        <div class="pf-v6-c-toolbar__content">
+          <h1 class="pf-v6-c-title pf-m-2xl">AI Asset Endpoints</h1>
+          <div class="pf-v6-c-toolbar__item" style="margin-left:auto">
+            <button class="pf-v6-c-button pf-m-primary" type="button">Add endpoint</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="asr-banner" class="pf-v6-c-alert pf-m-success pf-m-inline ai-hidden" style="margin-top:16px" aria-live="polite">
+        <p class="pf-v6-c-alert__title">whisper-large-v3 is flagged ASR-capable and now appears in the Playground audio dropdown.</p>
+      </div>
+
+      <div id="empty-state" class="pf-v6-c-empty-state ai-hidden" style="margin-top:24px">
+        <div class="pf-v6-c-empty-state__content">
+          <h2 class="pf-v6-c-empty-state__title-text">No AI Assets registered</h2>
+          <div class="pf-v6-c-empty-state__body">Register an endpoint to use it in the Playground. Flag a transcription model as ASR-capable to enable audio input.</div>
+          <button class="pf-v6-c-button pf-m-primary" type="button" style="margin-top:16px">Add endpoint</button>
+        </div>
+      </div>
+
+      <table class="pf-v6-c-table pf-m-compact" id="assets-table" aria-label="AI Asset Endpoints" style="margin-top:16px">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Endpoint</th>
+            <th scope="col">Deployment</th>
+            <th scope="col">ASR-capable</th>
+          </tr>
+        </thead>
+        <tbody id="assets-body"></tbody>
+      </table>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Scenario catalog. Keys match scenarios.json ids for /ai-assets.html.
+  var SCENARIOS = {
+    'default': {
+      rows: [
+        { name: 'qwen3-vl-8b-instruct', endpoint: 'https://qwen3-vl.ns.svc/v1', deployment: 'InferenceService', asr: false },
+        { name: 'granite-3.3-8b-instruct', endpoint: 'https://granite.ns.svc/v1', deployment: 'InferenceService', asr: false }
+      ]
+    },
+    'asr-flagged': {
+      rows: [
+        { name: 'qwen3-vl-8b-instruct', endpoint: 'https://qwen3-vl.ns.svc/v1', deployment: 'InferenceService', asr: false },
+        { name: 'whisper-large-v3', endpoint: 'https://whisper.ns.svc/v1', deployment: 'InferenceService', asr: true }
+      ],
+      banner: true
+    },
+    'empty': { rows: [], empty: true }
+  };
+
+  function currentScenario() {
+    var id = (window.UxdScenario && window.UxdScenario.get && window.UxdScenario.get())
+      || new URLSearchParams(window.location.search).get('scenario') || 'default';
+    return SCENARIOS[id] ? id : 'default';
+  }
+
+  function render(s) {
+    document.getElementById('empty-state').classList.toggle('ai-hidden', !s.empty);
+    document.getElementById('assets-table').classList.toggle('ai-hidden', !!s.empty);
+    document.getElementById('asr-banner').classList.toggle('ai-hidden', !s.banner);
+    var body = document.getElementById('assets-body');
+    body.innerHTML = '';
+    s.rows.forEach(function (r) {
+      var tr = document.createElement('tr');
+      var cells = [r.name, r.endpoint, r.deployment];
+      cells.forEach(function (text) {
+        var td = document.createElement('td');
+        td.textContent = text;
+        tr.appendChild(td);
+      });
+      var asrTd = document.createElement('td');
+      if (r.asr) {
+        asrTd.innerHTML = '<span class="pf-v6-c-label pf-m-green" data-testid="asr-badge"><span class="pf-v6-c-label__content">ASR</span></span>';
+      } else {
+        asrTd.innerHTML = '<button class="pf-v6-c-button pf-m-link pf-m-inline" type="button">Flag as ASR</button>';
+      }
+      tr.appendChild(asrTd);
+      body.appendChild(tr);
+    });
+  }
+
+  render(SCENARIOS[currentScenario()]);
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"RHAISTRAT-1527","jiraBaseUrl":"https://issues.example.com/browse/","sources":[],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Text chat","default":true},{"route":"/playground.html","id":"image-attached","name":"Image attached"},{"route":"/playground.html","id":"transcribing","name":"Audio transcribing"},{"route":"/playground.html","id":"audio-no-asr","name":"No ASR model"},{"route":"/playground.html","id":"limit-reached","name":"One-per-conversation limit"},{"route":"/playground.html","id":"file-too-large","name":"File over size limit"},{"route":"/playground.html","id":"text-only-model","name":"Text-only model"},{"route":"/ai-assets.html","id":"default","name":"No ASR assets","default":true},{"route":"/ai-assets.html","id":"asr-flagged","name":"Whisper flagged ASR"},{"route":"/ai-assets.html","id":"empty","name":"No AI Assets"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

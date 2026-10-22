@@ -1,0 +1,138 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "strat",
+      "key": "RHAISTRAT-1527",
+      "label": "Strategy",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "rfe",
+      "key": "RHAIRFE-913",
+      "label": "RFE",
+      "url": "https://issues.redhat.com/browse/RHAIRFE-913"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/playground.html",
+      "id": "default",
+      "name": "Vision model, new chat",
+      "default": true
+    },
+    {
+      "route": "/playground.html",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/playground.html",
+      "id": "image-response",
+      "name": "Image answered"
+    },
+    {
+      "route": "/playground.html",
+      "id": "image-processing",
+      "name": "Image processing"
+    },
+    {
+      "route": "/playground.html",
+      "id": "audio-ready",
+      "name": "Audio ready to send"
+    },
+    {
+      "route": "/playground.html",
+      "id": "audio-transcribing",
+      "name": "Transcribing audio"
+    },
+    {
+      "route": "/playground.html",
+      "id": "audio-response",
+      "name": "Audio answered"
+    },
+    {
+      "route": "/playground.html",
+      "id": "no-asr-asset",
+      "name": "No ASR model registered"
+    },
+    {
+      "route": "/playground.html",
+      "id": "file-too-large",
+      "name": "File too large"
+    },
+    {
+      "route": "/playground.html",
+      "id": "unsupported-file-type",
+      "name": "Unsupported file type"
+    },
+    {
+      "route": "/playground.html",
+      "id": "empty-file",
+      "name": "Empty file"
+    },
+    {
+      "route": "/playground.html",
+      "id": "conversation-limit",
+      "name": "One-file limit reached"
+    },
+    {
+      "route": "/playground.html",
+      "id": "asr-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/playground.html",
+      "id": "empty-transcription",
+      "name": "No speech detected"
+    },
+    {
+      "route": "/playground.html",
+      "id": "model-rejected-input",
+      "name": "Model rejected image"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "default",
+      "name": "Assets with ASR endpoints",
+      "default": true
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "no-asr-flagged",
+      "name": "No ASR endpoints"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "asr-flag-saved",
+      "name": "ASR flag saved"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "asr-filter",
+      "name": "Filtered to ASR endpoints"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "empty",
+      "name": "No AI assets"
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "id": "load-error",
+      "name": "Load error"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": null,
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": null,
+    "count": 0
+  },
+  "assumptions": [
+    "Jira was unreachable; the local snapshot rfe-snapshot.md was used as the canonical source.",
+    "Screen names, routes, and the Input type / ASR dropdown layout are prototype inventions, not confirmed against the gen-ai-ui codebase.",
+    "Standalone build: no codebase was available, so no workspace clone or verification was run.",
+    "Images are JPG/PNG and audio is WAV/MP3 with a 10 MB limit per the RFE proposed default (requires PM confirmation).",
+    "Microphone capture is out of scope per the RFE; PDF input and native input_audio are out of scope.",
+    "Only one image or one audio file per conversation history, per the RFE.",
+    "Decision mode skip: design calls were made inline without a decision kit."
+  ],
+  "created_at": "2026-10-19T13:46:36Z",
+  "updated_at": null,
+  "refinement_history": [],
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype"
+}

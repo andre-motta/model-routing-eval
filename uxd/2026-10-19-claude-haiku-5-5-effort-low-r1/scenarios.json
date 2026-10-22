@@ -1,0 +1,70 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Vision reply with image",
+          "description": "Vision model selected; invoice image in the transcript with an answer",
+          "default": true
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Text-only model; no image or audio controls; info notice"
+        },
+        {
+          "id": "image-limit",
+          "name": "One-file limit reached",
+          "description": "Image already in history; image control disabled with limit notice"
+        },
+        {
+          "id": "audio-no-asr",
+          "name": "No ASR model registered",
+          "description": "Audio-capable model; empty ASR dropdown; submit blocked with register message"
+        },
+        {
+          "id": "audio-transcribed",
+          "name": "Transcript ready",
+          "description": "WAV transcribed by ASR model; transcript shown and model reply rendered"
+        },
+        {
+          "id": "asr-failure",
+          "name": "Transcription failed",
+          "description": "MP3 attached; ASR endpoint unreachable; failure alert, no reply"
+        },
+        {
+          "id": "file-too-large",
+          "name": "File over limit",
+          "description": "High-res PNG rejected client-side; 10 MB limit alert"
+        }
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Assets with one ASR flag",
+          "description": "Whisper asset flagged ASR; other assets unflagged",
+          "default": true
+        },
+        {
+          "id": "no-asr-flagged",
+          "name": "No ASR flags",
+          "description": "Assets listed but none flagged ASR; warning banner"
+        },
+        {
+          "id": "no-assets",
+          "name": "No AI Assets",
+          "description": "Empty table with register call-to-action"
+        }
+      ]
+    }
+  ]
+}

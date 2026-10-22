@@ -1,0 +1,21 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "pages": [
+    {"route":"/playground","screen":"Playground","scenarios":[
+      {"id":"default","name":"Vision ready","description":"Vision model selected; prompt composer and image attachment available.","default":true},
+      {"id":"audio-ready","name":"ASR ready","description":"Audio mode selected; WAV/MP3 upload and registered Whisper ASR selector visible.","default":false},
+      {"id":"no-asr-assets","name":"No ASR model registered","description":"Audio upload is visible with an empty ASR selector and registration guidance.","default":false},
+      {"id":"unsupported-model","name":"Model lacks image capability","description":"Text model selected; image control hidden and capability guidance visible.","default":false},
+      {"id":"upload-too-large","name":"Upload exceeds limit","description":"Selected image exceeds the proposed 10 MB limit; persistent validation alert appears.","default":false},
+      {"id":"inference-error","name":"Multimodal inference rejected","description":"Image attached; persistent error explains the selected model rejected multimodal input.","default":false},
+      {"id":"file-limit-reached","name":"Conversation already has a file","description":"Transcript contains one attached image; image and audio controls are disabled with the one-file limit explained.","default":false}
+    ]},
+    {"route":"/ai-assets","screen":"AIAssetEndpoints","scenarios":[
+      {"id":"default","name":"Assets with ASR model","description":"AI Asset table contains Whisper marked as an ASR transcription endpoint.","default":true},
+      {"id":"no-assets","name":"No AI Assets registered","description":"Empty table explains that an endpoint must be registered before Playground audio can use it.","default":false},
+      {"id":"unmarked-assets","name":"No ASR capability marked","description":"AI Assets exist, but none is marked as a transcription endpoint.","default":false},
+      {"id":"asset-load-error","name":"Asset list failed to load","description":"Persistent error alert appears above the AI Asset table with a retry action.","default":false}
+    ]}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "journeys": [
+    {"id":"image-analysis","title":"Analyze an image in Playground","persona":"app-developer","source":"jira","ac_ids":["AC-1","AC-2","AC-3","AC-7","AC-8","AC-14"],"steps":[{"id":"playground","name":"Playground prompt","route":"/index.html","export":true},{"id":"image-attached","name":"Image attached and response shown","route":"/index.html","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=send-prompt]"},{"type":"wait_for","selector":"[data-ouia-component-id=assistant-response]"}]}]},
+    {"id":"audio-transcription","title":"Transcribe audio and ask a model","persona":"app-developer","source":"jira","ac_ids":["AC-4","AC-5","AC-6","AC-10","AC-11"],"steps":[{"id":"playground-audio","name":"Audio capable Playground","route":"/index.html","export":true}]},
+    {"id":"register-asr","title":"Register a transcription AI Asset","persona":"data-scientist","source":"inferred","ac_ids":["AC-6"],"steps":[{"id":"ai-assets","name":"AI Asset Endpoints","route":"/ai-assets.html","export":true}]}
+  ]
+}

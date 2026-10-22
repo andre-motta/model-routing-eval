@@ -1,0 +1,261 @@
+:root {
+  --uxd-border: #d2d2d2;
+  --uxd-subtle: #f2f2f2;
+}
+
+body {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.uxd-page {
+  min-height: 100vh;
+}
+
+.uxd-brand {
+  color: #fff;
+  font-weight: 700;
+  margin-inline-end: 2rem;
+  text-decoration: none;
+}
+
+.uxd-top-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.uxd-top-nav a {
+  color: #d2d2d2;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+}
+
+.uxd-top-nav a:hover,
+.uxd-top-nav a.pf-m-current {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.uxd-page-header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.uxd-page-header h1 {
+  margin: 0;
+}
+
+.uxd-page-header p {
+  margin: 0.35rem 0 0;
+}
+
+.uxd-config {
+  display: grid;
+  gap: 1rem;
+}
+
+.uxd-config .pf-v6-c-form-control {
+  width: 100%;
+}
+
+.uxd-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.uxd-chat-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 640px;
+}
+
+.uxd-transcript {
+  background: #fff;
+  border: 1px solid var(--uxd-border);
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 350px;
+  overflow-y: auto;
+}
+
+.uxd-message {
+  border: 1px solid var(--uxd-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.65rem;
+  max-width: 78%;
+  padding: 1rem;
+}
+
+.uxd-message-user {
+  background: #e0f0ff;
+  justify-self: end;
+}
+
+.uxd-message-model {
+  background: #fff;
+  justify-self: start;
+}
+
+.uxd-message h3,
+.uxd-message p {
+  margin: 0;
+}
+
+.uxd-media {
+  background: #fff;
+  border: 1px solid var(--uxd-border);
+  border-radius: 6px;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.uxd-image-preview {
+  background: linear-gradient(135deg, #51a549, #2b6cb0);
+  color: #fff;
+  display: grid;
+  font-weight: 700;
+  height: 160px;
+  place-items: center;
+  width: 260px;
+}
+
+.uxd-audio {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.uxd-input-controls {
+  display: grid;
+  gap: 0.75rem;
+  margin-block-end: 1rem;
+}
+
+.uxd-input-row {
+  align-items: center;
+  border: 1px solid var(--uxd-border);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto 1fr auto;
+  padding: 0.75rem;
+}
+
+.uxd-input-row strong {
+  min-width: 7rem;
+}
+
+.uxd-input-row small {
+  color: #4d4d4d;
+}
+
+.uxd-composer {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.uxd-composer textarea {
+  width: 100%;
+}
+
+.uxd-modal {
+  border: 0;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.25);
+  padding: 0;
+  width: min(520px, 92vw);
+}
+
+.uxd-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.uxd-modal .pf-v6-c-modal-box__header,
+.uxd-modal .pf-v6-c-modal-box__body,
+.uxd-modal .pf-v6-c-modal-box__footer {
+  padding: 1.25rem;
+}
+
+.uxd-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.uxd-table th,
+.uxd-table td {
+  border-bottom: 1px solid var(--uxd-border);
+  padding: 0.85rem 0.75rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.uxd-table th {
+  background: var(--uxd-subtle);
+  font-weight: 700;
+}
+
+.uxd-empty {
+  color: #4d4d4d;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.uxd-alert-slot:empty {
+  display: none;
+}
+
+.uxd-inline-alert {
+  align-items: flex-start;
+  border-left: 4px solid #c9190b;
+  display: grid;
+  gap: 0.35rem;
+  margin-block-end: 1rem;
+  padding: 0.85rem;
+}
+
+.uxd-inline-alert strong {
+  color: #a30000;
+}
+
+.uxd-inline-alert.uxd-warning {
+  border-left-color: #f0ab00;
+}
+
+.uxd-inline-alert.uxd-warning strong {
+  color: #735600;
+}
+
+.uxd-inline-alert.uxd-success {
+  border-left-color: #3e8635;
+}
+
+.uxd-inline-alert.uxd-success strong {
+  color: #1e4f18;
+}
+
+.uxd-scenario-note {
+  color: #4d4d4d;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 992px) {
+  .uxd-playground-grid > .pf-v6-l-grid__item {
+    grid-column: 1 / -1;
+  }
+
+  .uxd-input-row {
+    grid-template-columns: 1fr;
+  }
+}

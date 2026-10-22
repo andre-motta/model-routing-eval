@@ -1,0 +1,86 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/playground/",
+      "id": "default",
+      "name": "Multimodal controls ready",
+      "default": true
+    },
+    {
+      "route": "/playground/",
+      "id": "image-complete",
+      "name": "Image response complete"
+    },
+    {
+      "route": "/playground/",
+      "id": "audio-transcribed",
+      "name": "Audio transcribed"
+    },
+    {
+      "route": "/playground/",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/playground/",
+      "id": "no-asr-asset",
+      "name": "No ASR asset"
+    },
+    {
+      "route": "/playground/",
+      "id": "upload-too-large",
+      "name": "File too large"
+    },
+    {
+      "route": "/playground/",
+      "id": "one-file-limit",
+      "name": "One media file limit"
+    },
+    {
+      "route": "/playground/",
+      "id": "transcription-error",
+      "name": "Transcription error"
+    },
+    {
+      "route": "/ai-assets/",
+      "id": "default",
+      "name": "Endpoints populated",
+      "default": true
+    },
+    {
+      "route": "/ai-assets/",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/ai-assets/",
+      "id": "asr-registered",
+      "name": "ASR asset registered"
+    },
+    {
+      "route": "/ai-assets/",
+      "id": "load-error",
+      "name": "Endpoints load error"
+    },
+    {
+      "route": "/ai-assets/",
+      "id": "capability-metadata-pending",
+      "name": "Capability metadata pending"
+    }
+  ]
+}

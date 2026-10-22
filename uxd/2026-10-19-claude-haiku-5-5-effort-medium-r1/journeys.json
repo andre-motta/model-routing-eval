@@ -1,0 +1,104 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Send an image to a vision model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-11"],
+      "steps": [
+        {
+          "id": "vision-model-selected",
+          "name": "Vision model selected, image control visible",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "attach-image-dialog",
+          "name": "Attach image dialog open",
+          "route": "/",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"attach-image\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        },
+        {
+          "id": "image-reply",
+          "name": "Image sent, reply rendered",
+          "route": "/",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Text-only model hides multimodal controls",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-2", "AC-4"],
+      "steps": [
+        {
+          "id": "text-only-model",
+          "name": "Text-only model selected, no modality controls",
+          "route": "/",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Transcribe audio with a registered ASR model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-5", "AC-6", "AC-7", "AC-8"],
+      "steps": [
+        {
+          "id": "audio-without-asr",
+          "name": "Audio-capable model, no ASR model registered",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "audio-transcribed",
+          "name": "Audio transcribed and answered",
+          "route": "/",
+          "export": true
+        },
+        {
+          "id": "asr-failed",
+          "name": "Transcription failed, nothing sent",
+          "route": "/",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-4",
+      "title": "Flag an AI Asset as a transcription endpoint",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": ["AC-10"],
+      "steps": [
+        {
+          "id": "ai-assets-list",
+          "name": "AI Asset Endpoints table",
+          "route": "/ai-asset-endpoints.html",
+          "export": true
+        },
+        {
+          "id": "edit-asset-dialog",
+          "name": "Edit AI Asset dialog open",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-testid=\"edit-asset-whisper-large-v3\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

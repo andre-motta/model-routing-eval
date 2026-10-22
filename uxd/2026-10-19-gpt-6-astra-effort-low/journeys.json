@@ -1,0 +1,161 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:57:34.297634+00:00",
+  "journeys": [
+    {
+      "id": "vision",
+      "title": "Explore image input",
+      "persona": "ai-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "start",
+          "name": "Select model and attach an image",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "sample",
+          "name": "Preview sample image",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            }
+          ]
+        },
+        {
+          "id": "answer",
+          "name": "Read vision response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-image"
+            },
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Describe this image."
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#assistant-response"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "title": "Transcribe audio and ask a question",
+      "persona": "ai-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "assets",
+          "name": "Registered AI Asset Endpoints",
+          "route": "/assets.html",
+          "export": true
+        },
+        {
+          "id": "register",
+          "name": "Register a transcription endpoint",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            }
+          ]
+        },
+        {
+          "id": "audio-input",
+          "name": "Select audio model and attach a file",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-audio"
+            }
+          ]
+        },
+        {
+          "id": "audio-answer",
+          "name": "Read transcription and text response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#sample-audio"
+            },
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Summarize the recording."
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#assistant-response"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recovery",
+      "title": "Recover and start a new conversation",
+      "persona": "ai-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-7",
+        "AC-8",
+        "AC-12",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "validation",
+          "name": "Upload validation and recovery",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "new-chat",
+          "name": "Reset conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

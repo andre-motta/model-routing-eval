@@ -1,0 +1,37 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-6", "AC-12"],
+      "steps": [
+        {"id": "playground", "name": "Playground with image control", "route": "/playground.html", "export": true},
+        {"id": "attach-menu", "name": "Attach menu open", "route": "/playground.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"attach-image\"]"},
+           {"type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-chip\"]"}
+         ]}
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Chat with audio via an ASR model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-8", "AC-10"],
+      "steps": [
+        {"id": "playground-audio", "name": "Playground audio flow", "route": "/playground.html", "export": true},
+        {"id": "register-asr", "name": "AI Asset Endpoints", "route": "/ai-assets.html", "export": true},
+        {"id": "flag-asr", "name": "Edit asset: mark as ASR", "route": "/ai-assets.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"edit-asset-whisper-large-v3\"]"},
+           {"type": "wait_for", "selector": "[role=\"dialog\"]"}
+         ]}
+      ]
+    }
+  ]
+}

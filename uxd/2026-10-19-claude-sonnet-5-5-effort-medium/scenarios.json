@@ -1,0 +1,75 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Text-only model",
+          "description": "Text-only model selected; no image or audio controls, empty chat",
+          "default": true
+        },
+        {
+          "id": "vision-ready",
+          "name": "Vision model ready",
+          "description": "Vision model selected; image control visible, audio hidden, empty chat"
+        },
+        {
+          "id": "image-response",
+          "name": "Image answered",
+          "description": "Vision model; image shown in transcript with text reply; attach disabled by one-file limit"
+        },
+        {
+          "id": "file-too-large",
+          "name": "File too large",
+          "description": "Vision model; danger alert that the chosen file exceeds 10 MB, nothing uploaded"
+        },
+        {
+          "id": "audio-no-asr",
+          "name": "Audio, no ASR model",
+          "description": "Audio-capable model; audio control visible, send blocked, warning to register an ASR AI Asset"
+        },
+        {
+          "id": "audio-ready",
+          "name": "Audio ready to send",
+          "description": "Audio model with ASR dropdown set and WAV chip attached, send enabled"
+        },
+        {
+          "id": "audio-result",
+          "name": "Audio transcribed",
+          "description": "Transcript step and model reply shown in chat"
+        },
+        {
+          "id": "asr-failure",
+          "name": "ASR failure",
+          "description": "Transcription failed danger alert; no model reply"
+        }
+      ]
+    },
+    {
+      "route": "/ai-assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Assets with ASR flag",
+          "description": "Table of endpoints including one flagged ASR",
+          "default": true
+        },
+        {
+          "id": "no-asr",
+          "name": "No ASR assets",
+          "description": "Endpoints listed but none flagged ASR; info alert explains the flag"
+        },
+        {
+          "id": "load-error",
+          "name": "Load error",
+          "description": "Endpoints failed to load; error empty state"
+        }
+      ]
+    }
+  ]
+}

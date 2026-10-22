@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI asset endpoints · Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><div class="pf-v6-c-masthead__brand"><strong>Red Hat OpenShift AI</strong></div></div>
+    <div class="pf-v6-c-masthead__content">Gen AI Studio</div>
+  </header>
+  <div class="pf-v6-c-page__sidebar">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item"><a href="playground.html" class="pf-v6-c-nav__link" data-ouia-component-id="nav-playground">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a href="ai-asset-endpoints.html" class="pf-v6-c-nav__link pf-m-current" aria-current="page" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main" tabindex="-1">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+      <p class="pf-v6-u-mt-sm">Endpoints available to the Playground. Mark speech-to-text models as <strong>Transcription (ASR)</strong> so they appear in the Playground audio model dropdown.</p>
+    </section>
+    <section class="pf-v6-c-page__main-section" id="content" aria-live="polite"></section>
+  </main>
+</div>
+<script src="shared.js"></script>
+<script>
+(function () {
+  var M = window.MM, esc = M.esc, sc = M.scenario();
+  var rows = M.ASSETS.map(function (a) { return Object.assign({}, a); });
+  var notice = null;
+  if (sc === 'no-asr-flagged') {
+    rows.forEach(function (r) { r.asr = false; });
+    notice = { variant: 'info', title: 'No transcription endpoints', body: 'Audio input in the Playground is unavailable until at least one endpoint is marked as Transcription (ASR). Use the Transcription (ASR) switch on a speech-to-text model such as whisper-large-v3.' };
+  } else if (sc === 'empty') rows = [];
+
+  function render() {
+    var c = document.getElementById('content');
+    if (!rows.length) {
+      c.innerHTML = '<div class="pf-v6-c-empty-state" data-ouia-component-id="assets-empty"><div class="pf-v6-c-empty-state__content"><h2 class="pf-v6-c-title pf-m-lg">No AI asset endpoints</h2><div class="pf-v6-c-empty-state__body">Deploy a model or add a custom endpoint to use it in the Playground. To enable audio input, register a speech-to-text model (for example Whisper) and mark it as Transcription (ASR).</div><div class="pf-v6-c-empty-state__footer"><button class="pf-v6-c-button pf-m-primary">Add endpoint</button></div></div></div>';
+      return;
+    }
+    c.innerHTML = (notice ? '<div class="pf-v6-c-alert pf-m-inline pf-m-' + notice.variant + ' pf-v6-u-mb-md" role="alert"><p class="pf-v6-c-alert__title">' + notice.title + '</p><div class="pf-v6-c-alert__description"><p>' + notice.body + '</p></div></div>' : '') +
+      '<table class="pf-v6-c-table pf-m-grid-md" role="grid" aria-label="AI asset endpoints" data-ouia-component-id="assets-table"><thead class="pf-v6-c-table__thead"><tr class="pf-v6-c-table__tr">' +
+      '<th class="pf-v6-c-table__th">Name</th><th class="pf-v6-c-table__th">Type</th><th class="pf-v6-c-table__th">Endpoint</th><th class="pf-v6-c-table__th">Status</th><th class="pf-v6-c-table__th">Transcription (ASR)</th></tr></thead><tbody class="pf-v6-c-table__tbody">' +
+      rows.map(function (r, i) {
+        return '<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td" data-label="Name">' + esc(r.name) + (r.asr ? ' <span class="pf-v6-c-label pf-m-purple pf-m-compact"><span class="pf-v6-c-label__content">ASR</span></span>' : '') + '</td>' +
+          '<td class="pf-v6-c-table__td" data-label="Type">' + r.type + '</td><td class="pf-v6-c-table__td" data-label="Endpoint"><code>' + esc(r.endpoint) + '</code></td>' +
+          '<td class="pf-v6-c-table__td" data-label="Status">' + r.status + '</td><td class="pf-v6-c-table__td" data-label="Transcription (ASR)">' +
+          '<label class="pf-v6-c-switch" for="asr-' + i + '"><input class="pf-v6-c-switch__input" type="checkbox" role="switch" id="asr-' + i + '" data-i="' + i + '" data-ouia-component-id="asr-toggle-' + esc(r.name) + '"' + (r.asr ? ' checked' : '') + ' aria-label="Mark ' + esc(r.name) + ' as transcription endpoint" />' +
+          '<span class="pf-v6-c-switch__toggle"></span><span class="pf-v6-c-switch__label">' + (r.asr ? 'On' : 'Off') + '</span></label></td></tr>';
+      }).join('') + '</tbody></table>';
+    c.querySelectorAll('input[role=switch]').forEach(function (el) {
+      el.onchange = function () { rows[+el.dataset.i].asr = el.checked; notice = rows.some(function (r) { return r.asr; }) ? null : notice; render(); };
+    });
+  }
+  render();
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://issues.example.com/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Image conversation","default":true},{"route":"/playground.html","id":"text-only-model","name":"Text-only model"},{"route":"/playground.html","id":"audio-transcribed","name":"Audio transcribed"},{"route":"/playground.html","id":"no-asr-asset","name":"No ASR model"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"one-file-limit","name":"Second file blocked"},{"route":"/playground.html","id":"transcription-error","name":"Transcription failed"},{"route":"/ai-asset-endpoints.html","id":"default","name":"ASR endpoints flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr-flagged","name":"No ASR flagged"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No endpoints"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

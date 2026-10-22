@@ -1,0 +1,26 @@
+prototype_summary:
+  prototype_id: RHAISTRAT-1527
+  title: Multimodal Support in Gen AI Studio Playground
+  source:
+    type: jira
+    reference: RHAISTRAT-1527
+    rfe_count: 1
+  build_mode: standalone-html
+  decision_mode: skip
+  screens:
+  - Playground
+  - AIAssetEndpoints
+  journeys_path: /home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/journeys.json
+  scenarios_path: /home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/scenarios.json
+  prototype_bar: true
+  prototype_path: /home/alustosa/git/model-routing-eval/.work-uxd-c/agent-eval/2026-10-19-gpt-6-astra-effort-medium/cases/u01_uxd_prototype_create/.artifacts/RHAISTRAT-1527/prototype
+  iteration: 0
+  status: draft
+  created_at: '2026-10-19T12:00:00Z'
+  updated_at: null
+  files_created: 24
+  files_modified: 0
+  reachability:
+    static: pass
+    browser: blocked
+    report: .artifacts/RHAISTRAT-1527/reachability-check.json

@@ -1,0 +1,49 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "Local RFE snapshot",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "Later Staff Engineer scope supersedes original broad RFE: input only, one attachment, no microphone/PDF/output generation/comparison/persistence.",
+    "10 MB is a prototype-only configurable assumption; production limit awaits validation.",
+    "All inference and uploads are local simulations; no BFF, OGX, authentication, storage, catalog, or ASR integration is implemented.",
+    "Sample model capabilities are illustrative. Endpoint registration persists only in browser sessionStorage.",
+    "Scenario axes considered: data presence, association, availability, outcomes, recovery, validation. Match quality is not applicable.",
+    "AC IDs assigned in snapshot acceptance-criteria order."
+  ],
+  "created_at": "2026-10-19T14:43:24.267569+00:00",
+  "updated_at": "2026-10-19T14:43:24.267569+00:00",
+  "refinement_history": [],
+  "reachability": {
+    "status": "static-pass",
+    "report": ".artifacts/RHAISTRAT-1527/reachability-check.json",
+    "browser_validation": "not run: no local Playwright dependency"
+  }
+}

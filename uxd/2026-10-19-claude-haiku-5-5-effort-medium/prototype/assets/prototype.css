@@ -1,0 +1,80 @@
+/* Prototype layout helpers. PatternFly 6 supplies the component styling. */
+.uxd-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.uxd-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+}
+
+.uxd-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 240px;
+  padding: 1rem;
+  border: 1px solid #d2d2d2;
+  border-radius: 6px;
+}
+
+.uxd-message {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background: #f0f0f0;
+}
+
+.uxd-message--user {
+  align-self: flex-end;
+  background: #e0edff;
+}
+
+.uxd-message p {
+  margin: 0;
+}
+
+.uxd-thumb {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 2.5rem 1.5rem;
+  border: 1px dashed #6a6e73;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.875rem;
+}
+
+.uxd-empty {
+  margin: auto;
+  color: #6a6e73;
+}
+
+.uxd-stack > * + * {
+  margin-top: 0.75rem;
+}
+
+.uxd-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.uxd-backdrop[hidden] {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .uxd-layout {
+    grid-template-columns: 1fr;
+  }
+}

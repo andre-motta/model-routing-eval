@@ -1,0 +1,120 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:24:17Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Vision model, new chat",
+          "description": "Qwen2.5-VL selected; empty chat; Image control visible, Audio control absent; format/size/one-file hint shown",
+          "default": true
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Granite selected; no Image or Audio controls in the DOM; capability shows Text only",
+          "default": false
+        },
+        {
+          "id": "file-too-large",
+          "name": "File too large",
+          "description": "Vision model; danger helper text 'street-scene.png is 14.2 MB, limit is 10 MB'; nothing uploaded",
+          "default": false
+        },
+        {
+          "id": "image-processing",
+          "name": "Image sent, generating",
+          "description": "User message with inline image; assistant 'Generating response' spinner with 120 s timeout note",
+          "default": false
+        },
+        {
+          "id": "image-response",
+          "name": "Image answered",
+          "description": "Inline image plus non-empty model answer; '1 of 1 file used' indicator on controls",
+          "default": false
+        },
+        {
+          "id": "model-rejected",
+          "name": "Model rejected image",
+          "description": "Inline image followed by danger alert: model rejected image input at inference time, suggest switching model",
+          "default": false
+        },
+        {
+          "id": "one-file-limit",
+          "name": "Second file blocked",
+          "description": "Answered image conversation with warning alert: only one image or audio file per conversation, Start new chat action",
+          "default": false
+        },
+        {
+          "id": "audio-no-asr",
+          "name": "Audio, no transcription model",
+          "description": "Gemma (image + audio) selected; WAV attached; transcription dropdown empty; warning alert to register an ASR AI asset; Send disabled",
+          "default": false
+        },
+        {
+          "id": "audio-transcribing",
+          "name": "Transcribing audio",
+          "description": "Audio message sent; progress stepper Uploading done, Transcribing audio in progress, Generating pending",
+          "default": false
+        },
+        {
+          "id": "audio-response",
+          "name": "Audio answered",
+          "description": "Audio player with transcription text, followed by non-empty model answer; whisper-large-v3 shown as transcription model",
+          "default": false
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failed",
+          "description": "Audio message with danger alert 'Transcription failed: whisper-large-v3 is unreachable'; no model call made; Retry action",
+          "default": false
+        },
+        {
+          "id": "empty-transcription",
+          "name": "No speech detected",
+          "description": "Audio message with warning alert 'No speech detected'; empty transcription; no model call made",
+          "default": false
+        }
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AiAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Endpoints with ASR flagged",
+          "description": "Five endpoints; whisper-large-v3 and whisper-1 labelled 'Transcription (ASR)'",
+          "default": true
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Endpoints listed but none marked ASR; info alert explains Playground audio needs a transcription endpoint",
+          "default": false
+        },
+        {
+          "id": "asr-marked",
+          "name": "ASR just marked",
+          "description": "Success alert 'whisper-large-v3 is now available as a transcription model in the Playground'; row label updated",
+          "default": false
+        },
+        {
+          "id": "empty",
+          "name": "No AI assets",
+          "description": "Empty state 'No AI asset endpoints' with guidance to deploy or add a custom endpoint",
+          "default": false
+        },
+        {
+          "id": "load-error",
+          "name": "Load error",
+          "description": "Danger empty state 'Unable to load AI asset endpoints' with Retry",
+          "default": false
+        }
+      ]
+    }
+  ]
+}

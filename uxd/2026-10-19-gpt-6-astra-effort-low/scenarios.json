@@ -1,0 +1,95 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:57:34.297634+00:00",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to experiment",
+          "description": "Empty transcript with image and audio controls and a registered ASR model.",
+          "default": true
+        },
+        {
+          "id": "vision-result",
+          "name": "Vision response",
+          "description": "Uploaded sample image and completed text answer; further attachments disabled."
+        },
+        {
+          "id": "audio-result",
+          "name": "Audio response",
+          "description": "Audio attachment, transcription, and completed text answer visible."
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Text-only model selected; image and audio controls absent from the DOM."
+        },
+        {
+          "id": "vision-only",
+          "name": "Vision-only model",
+          "description": "Vision-only model selected; image control present and audio control absent."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio control visible with no ASR endpoint and a registration link; audio submission blocked."
+        },
+        {
+          "id": "processing",
+          "name": "Transcribing audio",
+          "description": "Audio attachment visible with persistent transcription progress and disabled send."
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failed",
+          "description": "Audio retained with an unreachable-endpoint error and retry action; no model answer."
+        },
+        {
+          "id": "empty-transcription",
+          "name": "Silent audio",
+          "description": "Audio retained with a no-speech error; no model answer."
+        },
+        {
+          "id": "invalid-file",
+          "name": "File too large",
+          "description": "File size validation error visible; no attachment uploaded."
+        },
+        {
+          "id": "unsupported",
+          "name": "Unknown model capabilities",
+          "description": "Unknown-capability model selected with a rejected image request and recoverable inference error."
+        }
+      ]
+    },
+    {
+      "route": "/assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered endpoints",
+          "description": "Vision and transcription endpoints listed with capability labels.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "No registered endpoints; registration call to action visible."
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoints unavailable",
+          "description": "Endpoint fetch failure alert and retry action visible."
+        },
+        {
+          "id": "unflagged",
+          "name": "Transcription not enabled",
+          "description": "Whisper endpoint listed without transcription flag; enable action visible."
+        }
+      ]
+    }
+  ]
+}

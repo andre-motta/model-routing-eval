@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multimodal Playground — RHAISTRAT-1527</title>
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="pf-v6-c-masthead" id="prototype-masthead">
+      <div class="pf-v6-c-masthead__main">
+        <div class="pf-v6-c-masthead__brand">
+          <span class="pf-v6-c-brand">
+            <span class="pf-v6-c-brand__text">Red Hat AI Studio</span>
+          </span>
+        </div>
+        <nav class="pf-v6-c-nav" aria-label="Prototype navigation">
+          <ul class="pf-v6-c-nav__list">
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link pf-m-current" href="./" aria-current="page">Playground</a>
+            </li>
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link" href="./ai-assets">AI Asset Endpoints</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="pf-v6-c-masthead__content">
+        <span class="pf-v6-c-label pf-m-outline">
+          <span class="pf-v6-c-label__content">RHAISTRAT-1527</span>
+        </span>
+      </div>
+    </header>
+
+    <main class="prototype-shell" aria-labelledby="page-title">
+      <div class="prototype-column">
+        <section class="pf-v6-c-card prototype-card" aria-labelledby="model-heading">
+          <div class="pf-v6-c-card__title">
+            <h1 id="page-title" class="pf-v6-c-card__title-text">Multimodal Playground</h1>
+          </div>
+          <div class="pf-v6-c-card__body">
+            <h2 id="model-heading" class="pf-v6-c-title pf-m-lg">Model and capabilities</h2>
+          </div>
+          <div class="pf-v6-c-card__body prototype-form-grid">
+            <div>
+              <label class="pf-v6-c-form__label" for="model-selector">Serving model</label>
+              <select
+                id="model-selector"
+                class="pf-v6-c-form-control"
+                data-ouia-component-id="model-selector"
+                aria-describedby="model-capabilities"
+              >
+                <option value="qwen3-vl" data-ouia-component-id="option-qwen3-vl">Qwen3 VL — vision</option>
+                <option value="granite-audio" data-ouia-component-id="option-granite-audio">Granite Audio — audio ASR</option>
+                <option value="granite-text" data-ouia-component-id="option-granite-text">Granite Text — text only</option>
+              </select>
+            </div>
+            <div id="model-capabilities" class="prototype-capability-row" aria-live="polite"></div>
+            <p class="prototype-hint">
+              Controls are driven by model capability tags. Switching models updates the controls without a page reload.
+            </p>
+          </div>
+        </section>
+
+        <section class="pf-v6-c-card prototype-card" aria-labelledby="input-heading">
+          <div class="pf-v6-c-card__title">
+            <h2 id="input-heading" class="pf-v6-c-card__title-text">Input composer</h2>
+          </div>
+          <div class="pf-v6-c-card__body prototype-form-grid">
+            <div id="image-upload-control" data-ouia-component-id="image-upload-control">
+              <label class="pf-v6-c-form__label" for="image-file-input">Image input</label>
+              <div class="prototype-file-row">
+                <input
+                  id="image-file-input"
+                  class="pf-v6-c-file-upload__file-select"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  data-ouia-component-id="image-file-input"
+                />
+                <button
+                  type="button"
+                  class="pf-v6-c-button pf-m-secondary"
+                  data-ouia-component-id="use-sample-image"
+                >
+                  Use sample JPG
+                </button>
+              </div>
+              <p class="prototype-hint">JPG or PNG, maximum 10 MB, one image per conversation history.</p>
+            </div>
+
+            <div id="audio-upload-control" data-ouia-component-id="audio-upload-control">
+              <label class="pf-v6-c-form__label" for="audio-file-input">Audio input</label>
+              <div class="prototype-file-row">
+                <input
+                  id="audio-file-input"
+                  class="pf-v6-c-file-upload__file-select"
+                  type="file"
+                  accept="audio/wav,audio/mpeg"
+                  data-ouia-component-id="audio-file-input"
+                />
+                <button
+                  type="button"
+                  class="pf-v6-c-button pf-m-secondary"
+                  data-ouia-component-id="use-sample-audio"
+                >
+                  Use sample MP3
+                </button>
+              </div>
+              <div id="asr-control">
+                <label class="pf-v6-c-form__label" for="asr-model-selector">ASR AI Asset</label>
+                <select
+                  id="asr-model-selector"
+                  class="pf-v6-c-form-control"
+                  data-ouia-component-id="asr-model-selector"
+                ></select>
+              </div>
+              <p class="prototype-hint">WAV or MP3, maximum 10 MB. Audio is transcribed by the selected ASR AI Asset before inference.</p>
+            </div>
+
+            <div>
+              <label class="pf-v6-c-form__label" for="prompt-input">Prompt</label>
+              <textarea
+                id="prompt-input"
+                class="pf-v6-c-form-control"
+                rows="5"
+                placeholder="Describe what you want the model to do with the attached input."
+                data-ouia-component-id="prompt-input"
+              ></textarea>
+            </div>
+            <div class="prototype-action-row">
+              <button
+                type="button"
+                class="pf-v6-c-button pf-m-primary"
+                data-ouia-component-id="submit-prompt"
+              >
+                Submit prompt
+              </button>
+              <button
+                type="button"
+                class="pf-v6-c-button pf-m-secondary"
+                data-ouia-component-id="new-conversation"
+              >
+                New conversation
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="prototype-column">
+        <section class="pf-v6-c-card prototype-card" aria-labelledby="transcript-heading">
+          <div class="pf-v6-c-card__title">
+            <h2 id="transcript-heading" class="pf-v6-c-card__title-text">Conversation transcript</h2>
+          </div>
+          <div class="pf-v6-c-card__body">
+            <div id="status-region" role="status" aria-live="polite"></div>
+            <div id="transcript" class="prototype-transcript" data-ouia-component-id="conversation-transcript"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="./playground.js"></script>
+  <script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision model ready","default":true},{"route":"/","id":"text-only-model","name":"Text-only model"},{"route":"/","id":"image-ready","name":"Image inference complete"},{"route":"/","id":"audio-ready","name":"Audio inference complete"},{"route":"/","id":"audio-no-asr","name":"No ASR AI Asset"},{"route":"/","id":"upload-error","name":"Oversized image rejected"},{"route":"/","id":"modality-limit","name":"One multimodal file limit"},{"route":"/ai-assets","id":"default","name":"ASR asset available","default":true},{"route":"/ai-assets","id":"empty","name":"No AI Assets"},{"route":"/ai-assets","id":"asr-unregistered","name":"No ASR capability"},{"route":"/ai-assets","id":"save-success","name":"ASR capability saved"},{"route":"/ai-assets","id":"load-error","name":"AI Asset load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

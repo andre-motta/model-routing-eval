@@ -1,0 +1,57 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-1", "AC-3", "AC-7", "AC-8", "AC-14"],
+      "steps": [
+        {"id": "playground", "name": "Playground with vision model", "route": "/playground.html", "export": true},
+        {"id": "image-attached", "name": "Image attached to prompt", "route": "/playground.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"attach-sample-image\"]"},
+           {"type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-chip\"]"}
+         ]},
+        {"id": "image-response", "name": "Image sent, response shown", "route": "/playground.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"attach-sample-image\"]"},
+           {"type": "click", "selector": "[data-ouia-component-id=\"send-button\"]"},
+           {"type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-message\"]"}
+         ]}
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe audio with a registered ASR model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-10", "AC-11"],
+      "steps": [
+        {"id": "audio-model", "name": "Audio-capable model selected", "route": "/playground.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"model-option-qwen2-audio\"]"},
+           {"type": "wait_for", "selector": "[data-ouia-component-id=\"asr-select\"]"}
+         ]},
+        {"id": "register-asr", "name": "AI Asset Endpoints table with ASR flag", "route": "/ai-asset-endpoints.html", "export": true},
+        {"id": "flag-asr-modal", "name": "Mark endpoint as ASR modal", "route": "/ai-asset-endpoints.html", "export": true,
+         "actions": [
+           {"type": "click", "selector": "[data-ouia-component-id=\"edit-capabilities-whisper-ext\"]"},
+           {"type": "wait_for", "selector": "[role=\"dialog\"]"}
+         ]}
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Switch to a text-only model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["AC-2", "AC-9"],
+      "steps": [
+        {"id": "text-only", "name": "Text-only model, no modality controls", "route": "/playground.html", "export": true}
+      ]
+    }
+  ]
+}

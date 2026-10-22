@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gen AI Studio Playground (RHAISTRAT-1527 prototype)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    .uxd-hidden { display: none !important; }
+    .uxd-chat { display: flex; flex-direction: column; gap: var(--pf-t--global--spacer--md); max-height: 460px; overflow-y: auto; padding: var(--pf-t--global--spacer--md); }
+    .uxd-msg-image { max-width: 240px; border: 1px solid var(--pf-t--global--border--color--default); border-radius: var(--pf-t--global--border--radius--small); }
+    .uxd-composer { display: flex; flex-wrap: wrap; gap: var(--pf-t--global--spacer--sm); align-items: flex-end; margin-top: var(--pf-t--global--spacer--md); }
+    .uxd-composer textarea { flex: 1 1 320px; }
+    .uxd-attach-row { display: flex; flex-wrap: wrap; gap: var(--pf-t--global--spacer--sm); align-items: center; margin-top: var(--pf-t--global--spacer--sm); }
+    .uxd-empty { color: var(--pf-t--global--text--color--subtle); padding: var(--pf-t--global--spacer--lg) 0; }
+  </style>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-page__header">
+    <div class="pf-v6-c-masthead">
+      <div class="pf-v6-c-masthead__main">
+        <div class="pf-v6-c-masthead__brand">
+          <span class="pf-v6-c-brand">Gen AI Studio</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="pf-v6-c-page__main-container">
+    <aside class="pf-v6-c-page__sidebar">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="./" aria-current="page">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="ai-asset-endpoints.html">AI Asset Endpoints</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="pf-v6-c-page__main" id="main-content">
+      <section class="pf-v6-c-page__main-section">
+        <h1 class="pf-v6-c-content__title pf-m-2xl">Playground</h1>
+        <p class="pf-v6-c-content__section">Test a model with text, images, or audio. Image and audio controls appear only when the selected model supports them.</p>
+      </section>
+
+      <section class="pf-v6-c-page__main-section">
+        <div class="pf-v6-c-form__group">
+          <label class="pf-v6-c-form__label" for="model-select">
+            <span class="pf-v6-c-form__label-text">Model</span>
+          </label>
+          <select class="pf-v6-c-form-control" id="model-select" data-testid="model-select"></select>
+        </div>
+
+        <div id="alert-area" aria-live="polite"></div>
+
+        <div class="pf-v6-c-card" style="margin-top: var(--pf-t--global--spacer--md);">
+          <div class="pf-v6-c-card__title"><h2 class="pf-v6-c-card__title-text">Conversation</h2></div>
+          <div class="pf-v6-c-card__body">
+            <div class="uxd-chat" id="transcript" role="log" aria-live="polite" aria-label="Conversation transcript"></div>
+
+            <div class="uxd-attach-row">
+              <button class="pf-v6-c-button pf-m-secondary uxd-hidden" type="button" id="attach-image" data-testid="attach-image">Attach image</button>
+              <button class="pf-v6-c-button pf-m-secondary uxd-hidden" type="button" id="attach-audio" data-testid="attach-audio">Attach audio</button>
+              <div class="pf-v6-c-form__group uxd-hidden" id="asr-wrap" style="margin: 0; min-width: 260px;">
+                <label class="pf-v6-c-form__label" for="asr-select">
+                  <span class="pf-v6-c-form__label-text">Transcription model (AI Asset)</span>
+                </label>
+                <select class="pf-v6-c-form-control" id="asr-select" data-testid="asr-model-select"></select>
+              </div>
+            </div>
+            <div id="pending-area" class="uxd-attach-row"></div>
+
+            <div class="uxd-composer">
+              <div class="pf-v6-c-form__group" style="flex: 1 1 320px; margin: 0;">
+                <label class="pf-v6-c-form__label" for="prompt">
+                  <span class="pf-v6-c-form__label-text">Prompt</span>
+                </label>
+                <textarea class="pf-v6-c-form-control" id="prompt" rows="2" placeholder="Type a prompt"></textarea>
+              </div>
+              <button class="pf-v6-c-button pf-m-primary" type="button" id="send" data-testid="send">Send</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Attach dialog: shared by image and audio -->
+  <div class="pf-v6-c-backdrop uxd-hidden" id="attach-backdrop">
+    <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="attach-title" style="margin: auto; max-width: 480px;">
+      <header class="pf-v6-c-modal-box__header">
+        <h1 class="pf-v6-c-modal-box__title" id="attach-title">Attach file</h1>
+      </header>
+      <div class="pf-v6-c-modal-box__body">
+        <div class="pf-v6-c-form__group">
+          <label class="pf-v6-c-form__label" for="attach-input">
+            <span class="pf-v6-c-form__label-text" id="attach-hint">Choose a file</span>
+          </label>
+          <input class="pf-v6-c-form-control" type="file" id="attach-input" data-testid="attach-input" />
+        </div>
+        <p class="pf-v6-c-helper-text" id="attach-error" role="alert" style="color: var(--pf-t--global--color--status--danger--default);"></p>
+      </div>
+      <footer class="pf-v6-c-modal-box__footer">
+        <button class="pf-v6-c-button pf-m-primary" type="button" id="attach-confirm" data-testid="attach-confirm">Attach</button>
+        <button class="pf-v6-c-button pf-m-link" type="button" id="attach-cancel">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Prototype-only mock data. Tags follow the names agreed in RHAISTRAT-1527 (image-inferencing, audio-asr).
+    var MODELS = [
+      { id: 'qwen2.5-vl-7b-instruct', label: 'Qwen2.5-VL-7B-Instruct', tags: ['image-inferencing'] },
+      { id: 'qwen2.5-omni-7b', label: 'Qwen2.5-Omni-7B', tags: ['image-inferencing', 'audio-asr'] },
+      { id: 'granite-3.3-8b-instruct', label: 'Granite-3.3-8B-Instruct', tags: [] }
+    ];
+    var MAX_BYTES = 10 * 1024 * 1024;
+
+    // One entry per scenario. Each describes the on-load end state of the page.
+    var SCENARIOS = {
+      'default': {
+        model: 'qwen2.5-vl-7b-instruct', asrAssets: [], asrSelected: '',
+        imageLocked: false, audioLocked: false, sendDisabled: false,
+        transcript: [], alert: null, pending: null
+      },
+      'text-only': {
+        model: 'granite-3.3-8b-instruct', asrAssets: [], asrSelected: '',
+        imageLocked: false, audioLocked: false, sendDisabled: false,
+        transcript: [],
+        alert: { variant: 'info', title: 'Text-only model', body: 'Granite-3.3-8B-Instruct accepts text input only. Image and audio controls are hidden for this model.' },
+        pending: null
+      },
+      'image-exchange': {
+        model: 'qwen2.5-vl-7b-instruct', asrAssets: [], asrSelected: '',
+        imageLocked: true, audioLocked: false, sendDisabled: false,
+        transcript: [
+          { role: 'user', text: 'What trend does this chart show?', image: { name: 'quarterly-latency.png', alt: 'Bar chart of quarterly latency with bars falling each quarter' } },
+          { role: 'assistant', text: 'Latency falls every quarter, from about 420 ms in Q1 to about 180 ms in Q4.' }
+        ],
+        alert: { variant: 'info', title: 'One image or audio file per conversation', body: 'This conversation already includes an image. Start a new chat to attach another file.' },
+        pending: null
+      },
+      'audio-no-asr': {
+        model: 'qwen2.5-omni-7b', asrAssets: [], asrSelected: '',
+        imageLocked: false, audioLocked: false, sendDisabled: true,
+        transcript: [],
+        alert: { variant: 'warning', title: 'No transcription model registered', body: 'Audio input needs a transcription model. Register a Whisper-compatible model as an AI Asset and flag it as Transcription (ASR) on the AI Asset Endpoints page.' },
+        pending: null
+      },
+      'audio-transcribed': {
+        model: 'qwen2.5-omni-7b', asrAssets: ['whisper-large-v3'], asrSelected: 'whisper-large-v3',
+        imageLocked: false, audioLocked: true, sendDisabled: false,
+        transcript: [
+          { role: 'user', text: '', audio: { name: 'standup-notes.wav', duration: '0:42', transcript: 'Ship the multimodal Playground by Friday, and review the ASR error states with QE.' } },
+          { role: 'assistant', text: 'Action items: ship the multimodal Playground by Friday, and review the ASR error states with QE.' }
+        ],
+        alert: { variant: 'info', title: 'One image or audio file per conversation', body: 'This conversation already includes an audio file. Start a new chat to attach another file.' },
+        pending: null
+      },
+      'asr-failure': {
+        model: 'qwen2.5-omni-7b', asrAssets: ['whisper-large-v3'], asrSelected: 'whisper-large-v3',
+        imageLocked: false, audioLocked: false, sendDisabled: true,
+        transcript: [],
+        alert: { variant: 'danger', title: 'Transcription failed', body: 'The selected transcription model could not be reached, so nothing was sent to the model. Retry, or choose another transcription model.' },
+        pending: { kind: 'audio', name: 'standup-notes.wav' }
+      },
+      'asr-empty': {
+        model: 'qwen2.5-omni-7b', asrAssets: ['whisper-large-v3'], asrSelected: 'whisper-large-v3',
+        imageLocked: false, audioLocked: false, sendDisabled: true,
+        transcript: [],
+        alert: { variant: 'warning', title: 'No speech detected', body: 'The transcription model returned an empty transcript for this file, so nothing was sent to the model. Try a different recording.' },
+        pending: { kind: 'audio', name: 'silence-10s.wav' }
+      }
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    function resolveScenarioId() {
+      var fromUrl = new URLSearchParams(window.location.search).get('scenario');
+      var fromBar = window.UxdScenario && typeof window.UxdScenario.get === 'function' ? window.UxdScenario.get() : null;
+      var id = fromUrl || fromBar || 'default';
+      return SCENARIOS[id] ? id : 'default';
+    }
+
+    var S = JSON.parse(JSON.stringify(SCENARIOS[resolveScenarioId()]));
+    var attachKind = 'image';
+
+    function modelById(id) {
+      for (var i = 0; i < MODELS.length; i++) { if (MODELS[i].id === id) return MODELS[i]; }
+      return null;
+    }
+
+    function chartSvg(name) {
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="240" height="150" viewBox="0 0 240 150">' +
+        '<rect width="240" height="150" fill="#f2f2f2"/>' +
+        '<text x="10" y="20" font-family="sans-serif" font-size="12" fill="#151515">' + name + '</text>' +
+        '<rect x="30" y="60" width="30" height="80" fill="#0066cc"/>' +
+        '<rect x="80" y="75" width="30" height="65" fill="#0066cc"/>' +
+        '<rect x="130" y="95" width="30" height="45" fill="#0066cc"/>' +
+        '<rect x="180" y="110" width="30" height="30" fill="#0066cc"/></svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined && text !== null) node.textContent = text;
+      return node;
+    }
+
+    function fillModelSelect() {
+      var sel = $('model-select');
+      sel.innerHTML = '';
+      MODELS.forEach(function (m) {
+        var opt = el('option', null, m.label);
+        opt.value = m.id;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderAsr() {
+      var sel = $('asr-select');
+      sel.innerHTML = '';
+      if (!S.asrAssets.length) {
+        var none = el('option', null, 'No transcription model registered');
+        none.value = '';
+        sel.appendChild(none);
+        sel.disabled = true;
+        return;
+      }
+      sel.disabled = false;
+      S.asrAssets.forEach(function (id) {
+        var opt = el('option', null, id);
+        opt.value = id;
+        sel.appendChild(opt);
+      });
+      sel.value = S.asrSelected || S.asrAssets[0];
+    }
+
+    function renderAlert() {
+      var area = $('alert-area');
+      area.innerHTML = '';
+      if (!S.alert) return;
+      var wrap = el('div', 'pf-v6-c-alert pf-m-inline pf-m-' + S.alert.variant);
+      wrap.setAttribute('aria-label', S.alert.variant + ' alert');
+      var title = el('h4', 'pf-v6-c-alert__title', S.alert.title);
+      var desc = el('div', 'pf-v6-c-alert__description', S.alert.body);
+      wrap.appendChild(title);
+      wrap.appendChild(desc);
+      area.appendChild(wrap);
+    }
+
+    function renderTranscript() {
+      var box = $('transcript');
+      box.innerHTML = '';
+      if (!S.transcript.length) {
+        box.appendChild(el('p', 'uxd-empty', 'No messages yet. Attach a file with the controls below, or type a prompt.'));
+        return;
+      }
+      var modelLabel = (modelById(S.model) || {}).label || 'Model';
+      S.transcript.forEach(function (m) {
+        var card = el('div', 'pf-v6-c-card pf-m-compact');
+        var body = el('div', 'pf-v6-c-card__body');
+        body.appendChild(el('strong', null, m.role === 'user' ? 'You' : modelLabel));
+        if (m.image) {
+          var img = document.createElement('img');
+          img.className = 'uxd-msg-image';
+          img.src = chartSvg(m.image.name);
+          img.alt = m.image.alt;
+          body.appendChild(img);
+          body.appendChild(el('p', null, 'Image: ' + m.image.name));
+        }
+        if (m.audio) {
+          body.appendChild(el('p', null, 'Audio: ' + m.audio.name + ' (' + m.audio.duration + ')'));
+          body.appendChild(el('p', 'pf-v6-u-font-style-italic', 'Transcript: ' + m.audio.transcript));
+        }
+        if (m.text) body.appendChild(el('p', null, m.text));
+        card.appendChild(body);
+        box.appendChild(card);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function renderPending() {
+      var area = $('pending-area');
+      area.innerHTML = '';
+      if (!S.pending) return;
+      var label = el('span', 'pf-v6-c-label pf-m-blue', 'Attached ' + S.pending.kind + ': ' + S.pending.name);
+      area.appendChild(label);
+      var remove = el('button', 'pf-v6-c-button pf-m-plain', 'Remove');
+      remove.type = 'button';
+      remove.setAttribute('aria-label', 'Remove attachment ' + S.pending.name);
+      remove.addEventListener('click', function () { S.pending = null; S.sendDisabled = false; S.alert = null; render(); });
+      area.appendChild(remove);
+      if (S.pending.kind === 'audio' && S.asrAssets.length) {
+        var retry = el('button', 'pf-v6-c-button pf-m-secondary', 'Retry transcription');
+        retry.type = 'button';
+        retry.addEventListener('click', function () {
+          S.alert = { variant: 'info', title: 'Transcribing audio', body: 'Calling the selected transcription model. This prototype does not call a real endpoint.' };
+          S.sendDisabled = false;
+          render();
+        });
+        area.appendChild(retry);
+      }
+    }
+
+    function render() {
+      var model = modelById(S.model) || { tags: [] };
+      var hasImage = model.tags.indexOf('image-inferencing') !== -1;
+      var hasAudio = model.tags.indexOf('audio-asr') !== -1;
+
+      $('model-select').value = S.model;
+
+      var attachImage = $('attach-image');
+      attachImage.classList.toggle('uxd-hidden', !hasImage);
+      attachImage.disabled = !!S.imageLocked;
+
+      var attachAudio = $('attach-audio');
+      attachAudio.classList.toggle('uxd-hidden', !hasAudio);
+      attachAudio.disabled = !!S.audioLocked;
+
+      $('asr-wrap').classList.toggle('uxd-hidden', !hasAudio);
+      renderAsr();
+      renderAlert();
+      renderTranscript();
+      renderPending();
+      $('send').disabled = !!S.sendDisabled;
+    }
+
+    function openAttach(kind) {
+      attachKind = kind;
+      $('attach-title').textContent = kind === 'image' ? 'Attach image' : 'Attach audio';
+      $('attach-hint').textContent = kind === 'image' ? 'JPG or PNG, up to 10 MB' : 'WAV or MP3, up to 10 MB';
+      $('attach-input').accept = kind === 'image' ? 'image/jpeg,image/png' : 'audio/wav,audio/mpeg';
+      $('attach-input').value = '';
+      $('attach-error').textContent = '';
+      $('attach-backdrop').classList.remove('uxd-hidden');
+      $('attach-input').focus();
+    }
+
+    function closeAttach() {
+      $('attach-backdrop').classList.add('uxd-hidden');
+    }
+
+    function validateFile(file, kind) {
+      if (!file) return 'Choose a file to attach.';
+      if (file.size === 0) return 'The file is empty. Choose a different file.';
+      if (file.size > MAX_BYTES) return 'The file is larger than 10 MB. Choose a smaller file.';
+      var okTypes = kind === 'image' ? ['image/jpeg', 'image/png'] : ['audio/wav', 'audio/x-wav', 'audio/mpeg'];
+      if (okTypes.indexOf(file.type) === -1) {
+        return kind === 'image' ? 'Only JPG and PNG files are supported.' : 'Only WAV and MP3 files are supported.';
+      }
+      return null;
+    }
+
+    $('model-select').addEventListener('change', function (e) {
+      S.model = e.target.value;
+      render();
+    });
+
+    $('asr-select').addEventListener('change', function (e) {
+      S.asrSelected = e.target.value;
+    });
+
+    $('attach-image').addEventListener('click', function () { openAttach('image'); });
+    $('attach-audio').addEventListener('click', function () { openAttach('audio'); });
+    $('attach-cancel').addEventListener('click', closeAttach);
+
+    $('attach-confirm').addEventListener('click', function () {
+      var file = $('attach-input').files[0];
+      var problem = validateFile(file, attachKind);
+      if (problem) {
+        $('attach-error').textContent = problem;
+        return;
+      }
+      if (attachKind === 'audio' && !S.asrAssets.length) {
+        $('attach-error').textContent = 'Register a transcription model as an AI Asset before attaching audio.';
+        return;
+      }
+      S.pending = { kind: attachKind, name: file.name };
+      S.alert = null;
+      closeAttach();
+      render();
+    });
+
+    $('send').addEventListener('click', function () {
+      if (S.sendDisabled) return;
+      var prompt = $('prompt').value.trim();
+      if (!prompt && !S.pending) return;
+      var userMsg = { role: 'user', text: prompt };
+      if (S.pending && S.pending.kind === 'image') {
+        userMsg.image = { name: S.pending.name, alt: 'Attached image: ' + S.pending.name };
+        S.imageLocked = true;
+      }
+      if (S.pending && S.pending.kind === 'audio') {
+        userMsg.audio = { name: S.pending.name, duration: '0:00', transcript: '(mock transcript for prototype)' };
+        S.audioLocked = true;
+      }
+      S.transcript.push(userMsg);
+      S.transcript.push({ role: 'assistant', text: 'Mock reply: this prototype does not call a model.' });
+      if (S.pending) {
+        S.alert = { variant: 'info', title: 'One image or audio file per conversation', body: 'This conversation already includes a ' + S.pending.kind + ' file. Start a new chat to attach another file.' };
+      }
+      S.pending = null;
+      $('prompt').value = '';
+      render();
+    });
+
+    fillModelSelect();
+    render();
+  </script>
+</div>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision model, empty chat","default":true},{"route":"/","id":"text-only","name":"Text-only model"},{"route":"/","id":"image-exchange","name":"Image answered, image locked"},{"route":"/","id":"audio-no-asr","name":"Audio model, no ASR registered"},{"route":"/","id":"audio-transcribed","name":"Audio transcribed and answered"},{"route":"/","id":"asr-failure","name":"Transcription endpoint unreachable"},{"route":"/","id":"asr-empty","name":"Silent audio, empty transcript"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Assets with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"Whisper registered but not flagged"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI Assets"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

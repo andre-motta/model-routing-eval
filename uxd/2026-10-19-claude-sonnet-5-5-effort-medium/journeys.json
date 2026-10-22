@@ -1,0 +1,116 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Send an image to a vision model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-4",
+        "AC-17"
+      ],
+      "steps": [
+        {
+          "id": "vision-ready",
+          "name": "Vision model selected",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "image-response",
+          "name": "Image in transcript with response",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe audio and chat",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-5",
+        "AC-10",
+        "AC-11",
+        "AC-13"
+      ],
+      "steps": [
+        {
+          "id": "audio-blocked",
+          "name": "No ASR model registered",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "audio-ready",
+          "name": "ASR model chosen, file attached",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "audio-result",
+          "name": "Transcript and response",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Register an ASR AI Asset",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": [
+        "AC-15",
+        "AC-16"
+      ],
+      "steps": [
+        {
+          "id": "assets-list",
+          "name": "AI Asset Endpoints table",
+          "route": "/ai-assets.html",
+          "export": true
+        },
+        {
+          "id": "mark-asr-open",
+          "name": "Mark as ASR dialog open",
+          "route": "/ai-assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"mark-asr-whisper-large\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[role=\"dialog\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-4",
+      "title": "Handle invalid files",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-7",
+        "AC-8",
+        "AC-9"
+      ],
+      "steps": [
+        {
+          "id": "file-too-large",
+          "name": "File exceeds limit",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        { "id": "default", "name": "Vision model, new chat", "description": "Qwen2.5-VL selected; Image input label; Attach image shown, no audio control; empty conversation", "default": true },
+        { "id": "text-only-model", "name": "Text-only model", "description": "granite-3.3 selected; no file controls in the DOM; 'accepts text only' helper; prior text exchange in transcript" },
+        { "id": "image-response", "name": "Image answered", "description": "Chart image rendered inline with alt text in a user message; model text response below; attach controls disabled, 1 of 1 file used" },
+        { "id": "image-processing", "name": "Image processing", "description": "Image message in transcript; status 'Image uploaded ✓ / Waiting for model response…' with spinner; input disabled" },
+        { "id": "audio-ready", "name": "Audio ready to send", "description": "Qwen2.5-Omni selected; image + audio controls; ASR dropdown with whisper-large-v3; standup-notes.wav chip staged in composer" },
+        { "id": "audio-transcribing", "name": "Transcribing audio", "description": "Audio message in transcript; status 'Audio uploaded ✓ / Transcribing audio with whisper-large-v3… / Waiting for model response'" },
+        { "id": "audio-response", "name": "Audio answered", "description": "Audio player with expanded transcription in user message; model text response listing action items" },
+        { "id": "no-asr-asset", "name": "No ASR model registered", "description": "Audio model selected; ASR dropdown disabled 'No transcription models available'; customer-call.mp3 staged; warning alert with link to AI asset endpoints; Send disabled" },
+        { "id": "file-too-large", "name": "File too large", "description": "Danger alert in composer: site-survey-photo.png is 14.2 MB, limit 10 MB; nothing attached" },
+        { "id": "unsupported-file-type", "name": "Unsupported file type", "description": "Danger alert in composer: quarterly-report.pdf not a supported image type, pointer to Upload files for PDFs" },
+        { "id": "empty-file", "name": "Empty file", "description": "Danger alert in composer: screenshot.png is 0 bytes; nothing attached" },
+        { "id": "conversation-limit", "name": "One-file limit reached", "description": "Image conversation in transcript; warning alert 'Only one image or audio file per conversation' with Start new chat action" },
+        { "id": "asr-error", "name": "Transcription failed", "description": "Audio message without transcription; danger alert 'Audio transcription failed' (503), no model response" },
+        { "id": "empty-transcription", "name": "No speech detected", "description": "Audio message with 'Empty transcription'; warning alert 'No speech detected', no model response" },
+        { "id": "model-rejected-input", "name": "Model rejected image", "description": "gemma-3-4b-it selected; image message followed by danger alert that the model returned 400 for image content" }
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AiAssetEndpoints",
+      "scenarios": [
+        { "id": "default", "name": "Assets with ASR endpoints", "description": "Table of 6 AI assets; whisper-large-v3 and whisper-1 carry the Transcription (ASR) label", "default": true },
+        { "id": "no-asr-flagged", "name": "No ASR endpoints", "description": "Info alert 'No transcription (ASR) endpoints'; whisper-large-v3 row highlighted without the ASR label" },
+        { "id": "asr-flag-saved", "name": "ASR flag saved", "description": "Success alert 'whisper-large-v3 is now a transcription (ASR) endpoint' with Open Playground link; row highlighted" },
+        { "id": "asr-filter", "name": "Filtered to ASR endpoints", "description": "Show filter set to Transcription (ASR) endpoints; only the two Whisper rows listed" },
+        { "id": "empty", "name": "No AI assets", "description": "Empty state 'No AI asset endpoints' with guidance to deploy a Whisper model for audio" },
+        { "id": "load-error", "name": "Load error", "description": "Error empty state 'Unable to load AI asset endpoints' (502) with Retry" }
+      ]
+    }
+  ]
+}

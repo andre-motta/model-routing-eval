@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RHAISTRAT-1527 · Multimodal support in Gen AI studio Playground</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <div class="pf-v6-c-page__main-container">
+    <main class="pf-v6-c-page__main">
+      <section class="pf-v6-c-page__main-section">
+        <div class="pf-v6-c-page__main-body">
+          <h1 class="pf-v6-c-title pf-m-2xl">RHAISTRAT-1527: Multimodal support in Gen AI studio Playground</h1>
+          <p class="pf-v6-u-mt-sm">Standalone prototype of image and audio <b>input</b> in the Playground (text output only). Audio is transcribed by a user-registered ASR AI asset before reaching the model.</p>
+          <ul class="pf-v6-c-list pf-v6-u-mt-md">
+            <li><a href="playground.html" data-ouia-component-id="start-playground">Playground</a>: per-modality image and audio controls, ASR model dropdown, inline rendering, validation and one-file-per-conversation limit</li>
+            <li><a href="ai-asset-endpoints.html" data-ouia-component-id="start-endpoints">AI asset endpoints</a>: mark an AI asset as a transcription (ASR) endpoint</li>
+          </ul>
+          <p class="pf-v6-u-mt-md pf-v6-u-color-200">Use the Prototype Bar Scenario menu, or add <code>?scenario=&lt;id&gt;</code> to a page URL, to load other end states.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Vision model, new chat","default":true},{"route":"/playground.html","id":"text-only-model","name":"Text-only model"},{"route":"/playground.html","id":"image-response","name":"Image answered"},{"route":"/playground.html","id":"image-processing","name":"Image processing"},{"route":"/playground.html","id":"audio-ready","name":"Audio ready to send"},{"route":"/playground.html","id":"audio-transcribing","name":"Transcribing audio"},{"route":"/playground.html","id":"audio-response","name":"Audio answered"},{"route":"/playground.html","id":"no-asr-asset","name":"No ASR model registered"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"unsupported-file-type","name":"Unsupported file type"},{"route":"/playground.html","id":"empty-file","name":"Empty file"},{"route":"/playground.html","id":"conversation-limit","name":"One-file limit reached"},{"route":"/playground.html","id":"asr-error","name":"Transcription failed"},{"route":"/playground.html","id":"empty-transcription","name":"No speech detected"},{"route":"/playground.html","id":"model-rejected-input","name":"Model rejected image"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Assets with ASR endpoints","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr-flagged","name":"No ASR endpoints"},{"route":"/ai-asset-endpoints.html","id":"asr-flag-saved","name":"ASR flag saved"},{"route":"/ai-asset-endpoints.html","id":"asr-filter","name":"Filtered to ASR endpoints"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI assets"},{"route":"/ai-asset-endpoints.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

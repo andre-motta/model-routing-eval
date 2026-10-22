@@ -1,0 +1,9 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T16:00:00Z",
+  "journeys": [
+    {"id":"vision-prompt","title":"Explore a vision model","persona":"ai-studio-user","source":"jira","ac_ids":["US-1","US-3"],"steps":[{"id":"playground","name":"Playground multimodal prompt","route":"/playground","export":true},{"id":"select-image","name":"Attach an image","route":"/playground","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"attach-image\"]"}]},{"id":"submit-prompt","name":"Submit prompt with image","route":"/playground","export":true,"actions":[{"type":"fill","selector":"[data-ouia-component-id=\"prompt-input\"]","value":"What is in this image?"},{"type":"click","selector":"[data-ouia-component-id=\"send-prompt\"]"}]}]},
+    {"id":"audio-transcription","title":"Submit audio through a registered ASR model","persona":"ai-studio-user","source":"jira","ac_ids":["US-2","US-3"],"steps":[{"id":"audio-playground","name":"Playground audio input","route":"/playground","export":true},{"id":"choose-asr","name":"Choose transcription model and audio","route":"/playground","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"audio-input\"]"}]},{"id":"submit-audio","name":"Submit audio for transcription","route":"/playground","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"send-prompt\"]"}]}]},
+    {"id":"register-asr","title":"Mark an AI Asset as transcription capable","persona":"ai-studio-admin","source":"jira","ac_ids":["US-4"],"steps":[{"id":"assets","name":"AI Asset Endpoints","route":"/ai-assets","export":true},{"id":"edit-asset","name":"Edit asset capabilities","route":"/ai-assets","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"edit-whisper\"]"}]},{"id":"save-asset","name":"Save ASR capability","route":"/ai-assets","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"save-asset\"]"}]}]}
+  ]
+}

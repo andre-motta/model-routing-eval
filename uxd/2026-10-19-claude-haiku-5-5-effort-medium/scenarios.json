@@ -1,0 +1,75 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:55:00Z",
+  "pages": [
+    {
+      "route": "/",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Vision model, image input",
+          "description": "Vision-capable model selected; image input active; no audio control; empty transcript; Send disabled until an image is attached",
+          "default": true
+        },
+        {
+          "id": "text-only-model",
+          "name": "Text-only model",
+          "description": "Text-only model selected; no image or audio controls rendered; info banner says image and audio inputs are unavailable for this model"
+        },
+        {
+          "id": "audio-no-asr-asset",
+          "name": "Audio, no ASR AI Asset",
+          "description": "Audio-capable model with audio input active; ASR dropdown empty with a register-a-transcription-model message; Send disabled"
+        },
+        {
+          "id": "audio-ready",
+          "name": "Audio ready to send",
+          "description": "Audio-capable model; whisper-large-v3 selected in ASR dropdown; standup-note.wav attached and ready; Send enabled"
+        },
+        {
+          "id": "image-limit-reached",
+          "name": "One image per conversation",
+          "description": "Transcript holds one image exchange; attach control disabled with a one-image-per-conversation notice"
+        },
+        {
+          "id": "file-too-large",
+          "name": "File over size limit",
+          "description": "Image input active; danger message says scan-report.png (14.2 MB) exceeds the 10 MB limit and nothing was sent; no attachment; Send disabled"
+        },
+        {
+          "id": "asr-failed",
+          "name": "ASR transcription failed",
+          "description": "Audio ready with whisper-large-v3 selected; danger alert says transcription failed because the endpoint is unreachable; Send disabled"
+        }
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "ASR asset flagged",
+          "description": "Table lists registered AI Assets; whisper-large-v3 shows ASR / transcription capability and the others show Chat",
+          "default": true
+        },
+        {
+          "id": "no-asr-flag",
+          "name": "No ASR flag",
+          "description": "Table lists AI Assets with none flagged ASR / transcription; warning banner says Playground audio input is blocked"
+        },
+        {
+          "id": "empty",
+          "name": "No AI Assets",
+          "description": "No AI Assets registered; empty state with Add AI Asset action"
+        },
+        {
+          "id": "load-error",
+          "name": "Load failed",
+          "description": "Danger alert says AI Asset endpoints could not be loaded, with a Retry action; no table rows"
+        }
+      ]
+    }
+  ]
+}

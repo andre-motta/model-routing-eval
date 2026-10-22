@@ -1,0 +1,80 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:37:34Z",
+  "pages": [
+    {
+      "route": "/",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Vision model ready",
+          "description": "Vision model selected; image control visible, audio control hidden, and transcript empty.",
+          "default": true
+        },
+        {
+          "id": "text-only-model",
+          "name": "Text-only model",
+          "description": "Text-only model selected; image and audio controls absent, with the standard text prompt ready."
+        },
+        {
+          "id": "image-ready",
+          "name": "Image inference complete",
+          "description": "JPG attached and vision response returned; inline image thumbnail and assistant text visible."
+        },
+        {
+          "id": "audio-ready",
+          "name": "Audio inference complete",
+          "description": "ASR AI Asset selected, MP3 attached, transcription shown, and assistant response returned."
+        },
+        {
+          "id": "audio-no-asr",
+          "name": "No ASR AI Asset",
+          "description": "Audio-capable model selected; audio control visible but submission blocked by no-ASR-asset guidance."
+        },
+        {
+          "id": "upload-error",
+          "name": "Oversized image rejected",
+          "description": "12.4 MB PNG rejected before upload; persistent size-limit error and no file badge shown."
+        },
+        {
+          "id": "modality-limit",
+          "name": "One multimodal file limit",
+          "description": "Conversation already contains an image; a second image or audio upload is blocked with a one-file limit alert."
+        }
+      ]
+    },
+    {
+      "route": "/ai-assets",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "ASR asset available",
+          "description": "AI Asset list loaded; one endpoint is marked ASR-capable and available to Playground.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No AI Assets",
+          "description": "No AI Assets are registered; empty state explains how to connect an ASR endpoint."
+        },
+        {
+          "id": "asr-unregistered",
+          "name": "No ASR capability",
+          "description": "AI Assets are registered but none is marked ASR-capable; table and guidance reflect the missing capability."
+        },
+        {
+          "id": "save-success",
+          "name": "ASR capability saved",
+          "description": "Whisper Micro asset is marked ASR-capable and a persistent save-success alert is visible."
+        },
+        {
+          "id": "load-error",
+          "name": "AI Asset load error",
+          "description": "AI Asset Endpoints cannot be loaded; persistent error alert and retry action are visible."
+        }
+      ]
+    }
+  ]
+}

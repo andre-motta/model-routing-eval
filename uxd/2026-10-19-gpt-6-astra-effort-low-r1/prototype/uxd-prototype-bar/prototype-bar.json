@@ -1,0 +1,76 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "Local RFE snapshot",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready to explore",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "image-success",
+      "name": "Image response"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-success",
+      "name": "Audio response"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-error",
+      "name": "Transcription failure"
+    },
+    {
+      "route": "/index.html",
+      "id": "empty-transcription",
+      "name": "No speech detected"
+    },
+    {
+      "route": "/assets.html",
+      "id": "default",
+      "name": "Registered ASR endpoint",
+      "default": true
+    },
+    {
+      "route": "/assets.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/assets.html",
+      "id": "unflagged",
+      "name": "Endpoint without ASR flag"
+    },
+    {
+      "route": "/assets.html",
+      "id": "load-error",
+      "name": "Endpoint load failure"
+    }
+  ]
+}

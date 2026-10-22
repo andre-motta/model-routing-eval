@@ -1,0 +1,64 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "RHAISTRAT-1527",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/playground.html",
+      "id": "default",
+      "name": "Text chat",
+      "default": true
+    },
+    {
+      "route": "/playground.html",
+      "id": "image-attached",
+      "name": "Image attached"
+    },
+    {
+      "route": "/playground.html",
+      "id": "transcribing",
+      "name": "Audio transcribing"
+    },
+    {
+      "route": "/playground.html",
+      "id": "audio-no-asr",
+      "name": "No ASR model"
+    },
+    {
+      "route": "/playground.html",
+      "id": "limit-reached",
+      "name": "One-per-conversation limit"
+    },
+    {
+      "route": "/playground.html",
+      "id": "file-too-large",
+      "name": "File over size limit"
+    },
+    {
+      "route": "/playground.html",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "default",
+      "name": "No ASR assets",
+      "default": true
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "asr-flagged",
+      "name": "Whisper flagged ASR"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "empty",
+      "name": "No AI Assets"
+    }
+  ]
+}

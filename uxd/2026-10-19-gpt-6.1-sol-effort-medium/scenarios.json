@@ -1,0 +1,70 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:11:44Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready for image input",
+          "description": "Empty conversation with a vision model selected; image control visible and audio control absent.",
+          "default": true
+        },
+        {
+          "id": "image-complete",
+          "name": "Image response complete",
+          "description": "Uploaded landscape and text response visible; additional media controls disabled."
+        },
+        {
+          "id": "audio-complete",
+          "name": "Audio response complete",
+          "description": "Audio file, transcription and text response visible; one-file limit active."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio workflow selected; ASR selector disabled and registration guidance visible."
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Empty chat with a text model selected; no image or audio input controls in the DOM."
+        },
+        {
+          "id": "upload-error",
+          "name": "File too large",
+          "description": "Persistent 10 MB validation error visible; no file accepted or uploaded."
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failed",
+          "description": "Audio attachment retained with persistent ASR failure message and retry controls."
+        }
+      ]
+    },
+    {
+      "route": "/assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered endpoints",
+          "description": "Vision and ASR endpoints listed with editable audio transcription flags.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No registered endpoints",
+          "description": "Empty endpoints state with registration call to action."
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoint loading failed",
+          "description": "Connection error state visible with a retry button."
+        }
+      ]
+    }
+  ]
+}

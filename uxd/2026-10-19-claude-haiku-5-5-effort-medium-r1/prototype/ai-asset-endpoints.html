@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Asset Endpoints (RHAISTRAT-1527 prototype)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    .uxd-hidden { display: none !important; }
+    .uxd-radio-group { display: flex; flex-direction: column; gap: var(--pf-t--global--spacer--sm); }
+  </style>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-page__header">
+    <div class="pf-v6-c-masthead">
+      <div class="pf-v6-c-masthead__main">
+        <div class="pf-v6-c-masthead__brand">
+          <span class="pf-v6-c-brand">Gen AI Studio</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="pf-v6-c-page__main-container">
+    <aside class="pf-v6-c-page__sidebar">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="./">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="ai-asset-endpoints.html" aria-current="page">AI Asset Endpoints</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="pf-v6-c-page__main" id="main-content">
+      <section class="pf-v6-c-page__main-section">
+        <h1 class="pf-v6-c-content__title pf-m-2xl">AI Asset Endpoints</h1>
+        <p class="pf-v6-c-content__section">Model endpoints available to the Playground. Flag a transcription endpoint so it appears in the Playground audio model dropdown.</p>
+      </section>
+
+      <section class="pf-v6-c-page__main-section">
+        <div id="alert-area" aria-live="polite"></div>
+        <div id="table-area" style="margin-top: var(--pf-t--global--spacer--md);"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Edit AI Asset dialog -->
+  <div class="pf-v6-c-backdrop uxd-hidden" id="edit-backdrop">
+    <div class="pf-v6-c-modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-title" style="margin: auto; max-width: 520px;">
+      <header class="pf-v6-c-modal-box__header">
+        <h1 class="pf-v6-c-modal-box__title" id="edit-title">Edit AI Asset</h1>
+      </header>
+      <div class="pf-v6-c-modal-box__body">
+        <fieldset class="pf-v6-c-form__group" style="border: 0; padding: 0;">
+          <legend class="pf-v6-c-form__label"><span class="pf-v6-c-form__label-text">Endpoint type</span></legend>
+          <div class="uxd-radio-group">
+            <label class="pf-v6-c-radio" for="type-model">
+              <input class="pf-v6-c-radio__input" type="radio" name="endpoint-type" id="type-model" value="model" />
+              <span class="pf-v6-c-radio__label">Model (chat or completions)</span>
+            </label>
+            <label class="pf-v6-c-radio" for="type-asr">
+              <input class="pf-v6-c-radio__input" type="radio" name="endpoint-type" id="type-asr" value="asr" />
+              <span class="pf-v6-c-radio__label">Transcription (ASR): available for audio input in the Playground</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+      <footer class="pf-v6-c-modal-box__footer">
+        <button class="pf-v6-c-button pf-m-primary" type="button" id="edit-save" data-testid="edit-save">Save</button>
+        <button class="pf-v6-c-button pf-m-link" type="button" id="edit-cancel">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // Prototype-only mock data. Scenario ids match scenarios.json for this route.
+    var SCENARIOS = {
+      'default': {
+        rows: [
+          { id: 'granite-3-3-8b-instruct', name: 'granite-3.3-8b-instruct', type: 'model', source: 'InferenceService' },
+          { id: 'qwen2-5-vl-7b-instruct', name: 'qwen2.5-vl-7b-instruct', type: 'model', source: 'InferenceService' },
+          { id: 'whisper-large-v3', name: 'whisper-large-v3', type: 'asr', source: 'InferenceService' }
+        ],
+        alert: null
+      },
+      'no-asr': {
+        rows: [
+          { id: 'granite-3-3-8b-instruct', name: 'granite-3.3-8b-instruct', type: 'model', source: 'InferenceService' },
+          { id: 'qwen2-5-vl-7b-instruct', name: 'qwen2.5-vl-7b-instruct', type: 'model', source: 'InferenceService' },
+          { id: 'whisper-large-v3', name: 'whisper-large-v3', type: 'model', source: 'InferenceService' }
+        ],
+        alert: { variant: 'warning', title: 'No transcription endpoint flagged', body: 'whisper-large-v3 is registered as a Model. Flag it as Transcription (ASR) to make it available for audio input in the Playground.' }
+      },
+      'empty': {
+        rows: [],
+        alert: null
+      }
+    };
+
+    function $(id) { return document.getElementById(id); }
+
+    function resolveScenarioId() {
+      var fromUrl = new URLSearchParams(window.location.search).get('scenario');
+      var fromBar = window.UxdScenario && typeof window.UxdScenario.get === 'function' ? window.UxdScenario.get() : null;
+      var id = fromUrl || fromBar || 'default';
+      return SCENARIOS[id] ? id : 'default';
+    }
+
+    var S = JSON.parse(JSON.stringify(SCENARIOS[resolveScenarioId()]));
+    var editingId = null;
+
+    function el(tag, className, text) {
+      var node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined && text !== null) node.textContent = text;
+      return node;
+    }
+
+    function renderAlert() {
+      var area = $('alert-area');
+      area.innerHTML = '';
+      if (!S.alert) return;
+      var wrap = el('div', 'pf-v6-c-alert pf-m-inline pf-m-' + S.alert.variant);
+      wrap.setAttribute('aria-label', S.alert.variant + ' alert');
+      wrap.appendChild(el('h4', 'pf-v6-c-alert__title', S.alert.title));
+      wrap.appendChild(el('div', 'pf-v6-c-alert__description', S.alert.body));
+      area.appendChild(wrap);
+    }
+
+    function typeLabel(type) {
+      var label = el('span', type === 'asr' ? 'pf-v6-c-label pf-m-blue' : 'pf-v6-c-label', type === 'asr' ? 'Transcription (ASR)' : 'Model');
+      return label;
+    }
+
+    function renderTable() {
+      var area = $('table-area');
+      area.innerHTML = '';
+      if (!S.rows.length) {
+        var empty = el('div', 'pf-v6-c-empty-state');
+        empty.appendChild(el('h2', 'pf-v6-c-empty-state__title-text', 'No AI Assets yet'));
+        empty.appendChild(el('p', 'pf-v6-c-empty-state__body', 'Register a model endpoint to make it available in the Playground.'));
+        var add = el('button', 'pf-v6-c-button pf-m-primary', 'Add AI Asset');
+        add.type = 'button';
+        empty.appendChild(add);
+        area.appendChild(empty);
+        return;
+      }
+      var table = el('table', 'pf-v6-c-table pf-m-compact');
+      table.setAttribute('aria-label', 'AI Assets');
+      var thead = el('thead', 'pf-v6-c-table__thead');
+      var headRow = el('tr', 'pf-v6-c-table__tr');
+      ['Name', 'Endpoint type', 'Source', 'Actions'].forEach(function (h) {
+        var th = el('th', 'pf-v6-c-table__th', h);
+        th.setAttribute('scope', 'col');
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      var tbody = el('tbody', 'pf-v6-c-table__tbody');
+      S.rows.forEach(function (row) {
+        var tr = el('tr', 'pf-v6-c-table__tr');
+        tr.appendChild(el('td', 'pf-v6-c-table__td', row.name));
+        var typeCell = el('td', 'pf-v6-c-table__td');
+        typeCell.appendChild(typeLabel(row.type));
+        tr.appendChild(typeCell);
+        tr.appendChild(el('td', 'pf-v6-c-table__td', row.source));
+        var actions = el('td', 'pf-v6-c-table__td');
+        var edit = el('button', 'pf-v6-c-button pf-m-secondary pf-m-small', 'Edit');
+        edit.type = 'button';
+        edit.setAttribute('data-testid', 'edit-asset-' + row.id);
+        edit.setAttribute('aria-label', 'Edit ' + row.name);
+        edit.addEventListener('click', function () { openEdit(row.id); });
+        actions.appendChild(edit);
+        tr.appendChild(actions);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      area.appendChild(table);
+    }
+
+    function openEdit(id) {
+      var row = null;
+      S.rows.forEach(function (r) { if (r.id === id) row = r; });
+      if (!row) return;
+      editingId = id;
+      $('edit-title').textContent = 'Edit ' + row.name;
+      $('type-model').checked = row.type !== 'asr';
+      $('type-asr').checked = row.type === 'asr';
+      $('edit-backdrop').classList.remove('uxd-hidden');
+      $('type-asr').focus();
+    }
+
+    function closeEdit() {
+      $('edit-backdrop').classList.add('uxd-hidden');
+      editingId = null;
+    }
+
+    $('edit-save').addEventListener('click', function () {
+      S.rows.forEach(function (r) {
+        if (r.id === editingId) r.type = $('type-asr').checked ? 'asr' : 'model';
+      });
+      closeEdit();
+      renderTable();
+    });
+    $('edit-cancel').addEventListener('click', closeEdit);
+
+    renderAlert();
+    renderTable();
+  </script>
+</div>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision model, empty chat","default":true},{"route":"/","id":"text-only","name":"Text-only model"},{"route":"/","id":"image-exchange","name":"Image answered, image locked"},{"route":"/","id":"audio-no-asr","name":"Audio model, no ASR registered"},{"route":"/","id":"audio-transcribed","name":"Audio transcribed and answered"},{"route":"/","id":"asr-failure","name":"Transcription endpoint unreachable"},{"route":"/","id":"asr-empty","name":"Silent audio, empty transcript"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Assets with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"Whisper registered but not flagged"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI Assets"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

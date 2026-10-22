@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground | Gen AI Studio (RHAISTRAT-1527 prototype)</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./assets/prototype.css" />
+</head>
+<body data-page="playground">
+  <div class="pf-v6-c-page">
+    <header class="pf-v6-c-masthead">
+      <span class="pf-v6-c-masthead__brand">Gen AI Studio</span>
+    </header>
+
+    <div class="pf-v6-c-page__sidebar">
+      <div class="pf-v6-c-page__sidebar-body">
+        <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+          <ul class="pf-v6-c-nav__list">
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link pf-m-current" href="./index.html" aria-current="page">Playground</a>
+            </li>
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link" href="./ai-asset-endpoints.html">AI Asset Endpoints</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <main class="pf-v6-c-page__main" id="main-content">
+      <section class="pf-v6-c-page__main-section">
+        <h1 class="pf-v6-c-content__h1">Playground</h1>
+
+        <div class="uxd-toolbar">
+          <div class="pf-v6-c-form__group">
+            <label class="pf-v6-c-form__label" for="model-select">
+              <span class="pf-v6-c-form__label-text">Model</span>
+            </label>
+            <select id="model-select" class="pf-v6-c-form-control" data-testid="model-select"></select>
+          </div>
+          <div class="pf-v6-c-form__group">
+            <span class="pf-v6-c-form__label"><span class="pf-v6-c-form__label-text">Input type</span></span>
+            <div role="group" aria-label="Input type" class="pf-v6-c-toggle-group" id="input-type-group" data-testid="input-type-group"></div>
+          </div>
+        </div>
+
+        <div id="modality-banner" aria-live="polite"></div>
+        <div id="conversation-limit" data-testid="conversation-limit"></div>
+        <div id="composer-alert" data-testid="composer-alert"></div>
+
+        <div class="uxd-layout">
+          <div class="uxd-stack">
+            <div id="audio-controls" data-testid="audio-controls"></div>
+
+            <div id="transcript" class="uxd-transcript" data-testid="transcript" aria-live="polite" aria-label="Conversation"></div>
+
+            <form class="pf-v6-c-form" onsubmit="event.preventDefault()">
+              <div class="pf-v6-c-form__group">
+                <label class="pf-v6-c-form__label" for="prompt">
+                  <span class="pf-v6-c-form__label-text">Message</span>
+                </label>
+                <textarea id="prompt" class="pf-v6-c-form-control" rows="3"></textarea>
+              </div>
+              <div id="attachment" data-testid="attachment"></div>
+              <div id="attachment-slot" class="uxd-toolbar"></div>
+              <button id="send" type="button" class="pf-v6-c-button pf-m-primary" data-testid="send" disabled>Send</button>
+            </form>
+          </div>
+
+          <aside class="pf-v6-c-card" aria-label="Model capabilities">
+            <div class="pf-v6-c-card__header">
+              <h2 class="pf-v6-c-card__title">Model capabilities</h2>
+            </div>
+            <div class="pf-v6-c-card__body" id="capability-tags"></div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+  <script src="./assets/mocks.js"></script>
+  <script src="./assets/playground.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision model, image input","default":true},{"route":"/","id":"text-only-model","name":"Text-only model"},{"route":"/","id":"audio-no-asr-asset","name":"Audio, no ASR AI Asset"},{"route":"/","id":"audio-ready","name":"Audio ready to send"},{"route":"/","id":"image-limit-reached","name":"One image per conversation"},{"route":"/","id":"file-too-large","name":"File over size limit"},{"route":"/","id":"asr-failed","name":"ASR transcription failed"},{"route":"/ai-asset-endpoints.html","id":"default","name":"ASR asset flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr-flag","name":"No ASR flag"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI Assets"},{"route":"/ai-asset-endpoints.html","id":"load-error","name":"Load failed"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready for image input",
+          "description": "Empty conversation with vision model selected and image control visible.",
+          "default": true
+        },
+        {
+          "id": "image-complete",
+          "name": "Image response",
+          "description": "Uploaded chart and model text response visible; further attachments blocked."
+        },
+        {
+          "id": "audio-complete",
+          "name": "Audio response",
+          "description": "Uploaded audio, sample transcription, and text response visible; further attachments blocked."
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Empty conversation with text-only model; image and audio controls absent from the DOM."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio control visible with registration guidance and no available ASR model."
+        },
+        {
+          "id": "oversize",
+          "name": "File too large",
+          "description": "Size validation error visible; no attachment was uploaded."
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failed",
+          "description": "Audio model selected with endpoint-unavailable error; no model response."
+        },
+        {
+          "id": "silent-audio",
+          "name": "No speech detected",
+          "description": "Audio model selected with empty-transcription error; no model response."
+        },
+        {
+          "id": "unsupported-model",
+          "name": "Unsupported input",
+          "description": "Unknown-capability model selected with inference rejection and recovery guidance."
+        }
+      ]
+    },
+    {
+      "route": "/assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered ASR endpoint",
+          "description": "Whisper endpoint listed with audio transcription capability enabled.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty endpoint list and registration guidance visible."
+        },
+        {
+          "id": "unmarked",
+          "name": "Unmarked endpoint",
+          "description": "Whisper endpoint listed with audio transcription capability unchecked."
+        },
+        {
+          "id": "load-error",
+          "name": "Load failed",
+          "description": "Endpoint loading error and retry action visible; table hidden."
+        },
+        {
+          "id": "registered",
+          "name": "Registration succeeded",
+          "description": "ASR endpoint listed with a persistent registration confirmation."
+        }
+      ]
+    }
+  ]
+}

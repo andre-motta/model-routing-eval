@@ -1,0 +1,66 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["US-1", "US-2", "US-3", "US-4"],
+      "steps": [
+        { "id": "playground", "name": "Playground with vision model", "route": "/index.html", "export": true },
+        {
+          "id": "image-attached", "name": "Image attached to composer", "route": "/index.html", "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-sample-image\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"staged-file\"]" }
+          ]
+        },
+        {
+          "id": "image-response", "name": "Image and model answer in transcript", "route": "/index.html", "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-sample-image\"]" },
+            { "type": "fill", "selector": "[data-ouia-component-id=\"prompt-input\"]", "value": "What is in this image?" },
+            { "type": "click", "selector": "[data-ouia-component-id=\"send-button\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-message\"]", "timeout_ms": 8000 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Ask a question by uploading audio",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": ["US-5", "US-6"],
+      "steps": [
+        { "id": "playground-audio", "name": "Playground with audio-capable model", "route": "/index.html", "export": true },
+        {
+          "id": "audio-attached", "name": "Audio file attached, ASR model chosen", "route": "/index.html", "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"attach-sample-audio\"]" },
+            { "type": "wait_for", "selector": "[data-ouia-component-id=\"staged-file\"]" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Register an ASR model as an AI Asset",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": ["US-7"],
+      "steps": [
+        { "id": "ai-assets", "name": "AI Asset Endpoints table", "route": "/ai-assets.html", "export": true },
+        {
+          "id": "flag-asr-modal", "name": "Edit asset modal with ASR toggle", "route": "/ai-assets.html", "export": true,
+          "actions": [
+            { "type": "click", "selector": "[data-ouia-component-id=\"edit-asset-whisper-large-v3\"]" },
+            { "type": "wait_for", "selector": "[role=\"dialog\"]" }
+          ]
+        }
+      ]
+    }
+  ]
+}

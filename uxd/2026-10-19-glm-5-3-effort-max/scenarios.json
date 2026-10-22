@@ -1,0 +1,85 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:49:30Z",
+  "pages": [
+    {
+      "route": "/playground/",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Multimodal controls ready",
+          "description": "Image and audio controls are visible for an image-and-audio-capable model, an ASR endpoint is selected, and the transcript is empty.",
+          "default": true
+        },
+        {
+          "id": "image-complete",
+          "name": "Image response complete",
+          "description": "A JPG image is rendered in chat with a completed vision-model text response."
+        },
+        {
+          "id": "audio-transcribed",
+          "name": "Audio transcribed",
+          "description": "A WAV file is rendered with its transcript and completed model response."
+        },
+        {
+          "id": "text-only-model",
+          "name": "Text-only model",
+          "description": "A text-only model is selected and both image and audio controls are absent from the DOM."
+        },
+        {
+          "id": "no-asr-asset",
+          "name": "No ASR asset",
+          "description": "An audio-capable model is selected, the ASR dropdown is empty, and a registration warning blocks submission."
+        },
+        {
+          "id": "upload-too-large",
+          "name": "File too large",
+          "description": "An oversized image selection is rejected before upload with a size validation error and no preview."
+        },
+        {
+          "id": "one-file-limit",
+          "name": "One media file limit",
+          "description": "One image is already in the conversation and a second media upload is blocked with the one-file limit message."
+        },
+        {
+          "id": "transcription-error",
+          "name": "Transcription error",
+          "description": "An audio file is attached, the ASR endpoint fails, and an error explains that no model response was requested."
+        }
+      ]
+    },
+    {
+      "route": "/ai-assets/",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Endpoints populated",
+          "description": "AI Asset endpoints are loaded and one endpoint is marked ASR-capable.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "No AI Asset endpoints are registered and the empty state explains how to add one."
+        },
+        {
+          "id": "asr-registered",
+          "name": "ASR asset registered",
+          "description": "A newly saved Whisper endpoint is marked ASR-capable and a persistent success alert is visible."
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoints load error",
+          "description": "The endpoint table fails to load and a retryable error alert is visible."
+        },
+        {
+          "id": "capability-metadata-pending",
+          "name": "Capability metadata pending",
+          "description": "Endpoints load but capability badges are unavailable and a warning recommends the static fallback."
+        }
+      ]
+    }
+  ]
+}

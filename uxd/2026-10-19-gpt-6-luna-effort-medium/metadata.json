@@ -1,0 +1,27 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": { "type": "jira", "reference": "RHAISTRAT-1527", "rfe_count": 1 },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    { "kind": "rfe", "key": "RHAISTRAT-1527", "label": "RFE", "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527" }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "The screen demonstrates the proposed 10 MB image and audio limit; PM confirmation is pending.",
+    "A registered ASR AI Asset and replica-safe temporary file storage are represented as available in the happy path.",
+    "Sprint 0 must validate replica-safe storage, OGX image content-part pass-through, and request size limits before implementation.",
+    "The accepted product scope is JPG/PNG image upload and WAV/MP3 audio upload. Microphone capture, video, multiple files, mixed image and audio, and persisted multimodal chats are out of scope."
+  ],
+  "created_at": "2026-10-19T16:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

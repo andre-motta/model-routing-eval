@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI asset endpoints · Gen AI studio · Red Hat OpenShift AI</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead" data-ouia-component-id="masthead">
+    <div class="pf-v6-c-masthead__main">
+      <div class="pf-v6-c-masthead__brand">
+        <a class="pf-v6-c-masthead__logo app-logo" href="./index.html"><span class="app-logo__mark" aria-hidden="true"></span>Red Hat OpenShift AI</a>
+      </div>
+    </div>
+    <div class="pf-v6-c-masthead__content">
+      <div class="pf-v6-c-toolbar pf-m-static">
+        <div class="pf-v6-c-toolbar__content">
+          <div class="pf-v6-c-toolbar__content-section">
+            <div class="pf-v6-c-toolbar__item pf-m-align-end">
+              <span class="pf-v6-u-font-size-sm">Project: <strong>multimodal-demo</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Global">
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Projects</span></a></li>
+          <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded">
+            <button type="button" class="pf-v6-c-nav__link" aria-expanded="true" id="nav-genai">
+              <span class="pf-v6-c-nav__link-text">Gen AI studio</span>
+            </button>
+            <section class="pf-v6-c-nav__subnav" aria-labelledby="nav-genai">
+              <ul class="pf-v6-c-nav__list" role="list">
+                <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="./index.html" data-ouia-component-id="nav-playground"><span class="pf-v6-c-nav__link-text">Playground</span></a></li>
+                <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" aria-current="page" href="./ai-asset-endpoints.html" data-ouia-component-id="nav-ai-asset-endpoints"><span class="pf-v6-c-nav__link-text">AI asset endpoints</span></a></li>
+              </ul>
+            </section>
+          </li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Model catalog</span></a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Model registry</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-page__main-container">
+    <main class="pf-v6-c-page__main" tabindex="-1">
+      <section class="pf-v6-c-page__main-section">
+        <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+        <p class="pf-v6-u-color-200">Model endpoints available to the Playground in project <strong>multimodal-demo</strong>. Mark transcription models (for example, Whisper) as <strong>Transcription (ASR)</strong> endpoints so they appear in the Playground's transcription model dropdown for audio input.</p>
+      </section>
+      <section class="pf-v6-c-page__main-section pf-v6-u-pt-0">
+        <div id="page-alerts" class="pf-v6-u-mb-md"></div>
+        <div class="pf-v6-c-card"><div class="pf-v6-c-card__body" id="assets-content"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script src="./common.js"></script>
+<script src="./assets.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://issues.example.com/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"Source RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Vision model, new chat","default":true},{"route":"/index.html","id":"text-only","name":"Text-only model"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"image-processing","name":"Image sent, generating"},{"route":"/index.html","id":"image-response","name":"Image answered"},{"route":"/index.html","id":"model-rejected","name":"Model rejected image"},{"route":"/index.html","id":"one-file-limit","name":"Second file blocked"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no transcription model"},{"route":"/index.html","id":"audio-transcribing","name":"Transcribing audio"},{"route":"/index.html","id":"audio-response","name":"Audio answered"},{"route":"/index.html","id":"asr-error","name":"Transcription failed"},{"route":"/index.html","id":"empty-transcription","name":"No speech detected"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Endpoints with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"No transcription endpoint"},{"route":"/ai-asset-endpoints.html","id":"asr-marked","name":"ASR just marked"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI assets"},{"route":"/ai-asset-endpoints.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

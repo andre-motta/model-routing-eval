@@ -1,0 +1,130 @@
+:root {
+  color-scheme: light;
+  --prototype-shell-max: 1440px;
+  --prototype-panel-gap: 1rem;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--pf-t--global--background--color--secondary--default, #f2f2f2);
+}
+
+.prototype-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 390px) minmax(0, 1fr);
+  gap: var(--prototype-panel-gap);
+  width: min(var(--prototype-shell-max), 100%);
+  margin: 0 auto;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+.prototype-column {
+  display: grid;
+  gap: var(--prototype-panel-gap);
+  min-width: 0;
+}
+
+.prototype-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.prototype-form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.prototype-capability-row,
+.prototype-file-row,
+.prototype-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.prototype-transcript {
+  display: grid;
+  gap: 1rem;
+  min-height: 280px;
+}
+
+.prototype-message {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--pf-t--global--border--color--default, #d2d2d2);
+  border-radius: 0.5rem;
+  background: #fff;
+}
+
+.prototype-message__header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.prototype-image-preview {
+  max-width: 280px;
+  border-radius: 0.375rem;
+  border: 1px solid var(--pf-t--global--border--color--default, #d2d2d2);
+}
+
+.prototype-audio {
+  width: min(100%, 360px);
+}
+
+.prototype-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  border: 1px solid currentColor;
+}
+
+.prototype-badge--vision {
+  color: #0066cc;
+}
+
+.prototype-badge--audio {
+  color: #6a3e9e;
+}
+
+.prototype-badge--text {
+  color: #4d4d4d;
+}
+
+.prototype-hint {
+  margin: 0;
+  color: var(--pf-t--global--text--color--subtle, #6a6e73);
+  font-size: 0.875rem;
+}
+
+.prototype-table {
+  width: 100%;
+}
+
+.prototype-table th,
+.prototype-table td {
+  vertical-align: middle;
+}
+
+.prototype-scope-note {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 1000px) {
+  .prototype-shell {
+    grid-template-columns: 1fr;
+  }
+}

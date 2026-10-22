@@ -1,0 +1,25 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {"id":"journey-1","title":"Ask a vision model about an image","persona":"ai-engineer","source":"jira","ac_ids":["AC-1","AC-3","AC-7","AC-8","AC-13"],
+     "steps":[
+      {"id":"vision-ready","name":"Vision model selected, image control only","route":"/index.html","export":true},
+      {"id":"image-answered","name":"Image sent and answered","route":"/index.html","export":true},
+      {"id":"second-upload-blocked","name":"Second upload blocked","route":"/index.html","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"attach-image\"]"},{"type":"wait_for","selector":"[data-ouia-component-id=\"limit-alert\"]"}]}
+     ]},
+    {"id":"journey-2","title":"Ask about audio via a transcription model","persona":"ai-engineer","source":"jira","ac_ids":["AC-4","AC-5","AC-6","AC-10"],
+     "steps":[
+      {"id":"audio-blocked","name":"Audio model, no ASR asset registered","route":"/index.html","export":true},
+      {"id":"audio-answered","name":"Audio transcribed and answered","route":"/index.html","export":true},
+      {"id":"asr-failure","name":"Transcription failed","route":"/index.html","export":true}
+     ]},
+    {"id":"journey-3","title":"Register an ASR endpoint","persona":"ai-admin","source":"jira","ac_ids":["AC-6"],
+     "steps":[
+      {"id":"assets-list","name":"AI Asset Endpoints table","route":"/ai-assets.html","export":true},
+      {"id":"flag-asr","name":"Mark as transcription endpoint","route":"/ai-assets.html","export":true,"actions":[{"type":"click","selector":"[data-ouia-component-id=\"edit-asr-whisper-small\"]"},{"type":"wait_for","selector":"[role=\"dialog\"]"}]}
+     ]},
+    {"id":"journey-4","title":"Text-only model has no multimodal controls","persona":"ai-engineer","source":"jira","ac_ids":["AC-2","AC-9","AC-14"],
+     "steps":[{"id":"text-only","name":"Text-only model","route":"/index.html","export":true}]}
+  ]
+}

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Asset Endpoints — RHAISTRAT-1527</title>
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="pf-v6-c-masthead" id="prototype-masthead">
+      <div class="pf-v6-c-masthead__main">
+        <div class="pf-v6-c-masthead__brand">
+          <span class="pf-v6-c-brand">
+            <span class="pf-v6-c-brand__text">Red Hat AI Studio</span>
+          </span>
+        </div>
+        <nav class="pf-v6-c-nav" aria-label="Prototype navigation">
+          <ul class="pf-v6-c-nav__list">
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link" href="./">Playground</a>
+            </li>
+            <li class="pf-v6-c-nav__item">
+              <a class="pf-v6-c-nav__link pf-m-current" href="./ai-assets" aria-current="page">AI Asset Endpoints</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="pf-v6-c-masthead__content">
+        <span class="pf-v6-c-label pf-m-outline">
+          <span class="pf-v6-c-label__content">RHAISTRAT-1527</span>
+        </span>
+      </div>
+    </header>
+
+    <main class="prototype-shell prototype-shell--single" aria-labelledby="page-title">
+      <section class="pf-v6-c-card prototype-card" aria-labelledby="asset-heading">
+        <div class="pf-v6-c-card__title">
+          <h1 id="page-title" class="pf-v6-c-card__title-text">AI Asset Endpoints</h1>
+        </div>
+        <div class="pf-v6-c-card__body">
+          <h2 id="asset-heading" class="pf-v6-c-title pf-m-lg">ASR capability registration</h2>
+          <p class="prototype-hint">
+            Mark an OpenAI-compatible AI Asset as ASR-capable when it exposes <code>/v1/audio/transcriptions</code>.
+            ASR-capable assets appear in the Playground audio model dropdown.
+          </p>
+        </div>
+        <div class="pf-v6-c-card__body">
+          <div id="asset-status" role="status" aria-live="polite"></div>
+          <div id="asset-table"></div>
+          <div class="prototype-action-row">
+            <button
+              type="button"
+              class="pf-v6-c-button pf-m-primary"
+              data-ouia-component-id="save-asr-capability"
+            >
+              Save ASR capability
+            </button>
+            <a class="pf-v6-c-button pf-m-secondary" href="./">Open Playground</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./ai-assets.js"></script>
+  <script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision model ready","default":true},{"route":"/","id":"text-only-model","name":"Text-only model"},{"route":"/","id":"image-ready","name":"Image inference complete"},{"route":"/","id":"audio-ready","name":"Audio inference complete"},{"route":"/","id":"audio-no-asr","name":"No ASR AI Asset"},{"route":"/","id":"upload-error","name":"Oversized image rejected"},{"route":"/","id":"modality-limit","name":"One multimodal file limit"},{"route":"/ai-assets","id":"default","name":"ASR asset available","default":true},{"route":"/ai-assets","id":"empty","name":"No AI Assets"},{"route":"/ai-assets","id":"asr-unregistered","name":"No ASR capability"},{"route":"/ai-assets","id":"save-success","name":"ASR capability saved"},{"route":"/ai-assets","id":"load-error","name":"AI Asset load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

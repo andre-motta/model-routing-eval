@@ -1,0 +1,258 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:36:22.114962Z",
+  "journeys": [
+    {
+      "id": "image-exploration",
+      "title": "Explore an image with a vision model",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-3",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Choose a model and start a conversation",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "attach-image",
+          "name": "Sample image ready to send",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-image\"]"
+            }
+          ]
+        },
+        {
+          "id": "image-response",
+          "name": "Image and text response in the transcript",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-image\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"send\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-exploration",
+      "title": "Transcribe audio and ask a question",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-10"
+      ],
+      "steps": [
+        {
+          "id": "audio-ready",
+          "name": "Audio file and ASR model selected",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-audio\"]"
+            }
+          ]
+        },
+        {
+          "id": "audio-response",
+          "name": "Audio transcript and model response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-audio\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"send\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register a transcription-capable AI Asset",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "endpoints",
+          "name": "Registered AI Asset Endpoints",
+          "route": "/ai-assets.html",
+          "export": true
+        },
+        {
+          "id": "registration-dialog",
+          "name": "Register endpoint and mark ASR capability",
+          "route": "/ai-assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"register-endpoint\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#register-dialog[open]"
+            }
+          ]
+        },
+        {
+          "id": "registered",
+          "name": "ASR endpoint registered",
+          "route": "/ai-assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"register-endpoint\"]"
+            },
+            {
+              "type": "fill",
+              "selector": "#endpoint-name",
+              "value": "Whisper team endpoint"
+            },
+            {
+              "type": "fill",
+              "selector": "#endpoint-url",
+              "value": "https://team-whisper.example.test/v1"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"endpoint-asr\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"save-endpoint\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#asset-feedback .success"
+            }
+          ]
+        },
+        {
+          "id": "return-playground",
+          "name": "New transcription endpoint available in audio dropdown",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-audio\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "text-follow-up",
+      "title": "Continue in text and start a fresh conversation",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "image-answered",
+          "name": "Conversation with one image",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-image\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"send\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            }
+          ]
+        },
+        {
+          "id": "follow-up",
+          "name": "Text follow-up response",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"example-image\"]"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"send\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            },
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Summarize that in one sentence."
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"send\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant:nth-of-type(4)"
+            }
+          ]
+        },
+        {
+          "id": "fresh-chat",
+          "name": "Clean conversation ready for another input",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"new-chat\"]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {
+      "kind": "strat",
+      "key": "RHAISTRAT-1527",
+      "label": "Strategy",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "rfe",
+      "key": "RHAIRFE-913",
+      "label": "Source RFE",
+      "url": "https://issues.redhat.com/browse/RHAIRFE-913"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "entry_points": {
+    "playground": ".artifacts/RHAISTRAT-1527/prototype/index.html",
+    "ai_asset_endpoints": ".artifacts/RHAISTRAT-1527/prototype/ai-asset-endpoints.html"
+  },
+  "screens": ["Playground", "AiAssetEndpoints", "EditEndpointUseModal"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": ".artifacts/RHAISTRAT-1527/exports",
+    "count": 0
+  },
+  "assumptions": [
+    "Source was the local snapshot .artifacts/RHAISTRAT-1527/rfe-snapshot.md (Jira not reachable from this environment).",
+    "Scope follows the Strategy and Staff Engineer direction, which narrows the RFE: image and audio INPUT only, text output only. Audio output/playback, microphone capture, video, PDF-as-image, multiple images per conversation, mixed image + audio, comparison mode, and persisted chats are not prototyped.",
+    "Persona catalog (knowledge/personas/catalog.yaml) is not present in the staged plugin; personas 'ai-engineer' and 'ai-asset-owner' were inferred from the strategy.",
+    "File size limit shown as 10 MB for both image and audio (proposed default in the strategy; PM confirmation pending).",
+    "Allowed types: JPG/PNG for images and WAV/MP3 for audio (confirmed minimum). PDF rejection message points to the existing Upload files capability.",
+    "Model capability tags are shown as 'Supported inputs' labels derived from supported_modalities (image-inferencing, audio-asr). Tag names are not final.",
+    "The ASR capability flag on the AI asset endpoints table is modeled as an 'Endpoint use' setting (Chat or Transcription (ASR)) edited from the row actions menu. The strategy leaves this UX and data model as an open question for UXD.",
+    "The Audio control is shown for models tagged audio-asr. Audio is transcribed by the selected ASR endpoint, and only the transcription text is sent to the chat model.",
+    "No hard guardrails: a model whose catalog tags are wrong rejects the payload at inference time, and the Playground shows the error (scenario model-rejected).",
+    "Once a file is sent, the conversation is at its one-file limit. A pending, unsent attachment also counts; the user removes it to pick another file.",
+    "Model, endpoint names, URLs, transcription text, and responses are mock data. Upload, transcription, and inference latency are simulated (about 0.7 s upload and 1.6 s per step).",
+    "Prototype-only 'Prototype sample files' entries in the Image and Audio menus let reviewers trigger valid, oversized, wrong-type, zero-byte, and silent files without local files."
+  ],
+  "created_at": "2026-10-19T14:24:17Z",
+  "updated_at": null,
+  "refinement_history": []
+}

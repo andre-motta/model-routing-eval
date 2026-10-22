@@ -1,0 +1,50 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/",
+      "id": "default",
+      "name": "Text ready",
+      "default": true
+    },
+    {
+      "route": "/",
+      "id": "image-attached",
+      "name": "Image attached"
+    },
+    {
+      "route": "/",
+      "id": "audio-ready",
+      "name": "Audio ready"
+    },
+    {
+      "route": "/",
+      "id": "no-asr-model",
+      "name": "No ASR model"
+    },
+    {
+      "route": "/",
+      "id": "upload-error",
+      "name": "Upload error"
+    },
+    {
+      "route": "/",
+      "id": "inference-error",
+      "name": "Inference error"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        {"id": "default", "name": "Vision model, ready", "description": "Vision-only model selected: image control visible, audio hidden, empty chat", "default": true},
+        {"id": "text-only", "name": "Text-only model", "description": "No image or audio controls rendered"},
+        {"id": "image-response", "name": "Image answered", "description": "Image rendered in transcript with model text response"},
+        {"id": "file-too-large", "name": "File too large", "description": "Client error alert for file over 10 MB, nothing uploaded"},
+        {"id": "one-file-limit", "name": "One-file limit", "description": "Image already in conversation; image control disabled with limit alert"},
+        {"id": "audio-no-asr", "name": "Audio, no ASR asset", "description": "Audio model selected, no ASR asset registered; send blocked with register message"},
+        {"id": "audio-transcribed", "name": "Audio transcribed", "description": "ASR asset chosen; audio and transcription shown with model response"},
+        {"id": "asr-error", "name": "Transcription failed", "description": "ASR endpoint unreachable; failure alert, no model response"}
+      ]
+    },
+    {
+      "route": "/ai-assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {"id": "default", "name": "Assets with ASR flag", "description": "Table with one ASR-flagged asset", "default": true},
+        {"id": "no-asr", "name": "No ASR assets", "description": "Table where no asset is flagged ASR, info alert shown"},
+        {"id": "empty", "name": "No assets", "description": "Empty state, no endpoints registered"},
+        {"id": "load-error", "name": "Load error", "description": "Failed to fetch endpoints"}
+      ]
+    }
+  ]
+}

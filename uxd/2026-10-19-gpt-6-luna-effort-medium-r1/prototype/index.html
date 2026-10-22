@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gen AI Studio | Playground</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    :root { --navy:#151515; --red:#ee0000; --ink:#151515; --muted:#6a6e73; --line:#d2d2d2; --canvas:#f5f5f5; --blue:#0066cc; }
+    * { box-sizing:border-box }
+    body { margin:0; color:var(--ink); background:var(--canvas); font-family:"Red Hat Text", "Helvetica Neue", Arial, sans-serif; font-size:14px }
+    button,select,textarea,input { font:inherit }
+    button { cursor:pointer }
+    .masthead { height:60px; background:var(--navy); color:#fff; display:flex; align-items:center; padding:0 28px; gap:15px; box-shadow:0 2px 4px #0003 }
+    .brand { font-size:17px; font-weight:700; letter-spacing:-.2px; display:flex; gap:10px; align-items:center }
+    .brand-mark { width:18px; height:18px; background:var(--red); transform:rotate(45deg); display:inline-block }
+    .masthead .divider { height:26px; border-left:1px solid #6a6e73 }
+    .masthead .product { font-size:15px; color:#e0e0e0 }
+    .top-spacer { flex:1 }
+    .icon-button { background:transparent; color:#fff; border:0; font-size:18px; padding:8px }
+    .app { display:grid; grid-template-columns:245px minmax(500px,1fr) 300px; min-height:calc(100vh - 60px) }
+    aside { background:#fff; border-right:1px solid var(--line); padding:22px 14px }
+    .side-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; padding:0 12px; margin:8px 0 10px }
+    .nav-link { display:flex; gap:12px; align-items:center; padding:11px 12px; border-radius:3px; margin:2px 0; color:#333; text-decoration:none }
+    .nav-link.active { background:#e7f1fa; color:#004d99; font-weight:600; border-left:3px solid #0066cc; padding-left:9px }
+    .nav-icon { width:18px; text-align:center; color:#6a6e73; font-size:16px }
+    .workspace { min-width:0; display:flex; flex-direction:column }
+    .page-head { background:#fff; padding:27px 34px 22px; border-bottom:1px solid var(--line) }
+    .crumb { color:#0066cc; font-size:12px; margin-bottom:12px }
+    h1 { font-size:25px; line-height:1.25; margin:0 0 7px; font-weight:500 }
+    .subhead { color:#6a6e73; font-size:13px }
+    .content { width:min(100%,1000px); margin:0 auto; padding:22px 28px 32px; flex:1 }
+    .model-card { background:#fff; border:1px solid var(--line); border-radius:4px; padding:17px 19px; display:flex; align-items:flex-end; gap:18px; box-shadow:0 1px 2px #0000000d }
+    .field { display:flex; flex-direction:column; gap:6px; min-width:0 }
+    .field label { font-weight:600; font-size:12px }
+    .field select,.field input { height:36px; border:1px solid #8a8d90; border-radius:3px; background:#fff; padding:0 10px; color:#151515 }
+    .model-field { flex:1; max-width:350px }
+    .provider { color:#6a6e73; font-size:12px; margin-left:auto; padding-bottom:9px }
+    .tag-row { display:flex; gap:7px; margin-top:10px }
+    .tag { border-radius:12px; background:#e7f1fa; color:#004d99; font-size:11px; padding:3px 9px; font-weight:600 }
+    .tag.gray { color:#4f5255; background:#f0f0f0 }
+    .alert { border:1px solid; border-radius:3px; padding:11px 13px; margin:14px 0; display:flex; gap:10px; align-items:flex-start; line-height:1.45 }
+    .alert.info { background:#e7f1fa; border-color:#73bcf7; color:#151515 }
+    .alert.warning { background:#fff8e5; border-color:#f0ab00; color:#3d3d3d }
+    .alert.danger { background:#faeae8; border-color:#c9190b; color:#151515 }
+    .alert.success { background:#f3faf2; border-color:#87d068; color:#151515 }
+    .alert strong { display:block; margin-bottom:2px }
+    .chat { background:#fff; border:1px solid var(--line); border-radius:4px; min-height:340px; margin-top:16px; display:flex; flex-direction:column; box-shadow:0 1px 2px #0000000d }
+    .chat-head { padding:13px 18px; border-bottom:1px solid #e0e0e0; display:flex; align-items:center; gap:8px; font-weight:600 }
+    .status-dot { width:8px;height:8px;border-radius:50%;background:#3e8635 }
+    .chat-body { flex:1; padding:20px 22px; display:flex; flex-direction:column; gap:16px }
+    .empty-chat { color:#6a6e73; margin:auto; max-width:420px; text-align:center; line-height:1.55 }
+    .empty-icon { margin:0 auto 10px; width:42px;height:42px;border:1px solid #d2d2d2;border-radius:50%;display:grid;place-items:center;font-size:20px;color:#6a6e73 }
+    .message { max-width:82%; border-radius:5px; padding:12px 14px; line-height:1.5; }
+    .message.user { background:#e7f1fa; align-self:flex-end }
+    .message.assistant { background:#f0f0f0; align-self:flex-start }
+    .message-label { font-size:11px; color:#5f6368; font-weight:700; margin-bottom:4px }
+    .attachment { display:flex; gap:10px; align-items:center; background:#fff; border:1px solid #c7c7c7; padding:8px; margin-top:8px; border-radius:3px }
+    .thumb { width:50px;height:45px;object-fit:cover;border-radius:2px;background:#dce8ef }
+    .file-icon { width:40px;height:40px;display:grid;place-items:center;background:#e7f1fa;color:#0066cc;font-weight:700;border-radius:3px }
+    .file-meta { min-width:0 }
+    .file-name { font-weight:600; overflow-wrap:anywhere }
+    .file-size { color:#6a6e73;font-size:11px }
+    .composer { border-top:1px solid #e0e0e0; padding:14px 16px 12px }
+    textarea { width:100%; min-height:72px; resize:vertical; border:1px solid #8a8d90; border-radius:3px; padding:10px; outline-color:#0066cc }
+    .composer-row { display:flex; align-items:center; gap:8px; margin-top:10px }
+    .pf-button { min-height:34px; border-radius:3px; border:1px solid #8a8d90; background:#fff; padding:0 13px; color:#151515; font-weight:600 }
+    .pf-button:hover { background:#f0f0f0 }
+    .pf-button.primary { background:#0066cc; border-color:#0066cc; color:#fff }
+    .pf-button.primary:hover { background:#004d99 }
+    .pf-button:disabled { background:#f0f0f0; color:#8a8d90; border-color:#d2d2d2; cursor:not-allowed }
+    .pf-button.link { color:#0066cc; border-color:transparent; background:transparent; padding:0 7px }
+    .attach-label { font-weight:600; font-size:12px; margin-right:4px }
+    .modality-button { display:inline-flex; align-items:center; gap:7px }
+    .tiny-note { color:#6a6e73; font-size:11px; margin-left:auto }
+    .right-panel { background:#fff; border-left:1px solid var(--line); padding:22px 18px }
+    .panel-title { display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:15px;margin:0 0 7px }
+    .panel-copy { color:#6a6e73;font-size:12px;line-height:1.5;margin:0 0 18px }
+    .asset { border:1px solid var(--line); border-radius:3px; padding:12px; margin-top:10px }
+    .asset-head { display:flex;justify-content:space-between;align-items:center;gap:6px }
+    .asset-name { font-weight:600 }
+    .asset-type { color:#6a6e73;font-size:11px;margin-top:4px }
+    .check { color:#3e8635;font-weight:700 }
+    .mini-tag { font-size:10px;font-weight:700;background:#f0f0f0;border-radius:10px;padding:3px 7px;color:#4f5255;white-space:nowrap }
+    .mini-tag.asr { background:#e7f1fa;color:#004d99 }
+    .asset-actions { margin-top:10px;display:flex;align-items:center;justify-content:space-between }
+    .link-button { border:0;background:none;color:#0066cc;padding:0;font-weight:600;font-size:12px }
+    .toggle { width:32px;height:18px;border-radius:10px;background:#0066cc;position:relative;border:0;padding:0 }
+    .toggle:after { content:"";position:absolute;right:2px;top:2px;background:white;width:14px;height:14px;border-radius:50% }
+    .toggle.off { background:#8a8d90 }.toggle.off:after { right:auto;left:2px }
+    .empty-assets { background:#f5f5f5;border:1px dashed #8a8d90;padding:16px;text-align:center;color:#6a6e73;font-size:12px;line-height:1.5;border-radius:3px }
+    .limit-card { border-top:1px solid #e0e0e0;margin-top:20px;padding-top:16px;color:#6a6e73;font-size:11px;line-height:1.55 }
+    .limit-card strong { color:#3d3d3d }
+    .toast { position:fixed;right:24px;top:78px;background:#fff;border:1px solid #87d068;border-left:4px solid #3e8635;padding:12px 16px;box-shadow:0 4px 14px #0002;z-index:5;max-width:360px }
+    [hidden] { display:none !important }
+    @media(max-width:1100px) { .app{grid-template-columns:210px minmax(480px,1fr)} .right-panel{display:none} }
+    @media(max-width:760px) { .app{display:block} aside{display:none}.page-head{padding:20px}.content{padding:16px}.model-card{display:block}.provider{margin-top:10px}.model-field{max-width:none} }
+  </style>
+</head>
+<body>
+  <header class="masthead"><div class="brand"><span class="brand-mark" aria-hidden="true"></span>Red Hat</div><span class="divider"></span><div class="product">OpenShift AI</div><div class="top-spacer"></div><button class="icon-button" aria-label="Help">?</button><button class="icon-button" aria-label="User account">●</button></header>
+  <div class="app">
+    <aside aria-label="Main navigation">
+      <div class="side-label">Gen AI Studio</div>
+      <a class="nav-link active" href="#playground"><span class="nav-icon">▤</span>Playground</a>
+      <a class="nav-link" href="#models"><span class="nav-icon">◇</span>Models</a>
+      <a class="nav-link" href="#assets"><span class="nav-icon">▦</span>AI Asset Endpoints</a>
+      <a class="nav-link" href="#prompts"><span class="nav-icon">▧</span>Prompt catalog</a>
+      <div class="side-label" style="margin-top:28px">Resources</div>
+      <a class="nav-link" href="#docs"><span class="nav-icon">ⓘ</span>Documentation</a>
+    </aside>
+    <main class="workspace" id="playground">
+      <div class="page-head"><div class="crumb">Gen AI Studio&nbsp; / &nbsp;Playground</div><h1>Playground</h1><div class="subhead">Experiment with models using text, images, and audio.</div></div>
+      <div class="content">
+        <section class="model-card" aria-label="Model configuration">
+          <div class="field model-field"><label for="model-select">Model</label><select id="model-select" data-ouia-component-id="model-select"><option value="vision">Granite Vision 3.2 · vision</option><option value="audio">Granite 3.3 · audio input</option><option value="text">Granite 3.3 · text only</option></select><div class="tag-row" id="capability-tags"><span class="tag">Text</span><span class="tag">Image input</span><span class="tag gray">Audio via ASR</span></div></div>
+          <div class="provider">Provider <strong>OpenShift AI</strong></div>
+          <button class="pf-button" id="clear-chat">New chat</button>
+        </section>
+        <div id="notice" aria-live="polite"></div>
+        <section class="chat" aria-label="Conversation">
+          <div class="chat-head"><span class="status-dot"></span><span>Conversation</span><span class="tiny-note" id="turn-limit">One image or audio file per conversation</span></div>
+          <div class="chat-body" id="chat-body"><div class="empty-chat" id="empty-state"><div class="empty-icon">✦</div><strong>Start a conversation</strong><br />Ask a question, or attach one image or audio file to include more context.</div></div>
+          <div class="composer">
+            <label class="field" for="prompt-input"><span class="field-label" style="font-weight:600;font-size:12px">Message</span><textarea id="prompt-input" data-ouia-component-id="prompt-input" placeholder="Ask a question about your input…"></textarea></label>
+            <div id="attachment-slot"></div>
+            <div class="composer-row" id="composer-actions">
+              <span class="attach-label">Add input</span>
+              <button class="pf-button modality-button" id="image-input" data-ouia-component-id="image-input" aria-label="Upload image"><span aria-hidden="true">▧</span> Image</button>
+              <button class="pf-button modality-button" id="audio-input" data-ouia-component-id="audio-input" aria-label="Upload audio"><span aria-hidden="true">♫</span> Audio</button>
+              <input id="file-picker" type="file" hidden />
+              <span class="tiny-note" id="input-hint">JPG or PNG · up to 10 MB</span>
+              <button class="pf-button primary" id="send-button" data-ouia-component-id="send-button">Send ↑</button>
+            </div>
+            <div class="tiny-note" style="margin:9px 0 0 0">Multimodal inputs are temporary in this prototype and are not saved to chat history.</div>
+          </div>
+        </section>
+        <div class="tiny-note" style="text-align:center;margin:12px">Model responses may be inaccurate. Review outputs before using them.</div>
+      </div>
+    </main>
+    <aside class="right-panel" id="assets" aria-label="Audio transcription models">
+      <h2 class="panel-title">Audio transcription models <button class="link-button" id="refresh-assets" aria-label="Refresh AI Assets">↻</button></h2>
+      <p class="panel-copy">Choose an ASR-capable AI Asset to transcribe audio before sending it to the selected model.</p>
+      <div id="asset-list"></div>
+      <button class="pf-button" style="width:100%;margin-top:12px" id="manage-assets">Manage AI Assets</button>
+      <div class="limit-card"><strong>Input limits</strong><br />Images: JPG, PNG · max 10 MB<br />Audio: WAV, MP3 · max 10 MB<br />One file per conversation. Microphone capture and PDF image input are not supported.</div>
+    </aside>
+  </div>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script>
+    (function () {
+      var MOCK_ASSETS = [{ name: 'whisper-large-v3', detail: 'Custom endpoint · Namespace: team-a', asr: true }, { name: 'voice-transcriber', detail: 'InferenceService · Namespace: team-a', asr: true }];
+      var state = { attachment: null, used: false, scenario: 'default', asr: true };
+      var q = new URLSearchParams(location.search);
+      var scenario = q.get('scenario') || 'default';
+      var validScenarios = ['default', 'text-only', 'no-asr', 'asr-error', 'oversized'];
+      if (validScenarios.indexOf(scenario) < 0) scenario = 'default';
+      window.UxdScenario = window.UxdScenario || { get: function () { return new URLSearchParams(location.search).get('scenario') || 'default'; }, set: function (id) { var u = new URL(location.href); u.searchParams.set('scenario', id); location.href = u.href; }, subscribe: function () {} };
+      var model = document.getElementById('model-select'), imageBtn = document.getElementById('image-input'), audioBtn = document.getElementById('audio-input');
+      var picker = document.getElementById('file-picker'), notice = document.getElementById('notice'), body = document.getElementById('chat-body'), slot = document.getElementById('attachment-slot'), send = document.getElementById('send-button');
+      function message(kind, title, detail) { notice.innerHTML = '<div class="alert ' + kind + '" role="alert"><span aria-hidden="true">' + (kind === 'danger' ? '✕' : kind === 'warning' ? '!' : 'i') + '</span><div><strong>' + title + '</strong>' + detail + '</div></div>'; }
+      function clearMessage() { notice.innerHTML = ''; }
+      function assetPanel() {
+        var el = document.getElementById('asset-list');
+        if (!state.asr) { el.innerHTML = '<div class="empty-assets"><strong>No ASR models registered</strong><br />Register an AI Asset and mark it as transcription-capable to enable audio input.</div>'; return; }
+        el.innerHTML = MOCK_ASSETS.map(function (a, i) { return '<div class="asset"><div class="asset-head"><div><div class="asset-name">' + a.name + '</div><div class="asset-type">' + a.detail + '</div></div><span class="mini-tag asr">ASR</span></div><div class="asset-actions"><button class="link-button asset-select" data-index="' + i + '">Use for audio</button><button class="toggle" aria-label="ASR capability enabled" title="ASR capability enabled"></button></div></div>'; }).join('');
+        Array.prototype.forEach.call(document.querySelectorAll('.asset-select'), function (b) { b.addEventListener('click', function () { document.querySelectorAll('.asset-select').forEach(function (x) { x.textContent = 'Use for audio'; }); b.textContent = 'Selected ✓'; }); });
+      }
+      function modelChange() {
+        var v = model.value;
+        imageBtn.hidden = v === 'text' || v === 'audio';
+        audioBtn.hidden = v === 'text' || v === 'vision';
+        document.getElementById('capability-tags').innerHTML = v === 'text' ? '<span class="tag">Text</span><span class="tag gray">No multimodal input</span>' : v === 'vision' ? '<span class="tag">Text</span><span class="tag">Image input</span>' : '<span class="tag">Text</span><span class="tag">Audio via ASR</span>';
+        document.getElementById('input-hint').textContent = v === 'audio' ? 'WAV or MP3 · up to 10 MB' : 'JPG or PNG · up to 10 MB';
+        if (v === 'audio' && !state.asr) message('warning', 'Transcription model required', 'Register and mark an ASR AI Asset in AI Asset Endpoints before submitting audio.'); else if (scenario !== 'asr-error' && scenario !== 'oversized') clearMessage();
+      }
+      function preview() {
+        if (!state.attachment) { slot.innerHTML = ''; return; }
+        var a = state.attachment;
+        slot.innerHTML = '<div class="attachment" data-ouia-component-id="attachment-preview"><div class="file-icon">' + (a.kind === 'image' ? 'IMG' : 'WAV') + '</div><div class="file-meta"><div class="file-name">' + a.name + '</div><div class="file-size">' + a.sizeText + (a.kind === 'audio' ? ' · Ready to transcribe' : ' · Ready to analyze') + '</div></div><button class="pf-button link" id="remove-file" aria-label="Remove attachment">Remove</button></div>';
+        document.getElementById('remove-file').onclick = function () { state.attachment = null; preview(); clearMessage(); };
+      }
+      imageBtn.onclick = function () { picker.accept = '.jpg,.jpeg,.png,image/jpeg,image/png'; picker.dataset.kind = 'image'; picker.click(); };
+      audioBtn.onclick = function () { if (!state.asr) { message('warning', 'Transcription model required', 'Register an ASR AI Asset in AI Asset Endpoints, then return to select it here.'); return; } picker.accept = '.wav,.mp3,audio/wav,audio/mpeg'; picker.dataset.kind = 'audio'; picker.click(); };
+      picker.onchange = function () {
+        var f = picker.files && picker.files[0]; if (!f) return;
+        var kind = picker.dataset.kind, allowed = kind === 'image' ? ['image/jpeg','image/png'] : ['audio/wav','audio/x-wav','audio/mpeg'];
+        if (!f.size) { message('danger', 'This file is empty', 'Choose a non-empty JPG, PNG, WAV, or MP3 file.'); picker.value = ''; return; }
+        if (allowed.indexOf(f.type) < 0) { message('danger', 'File type not supported', 'Choose ' + (kind === 'image' ? 'a JPG or PNG image.' : 'a WAV or MP3 audio file.')); picker.value = ''; return; }
+        if (f.size > 10 * 1024 * 1024) { message('danger', 'File exceeds 10 MB limit', 'Choose a smaller file. The file was not uploaded.'); picker.value = ''; return; }
+        if (state.used) { message('warning', 'One file per conversation', 'Start a new chat to attach another image or audio file.'); picker.value = ''; return; }
+        state.attachment = { file: f, kind: kind, name: f.name, sizeText: (f.size / (1024 * 1024)).toFixed(1) + ' MB' }; preview(); clearMessage();
+      };
+      model.onchange = modelChange;
+      send.onclick = function () {
+        var prompt = document.getElementById('prompt-input').value.trim();
+        if (!prompt && !state.attachment) { message('warning', 'Add a message or file', 'Enter a prompt or attach an image or audio file to continue.'); return; }
+        if (state.attachment && state.attachment.kind === 'audio' && !state.asr) { message('warning', 'Transcription model required', 'Register an ASR AI Asset to submit this audio.'); return; }
+        if (scenario === 'asr-error' && state.attachment && state.attachment.kind === 'audio') { message('danger', 'Audio transcription failed', 'The selected ASR endpoint did not respond. Check the endpoint and retry. No request was sent to the language model.'); return; }
+        document.getElementById('empty-state').remove();
+        var user = document.createElement('div'); user.className = 'message user'; user.innerHTML = '<div class="message-label">You</div>' + (prompt || 'Please describe this input.') + (state.attachment ? '<div class="attachment"><div class="file-icon">' + (state.attachment.kind === 'image' ? 'IMG' : 'WAV') + '</div><div class="file-meta"><div class="file-name">' + state.attachment.name + '</div><div class="file-size">' + state.attachment.sizeText + '</div></div></div>' : ''); body.appendChild(user);
+        var asr = state.attachment && state.attachment.kind === 'audio';
+        if (asr) message('info', 'Transcribing audio…', 'The selected ASR AI Asset is converting speech to text.');
+        state.used = !!state.attachment; state.attachment = null; preview(); document.getElementById('prompt-input').value = ''; send.disabled = true;
+        window.setTimeout(function () {
+          clearMessage();
+          var answer = document.createElement('div'); answer.className = 'message assistant'; answer.setAttribute('data-ouia-component-id','assistant-response');
+          answer.innerHTML = '<div class="message-label">Granite</div>' + (asr ? 'Transcription complete. I heard: “The project review is scheduled for Thursday at two PM.” Here is a concise summary of the recording: the project review is planned for Thursday afternoon.' : 'This image shows a small botanical illustration with a green leaf and fine vein details against a light background.');
+          body.appendChild(answer); send.disabled = false;
+        }, asr ? 1100 : 800);
+      };
+      document.getElementById('clear-chat').onclick = function () { state.attachment = null; state.used = false; preview(); body.innerHTML = '<div class="empty-chat" id="empty-state"><div class="empty-icon">✦</div><strong>Start a conversation</strong><br />Ask a question, or attach one image or audio file to include more context.</div>'; clearMessage(); send.disabled = false; document.getElementById('prompt-input').value = ''; };
+      document.getElementById('manage-assets').onclick = function () { document.getElementById('assets').scrollIntoView({behavior:'smooth'}); message('info', 'AI Asset Endpoints', 'ASR capability is managed when registering an endpoint. Select an ASR-capable asset from this panel.'); };
+      document.getElementById('refresh-assets').onclick = assetPanel;
+      if (scenario === 'text-only') model.value = 'text';
+      if (scenario === 'no-asr') { model.value = 'audio'; state.asr = false; }
+      if (scenario === 'asr-error') { model.value = 'audio'; }
+      if (scenario === 'oversized') { model.value = 'vision'; message('danger', 'File exceeds 10 MB limit', 'Choose a smaller JPG or PNG file. Validation happens before upload.'); }
+      assetPanel(); modelChange();
+      if (scenario === 'asr-error') { state.attachment = {kind:'audio',name:'meeting-notes.wav',sizeText:'2.4 MB'}; preview(); message('danger', 'Audio transcription failed', 'The selected ASR endpoint did not respond. Retry or choose another registered ASR AI Asset.'); }
+    })();
+  </script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/","id":"default","name":"Vision ready","default":true},{"route":"/","id":"text-only","name":"Text-only model"},{"route":"/","id":"no-asr","name":"No ASR asset registered"},{"route":"/","id":"asr-error","name":"Transcription failed"},{"route":"/","id":"oversized","name":"File exceeds limit"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

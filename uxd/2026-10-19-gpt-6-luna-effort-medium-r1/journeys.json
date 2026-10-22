@@ -1,0 +1,30 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-image-analysis",
+      "title": "Analyze an image in Playground",
+      "persona": "app-developer",
+      "source": "inferred",
+      "ac_ids": ["AC-1", "AC-2", "AC-3", "AC-7", "AC-8", "AC-13"],
+      "steps": [
+        {"id": "playground-default", "name": "Playground ready for multimodal input", "route": "/", "export": true},
+        {"id": "attach-image", "name": "Attach an image", "route": "/", "export": true, "actions": [{"type": "click", "selector": "[data-ouia-component-id=\"image-input\"]"}, {"type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-preview\"]"}]},
+        {"id": "submit-image", "name": "Submit image question", "route": "/", "export": true, "actions": [{"type": "fill", "selector": "[data-ouia-component-id=\"prompt-input\"]", "value": "What is in this image?"}, {"type": "click", "selector": "[data-ouia-component-id=\"send-button\"]"}, {"type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-response\"]"}]}
+      ]
+    },
+    {
+      "id": "journey-audio-transcription",
+      "title": "Ask a question with audio",
+      "persona": "app-developer",
+      "source": "inferred",
+      "ac_ids": ["AC-4", "AC-5", "AC-6", "AC-10", "AC-11"],
+      "steps": [
+        {"id": "playground-audio", "name": "Select an audio-capable model", "route": "/", "export": true, "actions": [{"type": "click", "selector": "[data-ouia-component-id=\"model-select\"]"}]},
+        {"id": "attach-audio", "name": "Choose ASR asset and attach audio", "route": "/", "export": true, "actions": [{"type": "click", "selector": "[data-ouia-component-id=\"audio-input\"]"}, {"type": "wait_for", "selector": "[data-ouia-component-id=\"attachment-preview\"]"}]},
+        {"id": "submit-audio", "name": "Transcribe and submit", "route": "/", "export": true, "actions": [{"type": "fill", "selector": "[data-ouia-component-id=\"prompt-input\"]", "value": "Summarize this recording."}, {"type": "click", "selector": "[data-ouia-component-id=\"send-button\"]"}, {"type": "wait_for", "selector": "[data-ouia-component-id=\"assistant-response\"]"}]}
+      ]
+    }
+  ]
+}

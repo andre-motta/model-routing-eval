@@ -1,0 +1,29 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        {"id": "default", "name": "Vision model, empty chat", "description": "Qwen2.5-VL selected; image control visible, audio hidden; empty conversation", "default": true},
+        {"id": "text-only", "name": "Text-only model", "description": "Granite text model selected; no image or audio controls rendered"},
+        {"id": "image-response", "name": "Image answered", "description": "Transcript shows uploaded PNG inline and the model's text answer; image control disabled with one-file-per-conversation hint"},
+        {"id": "audio-transcribed", "name": "Audio transcribed and answered", "description": "Audio model + Whisper ASR selected; transcript shows WAV player, transcription text, and model answer"},
+        {"id": "audio-no-asr", "name": "No ASR model registered", "description": "Audio control visible but blocked by warning alert linking to AI Asset Endpoints"},
+        {"id": "file-too-large", "name": "File too large", "description": "Inline danger validation: 14.2 MB image exceeds 10 MB limit; nothing uploaded"},
+        {"id": "asr-error", "name": "Transcription failed", "description": "Danger alert in transcript: ASR endpoint unreachable, no response generated"},
+        {"id": "limit-reached", "name": "Second file blocked", "description": "Conversation already has an image; second upload attempt blocked with info alert"}
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AiAssetEndpoints",
+      "scenarios": [
+        {"id": "default", "name": "Endpoints with ASR flagged", "description": "Table of endpoints; whisper-large-v3 shows ASR/transcription label", "default": true},
+        {"id": "no-asr", "name": "No ASR endpoint flagged", "description": "Endpoints listed but none flagged ASR; info alert explains how to flag one"},
+        {"id": "empty", "name": "No endpoints", "description": "Empty state prompting to add an AI Asset endpoint"}
+      ]
+    }
+  ]
+}

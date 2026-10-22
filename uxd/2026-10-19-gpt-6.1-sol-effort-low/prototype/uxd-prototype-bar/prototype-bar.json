@@ -1,0 +1,76 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready to experiment",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "image-result",
+      "name": "Image response"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-result",
+      "name": "Audio response"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "processing",
+      "name": "Transcribing audio"
+    },
+    {
+      "route": "/index.html",
+      "id": "upload-error",
+      "name": "Upload failed"
+    },
+    {
+      "route": "/index.html",
+      "id": "unsupported",
+      "name": "Unsupported inference"
+    },
+    {
+      "route": "/endpoints.html",
+      "id": "default",
+      "name": "Registered endpoints",
+      "default": true
+    },
+    {
+      "route": "/endpoints.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/endpoints.html",
+      "id": "load-error",
+      "name": "Unable to load"
+    },
+    {
+      "route": "/endpoints.html",
+      "id": "registered",
+      "name": "ASR endpoint registered"
+    }
+  ]
+}

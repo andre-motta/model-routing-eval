@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground · Gen AI studio · Red Hat OpenShift AI</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./app.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead" data-ouia-component-id="masthead">
+    <div class="pf-v6-c-masthead__main">
+      <div class="pf-v6-c-masthead__brand">
+        <a class="pf-v6-c-masthead__logo app-logo" href="./index.html"><span class="app-logo__mark" aria-hidden="true"></span>Red Hat OpenShift AI</a>
+      </div>
+    </div>
+    <div class="pf-v6-c-masthead__content">
+      <div class="pf-v6-c-toolbar pf-m-static">
+        <div class="pf-v6-c-toolbar__content">
+          <div class="pf-v6-c-toolbar__content-section">
+            <div class="pf-v6-c-toolbar__item pf-m-align-end">
+              <span class="pf-v6-u-font-size-sm">Project: <strong>multimodal-demo</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Global">
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Projects</span></a></li>
+          <li class="pf-v6-c-nav__item pf-m-expandable pf-m-expanded">
+            <button type="button" class="pf-v6-c-nav__link" aria-expanded="true" id="nav-genai">
+              <span class="pf-v6-c-nav__link-text">Gen AI studio</span>
+            </button>
+            <section class="pf-v6-c-nav__subnav" aria-labelledby="nav-genai">
+              <ul class="pf-v6-c-nav__list" role="list">
+                <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" aria-current="page" href="./index.html" data-ouia-component-id="nav-playground"><span class="pf-v6-c-nav__link-text">Playground</span></a></li>
+                <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="./ai-asset-endpoints.html" data-ouia-component-id="nav-ai-asset-endpoints"><span class="pf-v6-c-nav__link-text">AI asset endpoints</span></a></li>
+              </ul>
+            </section>
+          </li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Model catalog</span></a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="#" aria-disabled="true"><span class="pf-v6-c-nav__link-text">Model registry</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="pf-v6-c-page__main-container">
+    <main class="pf-v6-c-page__main" tabindex="-1">
+      <section class="pf-v6-c-page__main-section">
+        <div class="pf-v6-l-flex pf-m-justify-content-space-between pf-m-align-items-center">
+          <div>
+            <h1 class="pf-v6-c-title pf-m-2xl">Playground</h1>
+            <p class="pf-v6-u-color-200">Experiment with models in project <strong>multimodal-demo</strong>. Attach an image or audio file when the selected model supports it.</p>
+          </div>
+          <button type="button" class="pf-v6-c-button pf-m-secondary" id="new-chat" data-ouia-component-id="new-chat">
+            <span class="pf-v6-c-button__icon pf-m-start" id="new-chat-icon"></span>
+            <span class="pf-v6-c-button__text">New chat</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="pf-v6-c-page__main-section pf-v6-u-pt-0">
+        <div class="pg-layout">
+          <!-- Settings panel -->
+          <div class="pf-v6-c-card pg-settings" data-ouia-component-id="settings-panel">
+            <div class="pf-v6-c-card__title"><h2 class="pf-v6-c-card__title-text">Settings</h2></div>
+            <div class="pf-v6-c-card__body">
+              <div class="pf-v6-c-form__group">
+                <div class="pf-v6-c-form__group-label">
+                  <span class="pf-v6-c-form__label" id="model-select-label"><span class="pf-v6-c-form__label-text">Model</span></span>
+                </div>
+                <div class="pf-v6-c-form__group-control">
+                  <div class="app-dropdown app-dropdown--block" id="model-dropdown"></div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="pf-v6-c-title pf-m-md" id="capabilities-title">Supported inputs</h3>
+                <div class="assets-label-group pf-v6-u-mt-sm" id="capability-labels" data-ouia-component-id="capability-labels" role="list" aria-labelledby="capabilities-title"></div>
+                <p class="pg-hint pf-v6-u-mt-sm">From the model catalog (<code>supported_modalities</code>). Input controls appear only for supported types.</p>
+              </div>
+
+              <div class="pf-v6-c-form__group">
+                <div class="pf-v6-c-form__group-label">
+                  <label class="pf-v6-c-form__label" for="system-prompt"><span class="pf-v6-c-form__label-text">System instructions</span></label>
+                </div>
+                <div class="pf-v6-c-form__group-control">
+                  <span class="pf-v6-c-form-control pf-m-textarea pf-m-resize-vertical">
+                    <textarea id="system-prompt" rows="4">You are a helpful assistant.</textarea>
+                  </span>
+                </div>
+              </div>
+
+              <div class="pf-v6-c-form__group">
+                <div class="pf-v6-c-form__group-label">
+                  <label class="pf-v6-c-form__label" for="temperature"><span class="pf-v6-c-form__label-text">Temperature</span></label>
+                </div>
+                <div class="pf-v6-c-form__group-control">
+                  <span class="pf-v6-c-form-control"><input type="number" id="temperature" value="0.7" min="0" max="2" step="0.1" /></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chat -->
+          <div class="pf-v6-c-card pg-chat" data-ouia-component-id="chat-panel">
+            <div class="pf-v6-c-card__body" id="transcript-scroll">
+              <div class="pg-transcript" id="transcript" aria-live="polite" aria-label="Chat transcript" role="log"></div>
+            </div>
+
+            <div class="pg-composer" id="composer">
+              <div id="composer-alerts"></div>
+              <div id="attachment-area"></div>
+              <div class="pg-composer__toolbar" id="modality-controls" role="group" aria-label="Input types" data-ouia-component-id="modality-controls"></div>
+              <div id="composer-helper"></div>
+              <div class="pg-composer__row">
+                <label class="app-sr-only" for="prompt-input">Message</label>
+                <span class="pf-v6-c-form-control pf-m-textarea">
+                  <textarea id="prompt-input" rows="2" placeholder="Send a message..."></textarea>
+                </span>
+                <button type="button" class="pf-v6-c-button pf-m-primary" id="send-message" data-ouia-component-id="send-message" aria-label="Send message">
+                  <span class="pf-v6-c-button__icon pf-m-start" id="send-icon"></span>
+                  <span class="pf-v6-c-button__text">Send</span>
+                </button>
+              </div>
+              <p class="pg-hint" id="limits-hint" data-ouia-component-id="limits-hint"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<input type="file" id="file-input-image" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="app-sr-only" tabindex="-1" aria-hidden="true" />
+<input type="file" id="file-input-audio" accept=".wav,.mp3,audio/wav,audio/x-wav,audio/mpeg" class="app-sr-only" tabindex="-1" aria-hidden="true" />
+
+<script src="./common.js"></script>
+<script src="./playground.js"></script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://issues.example.com/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"Source RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Vision model, new chat","default":true},{"route":"/index.html","id":"text-only","name":"Text-only model"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"image-processing","name":"Image sent, generating"},{"route":"/index.html","id":"image-response","name":"Image answered"},{"route":"/index.html","id":"model-rejected","name":"Model rejected image"},{"route":"/index.html","id":"one-file-limit","name":"Second file blocked"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no transcription model"},{"route":"/index.html","id":"audio-transcribing","name":"Transcribing audio"},{"route":"/index.html","id":"audio-response","name":"Audio answered"},{"route":"/index.html","id":"asr-error","name":"Transcription failed"},{"route":"/index.html","id":"empty-transcription","name":"No speech detected"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Endpoints with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"No transcription endpoint"},{"route":"/ai-asset-endpoints.html","id":"asr-marked","name":"ASR just marked"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No AI assets"},{"route":"/ai-asset-endpoints.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

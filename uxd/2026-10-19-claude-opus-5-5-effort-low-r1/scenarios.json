@@ -1,0 +1,70 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/playground.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Image conversation",
+          "description": "Vision model selected; image + answer in transcript; attach controls disabled by one-file limit state",
+          "default": true
+        },
+        {
+          "id": "text-only-model",
+          "name": "Text-only model",
+          "description": "granite selected; no image/audio controls rendered; text conversation"
+        },
+        {
+          "id": "audio-transcribed",
+          "name": "Audio transcribed",
+          "description": "gemma + whisper-large-v3 selected; audio message with transcription and response"
+        },
+        {
+          "id": "no-asr-asset",
+          "name": "No ASR model",
+          "description": "Audio-capable model, ASR dropdown disabled, warning linking to AI asset endpoints"
+        },
+        {
+          "id": "file-too-large",
+          "name": "File too large",
+          "description": "Danger alert: 14.2 MB file rejected before upload"
+        },
+        {
+          "id": "one-file-limit",
+          "name": "Second file blocked",
+          "description": "Image conversation plus warning that only one file per conversation is allowed"
+        },
+        {
+          "id": "transcription-error",
+          "name": "Transcription failed",
+          "description": "Audio message sent, ASR unreachable alert, no model response"
+        }
+      ]
+    },
+    {
+      "route": "/ai-asset-endpoints.html",
+      "screen": "AiAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "ASR endpoints flagged",
+          "description": "Table with whisper-large-v3 and openai-whisper-1 marked ASR",
+          "default": true
+        },
+        {
+          "id": "no-asr-flagged",
+          "name": "No ASR flagged",
+          "description": "All switches off; info alert explaining audio is unavailable"
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty state prompting to add an endpoint"
+        }
+      ]
+    }
+  ]
+}

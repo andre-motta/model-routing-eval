@@ -1,0 +1,70 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:30:27.129561+00:00",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to experiment",
+          "description": "Empty conversation with vision model selected and image upload available.",
+          "default": true
+        },
+        {
+          "id": "image-result",
+          "name": "Image analysis complete",
+          "description": "Image attachment and complete model text analysis visible; further attachments blocked."
+        },
+        {
+          "id": "audio-result",
+          "name": "Audio analysis complete",
+          "description": "Audio attachment, transcription, and text response visible."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoints",
+          "description": "Audio controls visible; submission blocked with registration guidance."
+        },
+        {
+          "id": "asr-error",
+          "name": "Transcription failed",
+          "description": "Audio attachment retained with unreachable endpoint error and retry action."
+        },
+        {
+          "id": "empty-transcription",
+          "name": "No speech detected",
+          "description": "Audio retained with empty transcription warning and replacement guidance."
+        },
+        {
+          "id": "unknown-capabilities",
+          "name": "Unsupported image request",
+          "description": "Unknown capability model selected; rejected image request visible with recovery guidance."
+        }
+      ]
+    },
+    {
+      "route": "/endpoints.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered endpoints",
+          "description": "Vision and ASR endpoints listed with transcription capability checkbox.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "Empty endpoint table with registration call to action."
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoints unavailable",
+          "description": "Endpoint loading error visible with retry action."
+        }
+      ]
+    }
+  ]
+}

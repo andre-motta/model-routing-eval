@@ -1,0 +1,32 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {"type": "jira", "reference": "RHAISTRAT-1527", "rfe_count": 1},
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {"kind": "strat", "key": "RHAISTRAT-1527", "label": "Strategy", "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"},
+    {"kind": "rfe", "key": "RHAIRFE-913", "label": "RFE", "url": "https://issues.redhat.com/browse/RHAIRFE-913"}
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground", "AiAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {"path": ".artifacts/RHAISTRAT-1527/exports", "count": 0},
+  "assumptions": [
+    "Source was the local rfe-snapshot.md (Jira unreachable).",
+    "Scope follows the strategy, not the original RFE: input-only, no audio output, no microphone capture, no PDF, no video.",
+    "Model selection shown as a toggle group of three sample models with catalog capability tags (image-inferencing, audio-asr).",
+    "ASR capability flag UX in AI Asset Endpoints is modeled as an 'Edit capabilities' modal with a checkbox; final design is an open question in the strategy.",
+    "File size limit assumed at the proposed 10 MB default (pending PM confirmation).",
+    "Processing feedback shown as sequential status messages: Uploading, Transcribing audio, Generating response.",
+    "'Use sample image/audio' buttons exist only to make the prototype demoable without real files."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

@@ -1,0 +1,56 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE snapshot source",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace": "standalone",
+  "target": "none",
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "The final Staff Engineer clarifications and strategy scope take precedence over broader initial business needs: input files only, text output, one media file per conversation, no microphone/PDF/video/model comparison/persistence.",
+    "10 MiB (10 * 1024 * 1024 bytes) is the configurable-in-code prototype file limit, displayed as 10 MB; PM must finalize the production limit.",
+    "Model names and capability tags are illustrative mock catalog data; actual release model availability is unverified. Unknown tags allow attempted input with inference-time error handling, without a hardcoded production fallback list.",
+    "The persona catalog and overlays are not present in the staged plugin; app-developer is an assumed persona ID.",
+    "All backend operations are simulated. No network uploads, base64 encoding, ASR requests, OGX calls, or chat persistence are implemented. The prototype cannot prove timing, security, storage, replica safety, or production catalog behavior.",
+    "Endpoint registration uses browser localStorage for mock project-scoped records only; no credentials are requested. ASR capability is an asset classification, not manual model catalog tagging.",
+    "An SVG illustration stands in for an uploaded JPG/PNG in the seeded image-success scenario; real file selection accepts only JPG/PNG.",
+    "Native file selection is manual because the export journey action schema does not support file upload. Scenario URLs provide complete deterministic result states for capture."
+  ],
+  "created_at": "2026-10-19T14:11:44Z",
+  "updated_at": "2026-10-19T14:11:44Z",
+  "refinement_history": [],
+  "reachability_check_path": ".artifacts/RHAISTRAT-1527/reachability-check.json",
+  "validation": {
+    "static_reachability": "pass",
+    "javascript_syntax": "pass",
+    "browser": "blocked",
+    "browser_reason": "Local socket creation denied; Chrome could not create a headless user data directory. No workaround attempted.",
+    "backend_integration": "not-applicable-to-standalone"
+  }
+}

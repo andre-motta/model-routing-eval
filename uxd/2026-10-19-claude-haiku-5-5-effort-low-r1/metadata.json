@@ -1,0 +1,43 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": null,
+  "screens": ["Playground", "AIAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": null,
+    "count": 0
+  },
+  "assumptions": [
+    "Local rfe-snapshot.md used as source; Jira not reachable from this environment.",
+    "Model names and modality tags (image-inferencing, audio-asr) are placeholders until agreed with the model registry team.",
+    "10 MB file limit is the proposed default pending PM confirmation.",
+    "Decisions skipped (--decisions skip); design calls made while building.",
+    "Standalone HTML; PatternFly 6 via CDN; no workspace clone or verification run.",
+    "Export not requested (--export off); journeys marked export:true for later batch export.",
+    "Prototype is interaction-light: attach buttons and the ASR edit dialog are simulated; sends do not call a model."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

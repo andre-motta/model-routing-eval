@@ -1,0 +1,82 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "Local RFE snapshot",
+      "url": "../rfe-snapshot.md"
+    },
+    {
+      "kind": "jira",
+      "key": "RHAISTRAT-1527",
+      "label": "Jira source",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready to explore",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "image-result",
+      "name": "Image response"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-result",
+      "name": "Audio response"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "transcribing",
+      "name": "Transcription in progress"
+    },
+    {
+      "route": "/index.html",
+      "id": "transcription-error",
+      "name": "Transcription unavailable"
+    },
+    {
+      "route": "/index.html",
+      "id": "silent-audio",
+      "name": "No speech detected"
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "default",
+      "name": "Registered endpoints",
+      "default": true
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "load-error",
+      "name": "Endpoint load failed"
+    }
+  ]
+}

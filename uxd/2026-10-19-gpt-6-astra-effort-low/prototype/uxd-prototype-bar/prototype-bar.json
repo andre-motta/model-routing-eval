@@ -1,0 +1,96 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "Local RFE snapshot",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready to experiment",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "vision-result",
+      "name": "Vision response"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-result",
+      "name": "Audio response"
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "vision-only",
+      "name": "Vision-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "processing",
+      "name": "Transcribing audio"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/index.html",
+      "id": "empty-transcription",
+      "name": "Silent audio"
+    },
+    {
+      "route": "/index.html",
+      "id": "invalid-file",
+      "name": "File too large"
+    },
+    {
+      "route": "/index.html",
+      "id": "unsupported",
+      "name": "Unknown model capabilities"
+    },
+    {
+      "route": "/assets.html",
+      "id": "default",
+      "name": "Registered endpoints",
+      "default": true
+    },
+    {
+      "route": "/assets.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/assets.html",
+      "id": "load-error",
+      "name": "Endpoints unavailable"
+    },
+    {
+      "route": "/assets.html",
+      "id": "unflagged",
+      "name": "Transcription not enabled"
+    }
+  ]
+}

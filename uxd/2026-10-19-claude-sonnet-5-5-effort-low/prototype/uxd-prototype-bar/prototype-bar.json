@@ -1,0 +1,76 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Image answered",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "vision-only",
+      "name": "Vision-only model, empty chat"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-no-asr",
+      "name": "Audio, no ASR asset"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-answered",
+      "name": "Audio answered"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-failure",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/index.html",
+      "id": "upload-error",
+      "name": "File rejected"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "default",
+      "name": "Table with ASR endpoint",
+      "default": true
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "no-asr",
+      "name": "No ASR endpoints"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/ai-assets.html",
+      "id": "load-error",
+      "name": "Load error"
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI asset endpoints - Gen AI Studio</title>
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="./shared.css" />
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand app-brand">Red Hat OpenShift AI</span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Global">
+        <section class="pf-v6-c-nav__section"><h2 class="pf-v6-c-nav__section-title">Gen AI Studio</h2>
+        <ul class="pf-v6-c-nav__list" role="list">
+          <li class="pf-v6-c-nav__item"><a href="./playground.html" class="pf-v6-c-nav__link" data-ouia-component-id="nav-playground">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a href="./ai-asset-endpoints.html" class="pf-v6-c-nav__link pf-m-current" aria-current="page" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul></section>
+      </nav>
+    </div>
+  </div>
+  <div class="pf-v6-c-page__main-container">
+  <main class="pf-v6-c-page__main" tabindex="-1">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+      <p class="pf-v6-u-color-200">Endpoints available to the Playground. Flag a transcription-capable endpoint as <strong>ASR</strong> to use it for audio input.</p>
+    </section>
+    <section class="pf-v6-c-page__main-section">
+      <div id="alerts"></div>
+      <div class="pf-v6-c-card"><div class="pf-v6-c-card__body" id="content"></div></div>
+    </section>
+  </main>
+  </div>
+</div>
+
+<div id="modal" hidden>
+  <div class="pf-v6-c-backdrop">
+    <div class="pf-v6-l-bullseye">
+      <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="pf-v6-c-modal-box__close"><button class="pf-v6-c-button pf-m-plain" type="button" aria-label="Close" id="modal-close"><i class="fas fa-times" aria-hidden="true"></i></button></div>
+        <header class="pf-v6-c-modal-box__header"><h1 class="pf-v6-c-modal-box__title" id="modal-title">Edit capabilities</h1></header>
+        <div class="pf-v6-c-modal-box__body">
+          <p class="pf-v6-u-mb-md" id="modal-endpoint"></p>
+          <div class="pf-v6-c-check">
+            <input class="pf-v6-c-check__input" type="checkbox" id="asr-check" data-ouia-component-id="asr-checkbox" />
+            <label class="pf-v6-c-check__label" for="asr-check">ASR / transcription endpoint</label>
+            <span class="pf-v6-c-check__description">Exposes <code>/v1/audio/transcriptions</code>. Appears in the Playground audio transcription dropdown.</span>
+          </div>
+        </div>
+        <footer class="pf-v6-c-modal-box__footer">
+          <button class="pf-v6-c-button pf-m-primary" type="button" id="modal-save" data-ouia-component-id="save-capabilities">Save</button>
+          <button class="pf-v6-c-button pf-m-link" type="button" id="modal-cancel">Cancel</button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var DATA = {
+    'default': [
+      { id: 'qwen2-5-vl', name: 'Qwen2.5-VL-7B-Instruct', type: 'InferenceService', url: 'https://qwen25-vl.ds-project.svc/v1', asr: false },
+      { id: 'qwen2-audio', name: 'Qwen2-Audio-7B-Instruct', type: 'InferenceService', url: 'https://qwen2-audio.ds-project.svc/v1', asr: false },
+      { id: 'whisper-large-v3', name: 'whisper-large-v3', type: 'InferenceService', url: 'https://whisper.ds-project.svc/v1', asr: true },
+      { id: 'whisper-ext', name: 'openai-whisper-1', type: 'Custom endpoint', url: 'https://api.openai.com/v1', asr: false },
+      { id: 'granite-3-3', name: 'granite-3.3-8b-instruct', type: 'MaaS model', url: 'https://maas.example.com/granite/v1', asr: false }
+    ]
+  };
+  DATA['no-asr'] = DATA['default'].map(function (r) { return Object.assign({}, r, { asr: false }); });
+  DATA['empty'] = [];
+  var scenario = (window.UxdScenario && window.UxdScenario.get()) || new URLSearchParams(location.search).get('scenario') || 'default';
+  var rows = (DATA[scenario] || DATA['default']).map(function (r) { return Object.assign({}, r); });
+  var editing = null;
+  var $ = function (id) { return document.getElementById(id); };
+
+  function render() {
+    if (!rows.length) {
+      $('content').innerHTML = '<div class="pf-v6-c-empty-state"><div class="pf-v6-c-empty-state__content"><div class="pf-v6-c-empty-state__header"><div class="pf-v6-c-empty-state__icon"><i class="fas fa-cubes" aria-hidden="true"></i></div><div class="pf-v6-c-empty-state__title"><h2 class="pf-v6-c-empty-state__title-text">No AI asset endpoints</h2></div></div><div class="pf-v6-c-empty-state__body">Deploy a model or add a custom endpoint to use it in the Playground. To use audio input, add a transcription model (for example, Whisper) and flag it as ASR.</div><div class="pf-v6-c-empty-state__footer"><button class="pf-v6-c-button pf-m-primary" type="button">Add endpoint</button></div></div></div>';
+      return;
+    }
+    var anyAsr = rows.some(function (r) { return r.asr; });
+    $('alerts').innerHTML = anyAsr ? '' : '<div class="pf-v6-c-alert pf-m-inline pf-m-info pf-v6-u-mb-md" data-ouia-component-id="alert-no-asr-flagged"><div class="pf-v6-c-alert__icon"><i class="fas fa-info-circle" aria-hidden="true"></i></div><p class="pf-v6-c-alert__title">No endpoint is flagged as ASR</p><div class="pf-v6-c-alert__description">Audio input in the Playground is blocked until a transcription endpoint is flagged. Use <strong>Edit capabilities</strong> on a Whisper-compatible endpoint.</div></div>';
+    $('content').innerHTML = '<table class="pf-v6-c-table pf-m-grid-md" role="grid" aria-label="AI asset endpoints"><thead class="pf-v6-c-table__thead"><tr class="pf-v6-c-table__tr"><th class="pf-v6-c-table__th" scope="col">Name</th><th class="pf-v6-c-table__th" scope="col">Type</th><th class="pf-v6-c-table__th" scope="col">Endpoint</th><th class="pf-v6-c-table__th" scope="col">Capabilities</th><th class="pf-v6-c-table__th" scope="col"><span class="pf-v6-screen-reader">Actions</span></th></tr></thead><tbody class="pf-v6-c-table__tbody">' +
+      rows.map(function (r) {
+        return '<tr class="pf-v6-c-table__tr"><td class="pf-v6-c-table__td" data-label="Name">' + r.name + '</td><td class="pf-v6-c-table__td" data-label="Type">' + r.type + '</td><td class="pf-v6-c-table__td" data-label="Endpoint"><code>' + r.url + '</code></td><td class="pf-v6-c-table__td" data-label="Capabilities">' +
+          (r.asr ? '<span class="pf-v6-c-label pf-m-purple pf-m-compact" data-ouia-component-id="asr-label-' + r.id + '"><span class="pf-v6-c-label__content"><span class="pf-v6-c-label__icon"><i class="fas fa-microphone" aria-hidden="true"></i></span><span class="pf-v6-c-label__text">ASR / transcription</span></span></span>' : '<span class="pf-v6-u-color-200">Chat</span>') +
+          '</td><td class="pf-v6-c-table__td pf-v6-c-table__action"><button class="pf-v6-c-button pf-m-secondary pf-m-small" type="button" data-edit="' + r.id + '" data-ouia-component-id="edit-capabilities-' + r.id + '">Edit capabilities</button></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  function close() { $('modal').hidden = true; editing = null; }
+  $('content').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-edit]'); if (!b) return;
+    editing = rows.filter(function (r) { return r.id === b.getAttribute('data-edit'); })[0];
+    $('modal-endpoint').textContent = 'Endpoint: ' + editing.name;
+    $('asr-check').checked = editing.asr;
+    $('modal').hidden = false; $('asr-check').focus();
+  });
+  $('modal-save').addEventListener('click', function () { editing.asr = $('asr-check').checked; close(); render(); });
+  $('modal-cancel').addEventListener('click', close);
+  $('modal-close').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modal').hidden) close(); });
+  render();
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://issues.example.com/browse/RHAISTRAT-1527"},{"kind":"strat","key":"RHAISTRAT-1527","label":"Strategy","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"},{"kind":"rfe","key":"RHAIRFE-913","label":"RFE","url":"https://issues.redhat.com/browse/RHAIRFE-913"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground.html","id":"default","name":"Vision model, empty chat","default":true},{"route":"/playground.html","id":"text-only","name":"Text-only model"},{"route":"/playground.html","id":"image-response","name":"Image answered"},{"route":"/playground.html","id":"audio-transcribed","name":"Audio transcribed and answered"},{"route":"/playground.html","id":"audio-no-asr","name":"No ASR model registered"},{"route":"/playground.html","id":"file-too-large","name":"File too large"},{"route":"/playground.html","id":"asr-error","name":"Transcription failed"},{"route":"/playground.html","id":"limit-reached","name":"Second file blocked"},{"route":"/ai-asset-endpoints.html","id":"default","name":"Endpoints with ASR flagged","default":true},{"route":"/ai-asset-endpoints.html","id":"no-asr","name":"No ASR endpoint flagged"},{"route":"/ai-asset-endpoints.html","id":"empty","name":"No endpoints"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

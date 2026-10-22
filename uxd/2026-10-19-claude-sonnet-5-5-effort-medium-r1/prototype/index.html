@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground | Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <link rel="stylesheet" href="./shared.css" />
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead pf-m-display-inline">
+    <div class="pf-v6-c-masthead__main"><span class="mm-brand">Red Hat OpenShift AI</span></div>
+    <div class="pf-v6-c-masthead__content"><span style="color:#fff">Gen AI Studio</span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-nav__list">
+          <li class="pf-v6-c-nav__item"><a href="./index.html" class="pf-v6-c-nav__link pf-m-current" aria-current="page">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a href="./ai-assets.html" class="pf-v6-c-nav__link" data-ouia-component-id="nav-ai-assets">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main">
+    <div class="mm-main">
+      <section class="pf-v6-c-page__main-section pf-m-padding" style="flex:none;padding-bottom:0">
+        <h1 class="pf-v6-c-title pf-m-2xl">Playground</h1>
+      </section>
+      <div class="mm-playground">
+        <aside class="mm-config" aria-label="Playground configuration">
+          <div class="pf-v6-c-form">
+            <div class="pf-v6-c-form__group">
+              <label class="pf-v6-c-form__label" for="model-select"><span class="pf-v6-c-form__label-text">Model</span></label>
+              <select id="model-select" class="pf-v6-c-form-control" data-ouia-component-id="model-select">
+                <option value="omni">Qwen2.5-Omni-7B</option>
+                <option value="vl">Qwen2.5-VL-7B-Instruct</option>
+                <option value="text">Llama-3.1-8B-Instruct</option>
+              </select>
+              <div id="model-tags" style="margin-top:.5rem" class="pf-v6-l-flex"></div>
+            </div>
+            <div class="pf-v6-c-form__group" id="asr-group">
+              <label class="pf-v6-c-form__label" for="asr-select"><span class="pf-v6-c-form__label-text">Audio model (ASR)</span></label>
+              <select id="asr-select" class="pf-v6-c-form-control" data-ouia-component-id="asr-select" aria-describedby="asr-help"></select>
+              <div class="pf-v6-c-form__helper-text" id="asr-help"><span class="mm-hint"></span></div>
+            </div>
+            <div class="pf-v6-c-form__group">
+              <span class="pf-v6-c-form__label"><span class="pf-v6-c-form__label-text">Limits</span></span>
+              <p class="mm-hint">JPG or PNG images; WAV or MP3 audio. Up to 10 MB. One image or one audio file per conversation.</p>
+            </div>
+            <button class="pf-v6-c-button pf-m-secondary" id="new-chat" data-ouia-component-id="new-chat">New conversation</button>
+          </div>
+        </aside>
+        <section class="mm-chat" aria-label="Chat">
+          <div class="mm-transcript" id="transcript" role="log" aria-live="polite"></div>
+          <div class="mm-composer">
+            <div id="composer-alerts"></div>
+            <div id="progress" class="mm-progress mm-hidden"></div>
+            <div class="mm-tools" role="group" aria-label="Input type">
+              <button class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-image" data-ouia-component-id="attach-image"><span>Attach image</span></button>
+              <button class="pf-v6-c-button pf-m-secondary pf-m-small" id="btn-audio" data-ouia-component-id="attach-audio"><span>Attach audio</span></button>
+              <button class="pf-v6-c-button pf-m-link pf-m-small" id="attach-sample-image" data-ouia-component-id="attach-sample-image">Use sample image</button>
+              <button class="pf-v6-c-button pf-m-link pf-m-small" id="attach-sample-audio" data-ouia-component-id="attach-sample-audio">Use sample audio</button>
+              <span class="mm-hint" id="limit-hint"></span>
+            </div>
+            <div class="mm-chips" id="chips"></div>
+            <div class="mm-composer-row">
+              <textarea class="pf-v6-c-form-control" id="prompt" rows="2" aria-label="Message" placeholder="Send a message" data-ouia-component-id="prompt-input"></textarea>
+              <button class="pf-v6-c-button pf-m-primary" id="send" data-ouia-component-id="send-button">Send</button>
+            </div>
+            <p class="mm-proto-note" style="margin-top:.5rem">Prototype: file pickers are simulated with sample files.</p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+<script>
+(function () {
+  var MODELS = {
+    omni: { name: 'Qwen2.5-Omni-7B', tags: ['image-inferencing', 'audio-asr'] },
+    vl:   { name: 'Qwen2.5-VL-7B-Instruct', tags: ['image-inferencing'] },
+    text: { name: 'Llama-3.1-8B-Instruct', tags: [] }
+  };
+  var IMG = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="200"><rect width="320" height="200" fill="#bde0fe"/><circle cx="260" cy="45" r="22" fill="#ffd166"/><polygon points="0,200 90,70 170,200" fill="#6c8ea4"/><polygon points="110,200 210,90 320,200" fill="#4a6572"/></svg>');
+  var ANSWER_IMG = 'The image shows a mountain landscape under a clear sky, with two peaks in the foreground and a bright sun in the upper right.';
+  var TRANSCRIPT = 'Hi, can you summarize the key points of our quarterly planning meeting?';
+  var ANSWER_AUDIO = 'Based on the transcription, you asked for a summary of the quarterly planning meeting. I do not have the meeting notes, but I can summarize them if you paste them here.';
+  var LIMIT_MB = 10;
+
+  var scenario = (window.UxdScenario && window.UxdScenario.get()) || 'default';
+  var S = { model: 'omni', asrAssets: ['whisper-large-v3'], asr: 'whisper-large-v3', messages: [], staged: null, alerts: [], progress: null, used: false, busy: false };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function caps() { var t = MODELS[S.model].tags; return { image: t.indexOf('image-inferencing') >= 0, audio: t.indexOf('audio-asr') >= 0 }; }
+  function alertHtml(a) {
+    return '<div class="pf-v6-c-alert pf-m-' + a.type + ' pf-m-inline" aria-label="' + esc(a.title) + '" style="margin-bottom:.5rem"><div class="pf-v6-c-alert__icon"></div><p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">' + a.type + ' alert:</span>' + esc(a.title) + '</p>' + (a.body ? '<div class="pf-v6-c-alert__description">' + a.body + '</div>' : '') + '</div>';
+  }
+  function wave() { var h = [8, 16, 22, 12, 18, 24, 10, 20, 14, 8, 18, 22, 12], o = ''; h.forEach(function (x) { o += '<i style="height:' + x + 'px"></i>'; }); return '<div class="mm-wave" aria-hidden="true">' + o + '</div>'; }
+  function audioHtml() { return '<div class="mm-audio" role="group" aria-label="Uploaded audio meeting-question.wav"><span aria-hidden="true">&#9654;</span>' + wave() + '<span class="mm-hint">meeting-question.wav &middot; 0:07</span></div>'; }
+  function userMsg(kind, text) {
+    var m = '<div class="mm-msg user" data-ouia-component-id="user-message"><div class="mm-role">You</div>';
+    if (kind === 'image') m += '<img src="' + IMG + '" alt="Uploaded image: sample-mountains.png" />';
+    if (kind === 'audio') m += audioHtml();
+    return m + (text ? '<div>' + esc(text) + '</div>' : '') + '</div>';
+  }
+  function botMsg(body, extra) { return '<div class="mm-msg" data-ouia-component-id="assistant-message"><div class="mm-role">' + esc(MODELS[S.model].name) + '</div>' + (extra || '') + '<div>' + body + '</div></div>'; }
+
+  function seed() {
+    var P = 'What is in this image?';
+    switch (scenario) {
+      case 'text-only-model': S.model = 'text'; break;
+      case 'image-staged': S.staged = { kind: 'image', name: 'sample-mountains.png', size: '1.4 MB' }; $('prompt').value = P; break;
+      case 'file-too-large': S.alerts.push({ type: 'danger', title: 'photo.png is too large', body: 'photo.png is 14.2 MB. The limit is ' + LIMIT_MB + ' MB. Choose a smaller image.' }); break;
+      case 'image-conversation':
+        S.messages.push({ html: userMsg('image', P) }, { html: botMsg(ANSWER_IMG) }); S.used = true; break;
+      case 'model-rejected':
+        S.model = 'omni'; S.messages.push({ html: userMsg('image', P) }); S.used = false;
+        S.messages.push({ html: alertHtml({ type: 'danger', title: 'This model rejected the image', body: 'Qwen2.5-Omni-7B did not accept image input. Its capability tags may be missing from the catalog. Switch to a vision-capable model or send text only.' }) }); break;
+      case 'audio-no-asr': S.asrAssets = []; S.asr = ''; break;
+      case 'audio-staged': S.staged = { kind: 'audio', name: 'meeting-question.wav', size: '0.6 MB' }; break;
+      case 'audio-transcribing':
+        S.messages.push({ html: userMsg('audio', '') }); S.busy = true; S.progress = 1; S.staged = null; break;
+      case 'audio-conversation':
+        S.messages.push({ html: userMsg('audio', '') }, { html: botMsg(esc(ANSWER_AUDIO), '<div class="mm-transcription" data-ouia-component-id="transcription"><span class="mm-hint">Transcription by whisper-large-v3</span><br>&ldquo;' + esc(TRANSCRIPT) + '&rdquo;</div>') }); S.used = true; break;
+      case 'asr-error':
+        S.messages.push({ html: userMsg('audio', '') });
+        S.messages.push({ html: alertHtml({ type: 'danger', title: 'Transcription failed', body: 'whisper-large-v3 could not be reached. Check that the endpoint is running, then retry. <br><button class="pf-v6-c-button pf-m-link pf-m-inline" data-ouia-component-id="retry-asr">Retry</button>' }) }); break;
+    }
+  }
+
+  function renderProgress() {
+    var el = $('progress');
+    if (S.progress === null) { el.className = 'mm-progress mm-hidden'; el.innerHTML = ''; return; }
+    el.className = 'mm-progress';
+    var steps = S.progressKind === 'image' ? ['Uploading image', 'Generating response'] : ['Uploading audio', 'Transcribing audio', 'Generating response'];
+    if (scenario === 'audio-transcribing' && !S.progressKind) steps = ['Uploading audio', 'Transcribing audio', 'Generating response'];
+    var h = '<ol class="pf-v6-c-progress-stepper" aria-label="Request progress">';
+    steps.forEach(function (s, i) {
+      var cls = i < S.progress ? 'pf-m-success' : (i === S.progress ? 'pf-m-info pf-m-current' : 'pf-m-pending');
+      var label = i === S.progress ? s + '...' : s;
+      h += '<li class="pf-v6-c-progress-stepper__step ' + cls + '"' + (i === S.progress ? ' aria-current="step"' : '') + '><div class="pf-v6-c-progress-stepper__step-connector"><span class="pf-v6-c-progress-stepper__step-icon"></span></div><div class="pf-v6-c-progress-stepper__step-main"><div class="pf-v6-c-progress-stepper__step-title">' + esc(label) + '</div></div></li>';
+    });
+    el.innerHTML = h + '</ol>';
+  }
+
+  function render() {
+    var c = caps(), m = MODELS[S.model];
+    $('model-select').value = S.model;
+    $('model-tags').innerHTML = m.tags.length ? m.tags.map(function (t) { return '<span class="pf-v6-c-label pf-m-compact"><span class="pf-v6-c-label__content">' + t + '</span></span>'; }).join(' ') : '<span class="mm-hint">Text only</span>';
+    // transcript
+    var t = $('transcript');
+    if (!S.messages.length) {
+      var h = c.image || c.audio ? 'Ask about an image or an audio clip. Attach one file per conversation.' : 'This model only accepts text.';
+      t.innerHTML = '<div class="mm-empty"><h2 class="pf-v6-c-title pf-m-lg">Start a conversation</h2><p>' + h + '</p>' + (!c.image && !c.audio ? '<div class="pf-v6-c-alert pf-m-info pf-m-inline" style="text-align:left"><p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">info alert:</span>Image and audio inputs are unavailable for ' + esc(m.name) + '</p></div>' : '') + '</div>';
+    } else {
+      t.innerHTML = S.messages.map(function (x) { return x.html; }).join('');
+      t.scrollTop = t.scrollHeight;
+    }
+    // controls
+    $('btn-image').classList.toggle('mm-hidden', !c.image);
+    $('attach-sample-image').classList.toggle('mm-hidden', !c.image);
+    $('btn-audio').classList.toggle('mm-hidden', !c.audio);
+    $('attach-sample-audio').classList.toggle('mm-hidden', !c.audio);
+    $('asr-group').classList.toggle('mm-hidden', !c.audio);
+    var lock = S.used || S.busy || !!S.staged;
+    ['btn-image', 'btn-audio', 'attach-sample-image', 'attach-sample-audio'].forEach(function (id) { $(id).disabled = lock; });
+    $('limit-hint').textContent = S.used ? 'This conversation already has a file. Start a new conversation to attach another.' : (c.image || c.audio ? 'One image or one audio file per conversation, up to ' + LIMIT_MB + ' MB.' : '');
+    // ASR dropdown
+    var asr = $('asr-select');
+    if (S.asrAssets.length) {
+      asr.disabled = false;
+      asr.innerHTML = S.asrAssets.map(function (a) { return '<option value="' + a + '">' + a + '</option>'; }).join('');
+      asr.value = S.asr;
+      document.querySelector('#asr-help .mm-hint').textContent = 'Transcribes audio before it is sent to the model.';
+    } else {
+      asr.disabled = true;
+      asr.innerHTML = '<option>No ASR model registered</option>';
+      document.querySelector('#asr-help .mm-hint').textContent = '';
+    }
+    // alerts
+    var al = S.alerts.slice();
+    if (c.audio && !S.asrAssets.length) al.push({ type: 'warning', title: 'No transcription model registered', body: 'Audio cannot be sent until an ASR model is registered. <a href="./ai-assets.html?scenario=no-asr">Register a transcription model as an AI asset</a>.' });
+    $('composer-alerts').innerHTML = al.map(alertHtml).join('');
+    // chips
+    $('chips').innerHTML = S.staged ? '<span class="mm-chip" data-ouia-component-id="staged-file">' + (S.staged.kind === 'image' ? '<img src="' + IMG + '" alt="" />' : '<span aria-hidden="true">&#9835;</span>') + '<span>' + esc(S.staged.name) + ' <span class="mm-hint">' + esc(S.staged.size) + '</span></span><button class="pf-v6-c-button pf-m-plain pf-m-small" aria-label="Remove ' + esc(S.staged.name) + '" id="remove-staged">&times;</button></span>' : '';
+    var rm = $('remove-staged'); if (rm) rm.onclick = function () { S.staged = null; S.alerts = []; render(); };
+    renderProgress();
+    // send state
+    var blocked = (S.staged && S.staged.kind === 'audio' && !S.asrAssets.length) || (c.audio && !S.asrAssets.length && S.staged);
+    $('send').disabled = S.busy || blocked || (!S.staged && !$('prompt').value.trim());
+    $('prompt').disabled = S.busy;
+    if (scenario === 'audio-no-asr') { $('send').disabled = S.busy || !$('prompt').value.trim(); }
+  }
+
+  function stage(kind) {
+    var c = caps();
+    if (kind === 'audio' && !S.asrAssets.length) { S.alerts = []; render(); return; }
+    S.alerts = [];
+    S.staged = kind === 'image' ? { kind: 'image', name: 'sample-mountains.png', size: '1.4 MB' } : { kind: 'audio', name: 'meeting-question.wav', size: '0.6 MB' };
+    if (kind === 'image' && !$('prompt').value) $('prompt').value = 'What is in this image?';
+    render();
+  }
+
+  function send() {
+    var text = $('prompt').value.trim(), st = S.staged;
+    if (!text && !st) return;
+    S.messages.push({ html: userMsg(st ? st.kind : null, text) });
+    S.staged = null; $('prompt').value = ''; S.busy = true; S.alerts = [];
+    var kind = st ? st.kind : null;
+    S.progressKind = kind === 'image' ? 'image' : 'audio';
+    function done() {
+      S.busy = false; S.progress = null;
+      if (kind === 'image') S.messages.push({ html: botMsg(ANSWER_IMG) });
+      else if (kind === 'audio') S.messages.push({ html: botMsg(esc(ANSWER_AUDIO), '<div class="mm-transcription"><span class="mm-hint">Transcription by ' + esc(S.asr) + '</span><br>&ldquo;' + esc(TRANSCRIPT) + '&rdquo;</div>') });
+      else S.messages.push({ html: botMsg('This is a simulated text response.') });
+      if (kind) S.used = true;
+      render();
+    }
+    if (!kind) { S.progress = null; render(); setTimeout(done, 500); return; }
+    S.progress = 0; render();
+    var steps = kind === 'image' ? 1 : 2, i = 0;
+    var timer = setInterval(function () { i++; if (i > steps) { clearInterval(timer); done(); } else { S.progress = i; render(); } }, 700);
+  }
+
+  $('model-select').onchange = function () { S.model = this.value; S.staged = null; S.alerts = []; render(); };
+  $('asr-select').onchange = function () { S.asr = this.value; };
+  $('attach-sample-image').onclick = function () { stage('image'); };
+  $('attach-sample-audio').onclick = function () { stage('audio'); };
+  $('btn-image').onclick = function () { stage('image'); };
+  $('btn-audio').onclick = function () { stage('audio'); };
+  $('send').onclick = send;
+  $('prompt').oninput = render;
+  $('new-chat').onclick = function () { S.messages = []; S.used = false; S.staged = null; S.alerts = []; S.busy = false; S.progress = null; render(); };
+
+  seed();
+  render();
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Image+audio model, empty chat","default":true},{"route":"/index.html","id":"text-only-model","name":"Text-only model"},{"route":"/index.html","id":"image-staged","name":"Image staged"},{"route":"/index.html","id":"file-too-large","name":"Image too large"},{"route":"/index.html","id":"image-conversation","name":"Image answered"},{"route":"/index.html","id":"model-rejected","name":"Model rejected image"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR model"},{"route":"/index.html","id":"audio-staged","name":"Audio staged"},{"route":"/index.html","id":"audio-transcribing","name":"Transcribing audio"},{"route":"/index.html","id":"audio-conversation","name":"Audio answered"},{"route":"/index.html","id":"asr-error","name":"ASR unreachable"},{"route":"/ai-assets.html","id":"default","name":"Table with one ASR asset","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR assets"},{"route":"/ai-assets.html","id":"empty","name":"No assets"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

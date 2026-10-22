@@ -1,0 +1,135 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:47:44.254863+00:00",
+  "journeys": [
+    {
+      "id": "image-chat",
+      "title": "Explore an image",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Choose a model and image",
+          "route": "/index.html",
+          "export": true
+        }
+      ],
+      "manual_steps": [
+        "Select the matching file using the labeled attachment control.",
+        "Enter a prompt and send.",
+        "Verify inline attachment and a complete simulated text response."
+      ]
+    },
+    {
+      "id": "audio-chat",
+      "title": "Transcribe audio and ask a question",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5"
+      ],
+      "steps": [
+        {
+          "id": "audio-setup",
+          "name": "Select transcription endpoint",
+          "route": "/index.html",
+          "export": true
+        }
+      ],
+      "manual_steps": [
+        "Select the matching file using the labeled attachment control.",
+        "Enter a prompt and send.",
+        "Verify inline attachment and a complete simulated text response."
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register a transcription endpoint",
+      "persona": "endpoint-owner",
+      "source": "jira",
+      "ac_ids": [
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "assets",
+          "name": "AI Asset Endpoints",
+          "route": "/assets.html",
+          "export": true
+        },
+        {
+          "id": "register-dialog",
+          "name": "Register endpoint dialog",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#endpoint-dialog[open]"
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "name": "Use endpoint in Playground",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "text-followup",
+      "title": "Text follow-up and a fresh chat",
+      "persona": "model-explorer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "text-message",
+          "name": "Send a text message",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "What can you help with?"
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            }
+          ]
+        },
+        {
+          "id": "fresh-chat",
+          "name": "Start a new chat",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,219 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:11:44Z",
+  "journeys": [
+    {
+      "id": "image-analysis",
+      "title": "Analyze an image",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-3",
+        "AC-7",
+        "AC-8",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Vision Playground",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "compose",
+          "name": "Compose image question",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Describe the key details in this image."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "audio-analysis",
+      "title": "Transcribe audio and get a text response",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-6",
+        "AC-10",
+        "AC-11"
+      ],
+      "steps": [
+        {
+          "id": "audio-controls",
+          "name": "Audio workflow selected",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Home"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "ArrowDown"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Tab"
+            }
+          ]
+        },
+        {
+          "id": "registered-endpoints",
+          "name": "Inspect available ASR endpoints",
+          "route": "/assets.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register a transcription endpoint",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "endpoints",
+          "name": "AI asset endpoints",
+          "route": "/assets.html",
+          "export": true
+        },
+        {
+          "id": "registration-dialog",
+          "name": "Register endpoint dialog",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            },
+            {
+              "type": "wait_for",
+              "selector": "#endpoint-dialog[open]"
+            }
+          ]
+        },
+        {
+          "id": "asr-details",
+          "name": "Enter transcription endpoint",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            },
+            {
+              "type": "fill",
+              "selector": "#endpoint-name",
+              "value": "whisper-demo"
+            },
+            {
+              "type": "fill",
+              "selector": "#endpoint-url",
+              "value": "https://whisper-demo.example.test/v1"
+            },
+            {
+              "type": "click",
+              "selector": "#asr-flag"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "new-text-conversation",
+      "title": "Start a clean text conversation",
+      "persona": "app-developer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-2",
+        "AC-9",
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "new-conversation",
+          "name": "Clear conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        },
+        {
+          "id": "text-model",
+          "name": "Choose text-only model",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Home"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "ArrowDown"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "ArrowDown"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Tab"
+            }
+          ]
+        },
+        {
+          "id": "text-response",
+          "name": "Ask a text question",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "What can you help me explore?"
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait",
+              "ms": 2200
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

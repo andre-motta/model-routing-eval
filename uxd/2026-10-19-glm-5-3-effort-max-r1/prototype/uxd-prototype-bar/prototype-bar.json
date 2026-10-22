@@ -1,0 +1,81 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://redhat.atlassian.net/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/",
+      "id": "default",
+      "name": "Vision model ready",
+      "default": true
+    },
+    {
+      "route": "/",
+      "id": "text-only-model",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/",
+      "id": "image-ready",
+      "name": "Image inference complete"
+    },
+    {
+      "route": "/",
+      "id": "audio-ready",
+      "name": "Audio inference complete"
+    },
+    {
+      "route": "/",
+      "id": "audio-no-asr",
+      "name": "No ASR AI Asset"
+    },
+    {
+      "route": "/",
+      "id": "upload-error",
+      "name": "Oversized image rejected"
+    },
+    {
+      "route": "/",
+      "id": "modality-limit",
+      "name": "One multimodal file limit"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "default",
+      "name": "ASR asset available",
+      "default": true
+    },
+    {
+      "route": "/ai-assets",
+      "id": "empty",
+      "name": "No AI Assets"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "asr-unregistered",
+      "name": "No ASR capability"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "save-success",
+      "name": "ASR capability saved"
+    },
+    {
+      "route": "/ai-assets",
+      "id": "load-error",
+      "name": "AI Asset load error"
+    }
+  ]
+}

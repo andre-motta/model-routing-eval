@@ -1,0 +1,75 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T14:36:22.114962Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Ready to explore",
+          "description": "Empty chat with a multimodal sample model selected; image and audio input buttons available.",
+          "default": true
+        },
+        {
+          "id": "image-result",
+          "name": "Image response",
+          "description": "A chart image and text response are in the transcript; another attachment is blocked."
+        },
+        {
+          "id": "audio-result",
+          "name": "Audio response",
+          "description": "An audio attachment, expanded transcription, and text response are visible; text follow-ups remain available."
+        },
+        {
+          "id": "no-asr",
+          "name": "No transcription endpoint",
+          "description": "Audio input is selected; dropdown is empty, Send is blocked, and registration guidance is visible."
+        },
+        {
+          "id": "transcribing",
+          "name": "Transcription in progress",
+          "description": "An audio attachment is present with a persistent Transcribing audio status and disabled composer."
+        },
+        {
+          "id": "transcription-error",
+          "name": "Transcription unavailable",
+          "description": "The audio attachment is retained with an unreachable endpoint error and no model response."
+        },
+        {
+          "id": "silent-audio",
+          "name": "No speech detected",
+          "description": "Audio attachment is retained with an empty transcription error; no model response is present."
+        },
+        {
+          "id": "text-only",
+          "name": "Text-only model",
+          "description": "Llama text model is selected; image and audio upload controls are absent from the DOM."
+        }
+      ]
+    },
+    {
+      "route": "/ai-assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        {
+          "id": "default",
+          "name": "Registered endpoints",
+          "description": "Vision and Whisper endpoints are listed with an editable ASR capability checkbox.",
+          "default": true
+        },
+        {
+          "id": "empty",
+          "name": "No endpoints",
+          "description": "The endpoint table is empty with registration guidance and a Register endpoint button."
+        },
+        {
+          "id": "load-error",
+          "name": "Endpoint load failed",
+          "description": "A persistent error and Retry button replace the endpoint table."
+        }
+      ]
+    }
+  ]
+}

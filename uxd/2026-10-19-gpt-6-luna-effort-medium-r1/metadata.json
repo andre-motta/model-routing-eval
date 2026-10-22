@@ -1,0 +1,25 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {"type": "jira", "reference": "RHAISTRAT-1527", "rfe_count": 1},
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [{"kind": "rfe", "key": "RHAISTRAT-1527", "label": "RFE", "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "assumptions": [
+    "The local RFE snapshot has proposed acceptance criteria but no explicit user story section; stories were derived from its scope and criteria.",
+    "The prototype uses one Playground route. AI Asset registration is represented as a contextual side panel because the request targets a standalone prototype.",
+    "Model and ASR endpoints are representative mock data; the prototype demonstrates UI flows and does not make inference or upload requests to a backend.",
+    "The RFE describes 10 MB as a proposed default matching the existing upload baseline; the prototype uses 10 MB as the visible mock limit."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

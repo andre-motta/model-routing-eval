@@ -1,0 +1,113 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Ask a vision model about an image",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-3",
+        "AC-9"
+      ],
+      "steps": [
+        {
+          "id": "playground-image",
+          "name": "Playground with image conversation",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "switch-text-only",
+          "name": "Switch to text-only model",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "wait_for",
+              "selector": "[data-ouia-component-id=\"model-select\"]"
+            },
+            {
+              "type": "press",
+              "selector": "[data-ouia-component-id=\"model-select\"]",
+              "key": "Home"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Enable and use audio input via ASR",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "assets-table",
+          "name": "AI asset endpoints with ASR flag",
+          "route": "/ai-asset-endpoints.html",
+          "export": true
+        },
+        {
+          "id": "toggle-asr",
+          "name": "Mark endpoint as Transcription (ASR)",
+          "route": "/ai-asset-endpoints.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"asr-toggle-granite-3.3-8b-instruct\"]"
+            }
+          ]
+        },
+        {
+          "id": "playground-audio",
+          "name": "Playground with transcribed audio",
+          "route": "/playground.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Recover from file input errors",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-7",
+        "AC-8",
+        "AC-10",
+        "AC-11",
+        "AC-12",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "playground-errors",
+          "name": "Playground composer with validation alert",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "new-chat",
+          "name": "Start new chat to clear file limit",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"new-chat\"]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

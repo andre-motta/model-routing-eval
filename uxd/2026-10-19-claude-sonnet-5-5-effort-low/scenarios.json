@@ -1,0 +1,21 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {"route":"/index.html","screen":"Playground","scenarios":[
+      {"id":"default","name":"Image answered","description":"Vision model, image sent, text answer in transcript","default":true},
+      {"id":"text-only","name":"Text-only model","description":"No image or audio controls rendered"},
+      {"id":"vision-only","name":"Vision-only model, empty chat","description":"Image control visible, audio control hidden, empty transcript"},
+      {"id":"audio-no-asr","name":"Audio, no ASR asset","description":"Audio control visible, submission blocked with register-a-model alert"},
+      {"id":"audio-answered","name":"Audio answered","description":"ASR asset selected, transcript and answer shown"},
+      {"id":"asr-failure","name":"Transcription failed","description":"Danger alert for unreachable ASR model, no model response"},
+      {"id":"upload-error","name":"File rejected","description":"Over-size file rejected client-side with inline error"}
+    ]},
+    {"route":"/ai-assets.html","screen":"AIAssetEndpoints","scenarios":[
+      {"id":"default","name":"Table with ASR endpoint","description":"Several endpoints, one flagged as transcription","default":true},
+      {"id":"no-asr","name":"No ASR endpoints","description":"Endpoints present, none flagged, info banner explains audio is blocked"},
+      {"id":"empty","name":"No endpoints","description":"Empty state"},
+      {"id":"load-error","name":"Load error","description":"Failed to fetch endpoints"}
+    ]}
+  ]
+}

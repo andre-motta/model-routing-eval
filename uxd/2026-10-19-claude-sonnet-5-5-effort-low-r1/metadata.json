@@ -1,0 +1,30 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {"type": "jira", "reference": "RHAISTRAT-1527", "rfe_count": 1},
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {"kind": "rfe", "key": "RHAISTRAT-1527", "label": "RFE", "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"}
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": null,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": ["Playground", "AIAssetEndpoints"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {"path": ".artifacts/RHAISTRAT-1527/exports", "count": 0},
+  "assumptions": [
+    "Jira unreachable; source is the local rfe-snapshot.md (Strategy section used as scope: input-only, image + audio via ASR, one file per conversation, no microphone, no audio output).",
+    "The original RFE asks for audio output, multiple images and mixed modalities; the Strategy defers these, so the prototype follows the Strategy.",
+    "Model names, file names and the 10 MB limit are mock data (10 MB is a proposed default pending PM confirmation).",
+    "The ASR flag on the AI Asset Endpoints table is rendered as an edit-modal checkbox; final UX is an open question owned by UXD.",
+    "Processing/progress states (uploading, transcribing) are not modeled as scenarios; Send is a static mock."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

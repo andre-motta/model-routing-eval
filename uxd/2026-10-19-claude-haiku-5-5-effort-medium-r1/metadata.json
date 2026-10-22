@@ -1,0 +1,48 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": null,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype/",
+  "screens": ["PlaygroundPage", "AIAssetEndpointsPage"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": ".artifacts/RHAISTRAT-1527/exports",
+    "count": 0
+  },
+  "assumptions": [
+    "Jira was unreachable from this environment; the RFE was taken from the local snapshot .artifacts/RHAISTRAT-1527/rfe-snapshot.md (Step 1 local-artifact path). The snapshot's Jira key and URL are used as provenance.",
+    "The source is a strategy document (RHAISTRAT-1527, derived from RHAIRFE-913), so the scope follows its MVP and P0/P1 requirements, not a single RFE.",
+    "Out of scope and not prototyped: video, PDF as image input, microphone capture, audio output or playback, streaming, multiple images or mixed image plus audio per conversation, chat persistence.",
+    "Capability tag names image-inferencing and audio-asr are the names the RFE proposes; the model registry team has not confirmed them. Mock model tags use those names.",
+    "The audio-asr tag on a primary model is treated as the gate for showing the audio control. The RFE is not explicit on this point; the ASR dropdown is populated from AI Assets flagged as transcription endpoints.",
+    "Model names (Qwen2.5-VL-7B-Instruct, Qwen2.5-Omni-7B, Granite-3.3-8B-Instruct, whisper-large-v3) are illustrative mock catalog entries, not verified RHOAI registry contents.",
+    "Proposed 10 MB file size limit for images and audio (RFE default) is used pending PM confirmation. Accepted MIME types: image/jpeg, image/png, audio/wav, audio/mpeg.",
+    "No backend exists in the prototype. Send produces a mock reply, and ASR failure and empty-transcript states are scenario-driven, not computed.",
+    "Persona ids (ai-engineer, platform-admin) are plain labels; knowledge/personas/catalog.yaml is not present in this checkout.",
+    "Decision mode is skip, so no decision pages were generated."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

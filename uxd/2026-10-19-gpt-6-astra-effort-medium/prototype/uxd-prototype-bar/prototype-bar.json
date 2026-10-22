@@ -1,0 +1,91 @@
+{
+  "id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "jiraBaseUrl": "https://issues.example.com/browse/",
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "views": {
+    "prototype": null,
+    "eval": "/evals/RHAISTRAT-1527/"
+  },
+  "scenarios": [
+    {
+      "route": "/index.html",
+      "id": "default",
+      "name": "Ready for image input",
+      "default": true
+    },
+    {
+      "route": "/index.html",
+      "id": "image-complete",
+      "name": "Image response"
+    },
+    {
+      "route": "/index.html",
+      "id": "audio-complete",
+      "name": "Audio response"
+    },
+    {
+      "route": "/index.html",
+      "id": "text-only",
+      "name": "Text-only model"
+    },
+    {
+      "route": "/index.html",
+      "id": "no-asr",
+      "name": "No transcription endpoint"
+    },
+    {
+      "route": "/index.html",
+      "id": "oversize",
+      "name": "File too large"
+    },
+    {
+      "route": "/index.html",
+      "id": "asr-error",
+      "name": "Transcription failed"
+    },
+    {
+      "route": "/index.html",
+      "id": "silent-audio",
+      "name": "No speech detected"
+    },
+    {
+      "route": "/index.html",
+      "id": "unsupported-model",
+      "name": "Unsupported input"
+    },
+    {
+      "route": "/assets.html",
+      "id": "default",
+      "name": "Registered ASR endpoint",
+      "default": true
+    },
+    {
+      "route": "/assets.html",
+      "id": "empty",
+      "name": "No endpoints"
+    },
+    {
+      "route": "/assets.html",
+      "id": "unmarked",
+      "name": "Unmarked endpoint"
+    },
+    {
+      "route": "/assets.html",
+      "id": "load-error",
+      "name": "Load failed"
+    },
+    {
+      "route": "/assets.html",
+      "id": "registered",
+      "name": "Registration succeeded"
+    }
+  ]
+}

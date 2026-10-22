@@ -1,0 +1,129 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T13:45:52Z",
+  "journeys": [
+    {
+      "id": "journey-1",
+      "title": "Send an image to a vision-capable model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "RFE-IMG-1",
+        "RFE-IMG-2",
+        "RFE-IMG-3"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Playground, text chat",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "image-selected",
+          "name": "Image input selected",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-testid=\"input-type-image\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-testid=\"image-dropzone\"]"
+            }
+          ]
+        },
+        {
+          "id": "image-attached",
+          "name": "Image attached, ready to send",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "wait_for",
+              "selector": "[data-testid=\"attachment-card\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-2",
+      "title": "Transcribe an audio file through an ASR model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "RFE-AUD-1",
+        "RFE-AUD-2",
+        "RFE-AUD-3"
+      ],
+      "steps": [
+        {
+          "id": "playground",
+          "name": "Playground, text chat",
+          "route": "/playground.html",
+          "export": true
+        },
+        {
+          "id": "audio-selected",
+          "name": "Audio input selected",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-testid=\"input-type-audio\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "[data-testid=\"audio-dropzone\"]"
+            }
+          ]
+        },
+        {
+          "id": "transcribing",
+          "name": "Audio transcribing",
+          "route": "/playground.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "wait_for",
+              "selector": "[data-testid=\"transcribe-status\"]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "journey-3",
+      "title": "Flag an AI Asset as ASR-capable",
+      "persona": "platform-admin",
+      "source": "jira",
+      "ac_ids": [
+        "RFE-ASR-UX-1"
+      ],
+      "steps": [
+        {
+          "id": "ai-assets",
+          "name": "AI Asset Endpoints table",
+          "route": "/ai-assets.html",
+          "export": true
+        },
+        {
+          "id": "asr-flag-on",
+          "name": "ASR flag enabled on Whisper asset",
+          "route": "/ai-assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "wait_for",
+              "selector": "[data-testid=\"asr-badge\"]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

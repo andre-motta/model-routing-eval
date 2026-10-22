@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playground — Multimodal Support</title>
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+    <link rel="stylesheet" href="../assets/app.css" />
+  </head>
+  <body class="pf-m-redhat-font" data-page="playground">
+    <div class="pf-v6-c-page uxd-page">
+      <header class="pf-v6-c-masthead" id="masthead">
+        <div class="pf-v6-c-masthead__main">
+          <a class="pf-v6-c-brand uxd-brand" href="../">Gen AI Studio</a>
+        </div>
+        <nav class="pf-v6-c-nav uxd-top-nav" aria-label="Primary">
+          <a class="pf-v6-c-nav__link pf-m-current" href="./" data-ouia-component-id="nav-playground">Playground</a>
+          <a class="pf-v6-c-nav__link" href="../ai-assets/" data-ouia-component-id="nav-ai-assets">AI Asset Endpoints</a>
+        </nav>
+      </header>
+      <main class="pf-v6-c-page__main">
+        <section class="pf-v6-c-page__main-section pf-m-light uxd-page-header">
+          <div>
+            <h1>Playground</h1>
+            <p>Model controls change with capability tags from the model catalog.</p>
+          </div>
+          <span class="pf-v6-c-label pf-m-blue" id="scenario-label">Scenario: default</span>
+        </section>
+        <section class="pf-v6-c-page__main-section">
+          <div class="pf-v6-l-grid pf-m-gutter uxd-playground-grid">
+            <div class="pf-v6-l-grid__item pf-m-4-col-on-xl">
+              <article class="pf-v6-c-card pf-m-rounded">
+                <div class="pf-v6-c-card__title">Configuration</div>
+                <div class="pf-v6-c-card__body uxd-config">
+                  <label class="pf-v6-c-form__label" for="model-select">Primary model</label>
+                  <select class="pf-v6-c-form-control" id="model-select" data-ouia-component-id="model-select"></select>
+                  <div class="pf-v6-c-form__group">
+                    <label class="pf-v6-c-form__label" for="asr-model-select">ASR model</label>
+                    <select class="pf-v6-c-form-control" id="asr-model-select" data-ouia-component-id="asr-model-select"></select>
+                  </div>
+                  <div id="capability-badges" class="uxd-badges"></div>
+                </div>
+              </article>
+            </div>
+            <div class="pf-v6-l-grid__item pf-m-8-col-on-xl">
+              <article class="pf-v6-c-card pf-m-rounded uxd-chat-card">
+                <div class="pf-v6-c-card__title">Conversation</div>
+                <div class="pf-v6-c-card__body uxd-alert-slot" id="alert-slot"></div>
+                <div class="pf-v6-c-card__body uxd-transcript" id="transcript" aria-live="polite"></div>
+                <div class="pf-v6-c-card__footer">
+                  <div class="uxd-input-controls" id="input-controls"></div>
+                  <div class="uxd-composer">
+                    <label class="pf-v6-c-form__label" for="prompt-input">Text prompt</label>
+                    <textarea class="pf-v6-c-form-control" id="prompt-input" rows="2" aria-label="Text prompt"></textarea>
+                    <button class="pf-v6-c-button pf-m-primary" type="button" data-ouia-component-id="submit-prompt">Send</button>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="../assets/app.js"></script>
+  <script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://redhat.atlassian.net/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/playground/","id":"default","name":"Multimodal controls ready","default":true},{"route":"/playground/","id":"image-complete","name":"Image response complete"},{"route":"/playground/","id":"audio-transcribed","name":"Audio transcribed"},{"route":"/playground/","id":"text-only-model","name":"Text-only model"},{"route":"/playground/","id":"no-asr-asset","name":"No ASR asset"},{"route":"/playground/","id":"upload-too-large","name":"File too large"},{"route":"/playground/","id":"one-file-limit","name":"One media file limit"},{"route":"/playground/","id":"transcription-error","name":"Transcription error"},{"route":"/ai-assets/","id":"default","name":"Endpoints populated","default":true},{"route":"/ai-assets/","id":"empty","name":"No endpoints"},{"route":"/ai-assets/","id":"asr-registered","name":"ASR asset registered"},{"route":"/ai-assets/","id":"load-error","name":"Endpoints load error"},{"route":"/ai-assets/","id":"capability-metadata-pending","name":"Capability metadata pending"}]};</script>
+<link rel="stylesheet" href="../uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="../uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="../uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="../uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="../uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

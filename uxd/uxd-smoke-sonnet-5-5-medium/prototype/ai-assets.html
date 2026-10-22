@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" class="pf-v6-theme-light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI asset endpoints | Gen AI Studio</title>
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+  <style>
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; z-index: 500; }
+    .overlay[hidden] { display: none; }
+  </style>
+</head>
+<body>
+<div class="pf-v6-c-page">
+  <header class="pf-v6-c-masthead">
+    <div class="pf-v6-c-masthead__main"><span class="pf-v6-c-masthead__brand pf-v6-u-font-weight-bold">Red Hat OpenShift AI</span></div>
+    <div class="pf-v6-c-masthead__content"><span class="pf-v6-u-ml-auto">Project: <strong>genai-demo</strong></span></div>
+  </header>
+  <div class="pf-v6-c-page__sidebar pf-m-expanded">
+    <div class="pf-v6-c-page__sidebar-body">
+      <nav class="pf-v6-c-nav" aria-label="Gen AI Studio">
+        <ul class="pf-v6-c-list pf-m-plain" style="padding:0">
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link" href="index.html">Playground</a></li>
+          <li class="pf-v6-c-nav__item"><a class="pf-v6-c-nav__link pf-m-current" href="ai-assets.html" aria-current="page">AI asset endpoints</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+  <main class="pf-v6-c-page__main" tabindex="-1">
+    <section class="pf-v6-c-page__main-section">
+      <h1 class="pf-v6-c-title pf-m-2xl">AI asset endpoints</h1>
+      <p>Models and endpoints available to the Playground. Mark a speech-to-text endpoint as ASR to use it for audio input.</p>
+    </section>
+    <section class="pf-v6-c-page__main-section" id="content"></section>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="pf-v6-c-modal-box pf-m-sm" role="dialog" aria-modal="true" aria-labelledby="dlg-title" data-ouia-component-id="edit-dialog">
+    <header class="pf-v6-c-modal-box__header"><h2 class="pf-v6-c-modal-box__title" id="dlg-title"><span class="pf-v6-c-modal-box__title-text">Edit endpoint: whisper-large-v3</span></h2></header>
+    <div class="pf-v6-c-modal-box__body">
+      <div class="pf-v6-c-check">
+        <input class="pf-v6-c-check__input" type="checkbox" id="asr-flag" checked />
+        <label class="pf-v6-c-check__label" for="asr-flag">Use as transcription (ASR) endpoint</label>
+        <span class="pf-v6-c-check__description">Lists this endpoint in the Playground transcription model dropdown. The endpoint must support /v1/audio/transcriptions.</span>
+      </div>
+    </div>
+    <footer class="pf-v6-c-modal-box__footer">
+      <button class="pf-v6-c-button pf-m-primary" type="button" id="save">Save</button>
+      <button class="pf-v6-c-button pf-m-link" type="button" id="cancel">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+<script src="./uxd-prototype-bar/uxd-scenario-runtime.js"></script>
+<script>
+(function () {
+  var scenario = (window.UxdScenario && window.UxdScenario.get && window.UxdScenario.get()) ||
+    new URLSearchParams(location.search).get('scenario') || 'default';
+
+  var ROWS = [
+    { name: 'qwen2.5-vl-7b-instruct', type: 'Model deployment', tags: ['image-inferencing'], asr: false },
+    { name: 'llama-3.1-8b-instruct', type: 'Model deployment', tags: [], asr: false },
+    { name: 'whisper-large-v3', type: 'Model deployment', tags: ['audio-asr'], asr: true },
+    { name: 'openai-gpt-4o', type: 'Custom endpoint', tags: ['image-inferencing'], asr: false }
+  ];
+  var MOCKS = {
+    'default': ROWS,
+    'no-asr': ROWS.map(function (r) { return { name: r.name, type: r.type, tags: r.tags.filter(function (t) { return t !== 'audio-asr'; }), asr: false }; }),
+    'empty': [],
+    'load-error': null
+  };
+  var rows = Object.prototype.hasOwnProperty.call(MOCKS, scenario) ? MOCKS[scenario] : MOCKS['default'];
+  var c = document.getElementById('content');
+
+  function stateBlock(title, body, danger) {
+    return '<div class="pf-v6-c-empty-state"><div class="pf-v6-c-empty-state__content"><div class="pf-v6-c-empty-state__body">' +
+      '<h2 class="pf-v6-c-title pf-m-lg">' + title + '</h2><p>' + body + '</p></div>' +
+      '<div class="pf-v6-c-empty-state__footer"><div class="pf-v6-c-empty-state__actions"><button class="pf-v6-c-button pf-m-primary" type="button">' +
+      (danger ? 'Retry' : 'Add endpoint') + '</button></div></div></div></div>';
+  }
+
+  if (rows === null) {
+    c.innerHTML = stateBlock('Unable to load endpoints', 'The endpoint list could not be retrieved. Try again.', true);
+  } else if (!rows.length) {
+    c.innerHTML = stateBlock('No endpoints registered', 'Add a model deployment or custom endpoint to use it in the Playground.');
+  } else {
+    var hasAsr = rows.some(function (r) { return r.asr; });
+    var h = '';
+    if (!hasAsr) {
+      h += '<div class="pf-v6-c-alert pf-m-inline pf-m-info pf-v6-u-mb-md" role="status"><div class="pf-v6-c-alert__icon"></div>' +
+        '<p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">info alert:</span>No ASR endpoint</p>' +
+        '<div class="pf-v6-c-alert__description">Audio input in the Playground needs a transcription model. Edit an endpoint that supports /v1/audio/transcriptions and mark it as ASR.</div></div>';
+    }
+    h += '<table class="pf-v6-c-table pf-m-grid-md" role="grid" aria-label="AI asset endpoints"><thead><tr><th>Name</th><th>Type</th><th>Capabilities</th><th></th></tr></thead><tbody>';
+    h += rows.map(function (r) {
+      var labels = r.tags.map(function (t) { return '<span class="pf-v6-c-label pf-m-blue"><span class="pf-v6-c-label__content">' + t + '</span></span>'; }).join(' ');
+      if (r.asr) labels += ' <span class="pf-v6-c-label pf-m-green"><span class="pf-v6-c-label__content">ASR endpoint</span></span>';
+      var id = r.name.indexOf('whisper') === 0 ? 'edit-asset-whisper' : 'edit-asset-' + r.name.replace(/[^a-z0-9]+/g, '-');
+      return '<tr><td>' + r.name + '</td><td>' + r.type + '</td><td>' + (labels || '-') + '</td>' +
+        '<td><button class="pf-v6-c-button pf-m-secondary pf-m-small" type="button" data-ouia-component-id="' + id + '" aria-label="Edit ' + r.name + '">Edit</button></td></tr>';
+    }).join('');
+    h += '</tbody></table>';
+    c.innerHTML = h;
+  }
+
+  var overlay = document.getElementById('overlay');
+  c.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-ouia-component-id^="edit-asset-"]');
+    if (!b) return;
+    overlay.hidden = false;
+  });
+  function close() { overlay.hidden = true; }
+  document.getElementById('cancel').addEventListener('click', close);
+  document.getElementById('save').addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+})();
+</script>
+<script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Vision model, empty chat","default":true},{"route":"/index.html","id":"image-answered","name":"Image answered"},{"route":"/index.html","id":"text-only-model","name":"Text-only model"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR model"},{"route":"/index.html","id":"audio-answered","name":"Audio transcribed"},{"route":"/index.html","id":"file-too-large","name":"File too large"},{"route":"/index.html","id":"second-file-blocked","name":"Second file blocked"},{"route":"/index.html","id":"asr-failed","name":"Transcription failed"},{"route":"/ai-assets.html","id":"default","name":"Endpoints with one ASR","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR endpoint"},{"route":"/ai-assets.html","id":"empty","name":"No endpoints"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body>
+</html>

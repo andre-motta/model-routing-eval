@@ -1,0 +1,203 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "journeys": [
+    {
+      "id": "vision-input",
+      "title": "Explore an image with a vision model",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-1",
+        "AC-7",
+        "AC-8",
+        "AC-14"
+      ],
+      "steps": [
+        {
+          "id": "open",
+          "name": "Choose a vision model",
+          "route": "/index.html",
+          "export": true
+        },
+        {
+          "id": "prompt",
+          "name": "Compose a question",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "What does this image show?"
+            }
+          ]
+        }
+      ],
+      "manual_actions": [
+        "Attach a JPG or PNG using Attach image, then Send.",
+        "Follow up with text. A second attachment is blocked until New chat."
+      ]
+    },
+    {
+      "id": "audio-input",
+      "title": "Transcribe audio and get a text response",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-4",
+        "AC-5",
+        "AC-10",
+        "AC-11"
+      ],
+      "steps": [
+        {
+          "id": "audio-model",
+          "name": "Choose an audio workflow model",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Home"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "ArrowDown"
+            },
+            {
+              "type": "press",
+              "selector": "#model",
+              "key": "Enter"
+            },
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Summarize this audio."
+            }
+          ]
+        }
+      ],
+      "manual_actions": [
+        "Select Audio workflow model, choose a registered ASR model, attach WAV or MP3, and Send."
+      ]
+    },
+    {
+      "id": "register-asr",
+      "title": "Register a transcription endpoint",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-6"
+      ],
+      "steps": [
+        {
+          "id": "assets",
+          "name": "Review registered endpoints",
+          "route": "/assets.html",
+          "export": true
+        },
+        {
+          "id": "registration",
+          "name": "Open registration form",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"register-endpoint\"]"
+            },
+            {
+              "type": "wait_for",
+              "selector": "dialog[open]"
+            }
+          ]
+        },
+        {
+          "id": "complete-registration",
+          "name": "Register transcription model",
+          "route": "/assets.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#register"
+            },
+            {
+              "type": "fill",
+              "selector": "#asset-name",
+              "value": "Review ASR"
+            },
+            {
+              "type": "fill",
+              "selector": "#asset-url",
+              "value": "https://asr.example.test/v1"
+            },
+            {
+              "type": "click",
+              "selector": "#asset-asr"
+            },
+            {
+              "type": "click",
+              "selector": "[data-ouia-component-id=\"save-endpoint\"]"
+            }
+          ]
+        },
+        {
+          "id": "return",
+          "name": "Return to Playground",
+          "route": "/index.html",
+          "export": true
+        }
+      ]
+    },
+    {
+      "id": "fresh-chat",
+      "title": "Reset to a clean conversation",
+      "persona": "ai-engineer",
+      "source": "jira",
+      "ac_ids": [
+        "AC-9",
+        "AC-14",
+        "AC-15"
+      ],
+      "steps": [
+        {
+          "id": "new-chat",
+          "name": "Clear the conversation",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "click",
+              "selector": "#new-chat"
+            }
+          ]
+        },
+        {
+          "id": "text",
+          "name": "Send a text prompt",
+          "route": "/index.html",
+          "export": true,
+          "actions": [
+            {
+              "type": "fill",
+              "selector": "#prompt",
+              "value": "Help me plan a design review."
+            },
+            {
+              "type": "click",
+              "selector": "#send"
+            },
+            {
+              "type": "wait_for",
+              "selector": ".message.assistant"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

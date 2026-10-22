@@ -1,0 +1,49 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": ".artifacts/RHAISTRAT-1527/exports",
+    "count": 0
+  },
+  "assumptions": [
+    "Jira unreachable; used local rfe-snapshot.md (first 298 of 388 lines reviewed: Business Need, Strategy, ACs, risks).",
+    "Scope follows the Strategy: image and audio input only, text output. Audio output, microphone capture, PDF, video, and multiple files per conversation are out of scope and not prototyped.",
+    "Audio is transcribed by a user-selected ASR AI Asset before reaching the chat model; prototype shows the transcript step in the transcript.",
+    "10 MB file limit is the proposed default pending PM confirmation.",
+    "The ASR flag UX on the AI Asset Endpoints table (row action plus confirm dialog, Capability label) is a proposal; the Strategy lists it as needing design.",
+    "Model names and capability tags (image-inferencing, audio-asr) are mock data; tag names are still pending agreement.",
+    "Prototype is mock-only: no network calls, replies are canned."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

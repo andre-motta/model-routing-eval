@@ -1,0 +1,53 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1
+  },
+  "source_rfes": ["RHAISTRAT-1527"],
+  "sources": [
+    {
+      "kind": "strat",
+      "key": "RHAISTRAT-1527",
+      "label": "Strategy",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    },
+    {
+      "kind": "rfe",
+      "key": "RHAIRFE-913",
+      "label": "RFE",
+      "url": "https://issues.redhat.com/browse/RHAIRFE-913"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "prototype_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "entry": "playground.html",
+  "screens": ["Playground", "AiAssetEndpoints", "EditCapabilitiesModal"],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "user_stories_path": ".artifacts/RHAISTRAT-1527/user-stories.json",
+  "prototype_bar": true,
+  "exports": {
+    "path": ".artifacts/RHAISTRAT-1527/exports",
+    "count": 0
+  },
+  "assumptions": [
+    "Source was the local rfe-snapshot.md (Jira not reachable); the snapshot's strategy scope (input only, text output) supersedes the original RFE's audio output, microphone, multi-image and comparison asks.",
+    "Persona catalog (knowledge/personas/catalog.yaml) is not present in this plugin install; personas ai-engineer and ai-platform-admin are inferred.",
+    "File size limit shown as 10 MB for image and audio (proposed default pending PM confirmation).",
+    "The ASR capability flag UX is not yet designed; prototyped as an 'Edit capabilities' modal with a 'Transcription endpoint (ASR)' checkbox and a teal label in the AI asset endpoints table. Catalog modality tags are shown read only (custom capability tagging is out of scope).",
+    "Audio input control is shown for models tagged audio-asr; models without modality tags show text input only. Inaccurate tags surface as an inference-time error (model-rejected-input scenario).",
+    "The one-file-per-conversation limit is communicated with persistent helper text plus an inline warning on a second attempt; New chat clears the limit.",
+    "Image/audio controls are buttons that open the native file picker; client-side validation (0 bytes, MIME allowlist, 10 MB) runs before any upload and is functional in the prototype.",
+    "Model names (Qwen2.5-VL, Qwen2.5-Omni, granite-3.3, gemma-3, whisper-large-v3, OpenAI whisper-1) and responses are illustrative mock data.",
+    "ASR flag changes on the AI asset endpoints page are not persisted to the Playground page in this standalone prototype; use scenarios to see each end state."
+  ],
+  "created_at": "2026-10-19T12:00:00Z",
+  "updated_at": null,
+  "refinement_history": []
+}

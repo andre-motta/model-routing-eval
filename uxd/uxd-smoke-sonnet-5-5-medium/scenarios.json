@@ -1,0 +1,30 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "extracted_at": "2026-10-19T12:00:00Z",
+  "pages": [
+    {
+      "route": "/index.html",
+      "screen": "Playground",
+      "scenarios": [
+        { "id": "default", "name": "Vision model, empty chat", "description": "Vision-capable model selected; only the image control is shown; empty transcript with one-file hint", "default": true },
+        { "id": "image-answered", "name": "Image answered", "description": "Transcript shows the user's image inline and the model's text answer" },
+        { "id": "text-only-model", "name": "Text-only model", "description": "Text-only model selected; no image or audio controls in the composer" },
+        { "id": "audio-no-asr", "name": "Audio, no ASR model", "description": "Audio file attached, ASR dropdown empty, send blocked with a register-a-transcription-model alert" },
+        { "id": "audio-answered", "name": "Audio transcribed", "description": "ASR model chosen; transcript step and text answer shown in the transcript" },
+        { "id": "file-too-large", "name": "File too large", "description": "Rejected 14.2 MB image, danger alert, nothing uploaded" },
+        { "id": "second-file-blocked", "name": "Second file blocked", "description": "Conversation already holds an image; attach buttons disabled with one-file warning" },
+        { "id": "asr-failed", "name": "Transcription failed", "description": "ASR endpoint unreachable; danger alert in transcript, no model response" }
+      ]
+    },
+    {
+      "route": "/ai-assets.html",
+      "screen": "AIAssetEndpoints",
+      "scenarios": [
+        { "id": "default", "name": "Endpoints with one ASR", "description": "Table of endpoints; whisper-large-v3 shows an ASR label", "default": true },
+        { "id": "no-asr", "name": "No ASR endpoint", "description": "Table with no ASR-flagged endpoint and an info alert explaining Playground audio needs one" },
+        { "id": "empty", "name": "No endpoints", "description": "Empty state, nothing registered" },
+        { "id": "load-error", "name": "Load error", "description": "Endpoints failed to load, error state with retry" }
+      ]
+    }
+  ]
+}

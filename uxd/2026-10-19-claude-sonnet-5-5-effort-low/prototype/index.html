@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Playground - Gen AI Studio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/@patternfly/patternfly@6/patternfly-addons.min.css" />
+<style>
+.chat{min-height:280px;display:flex;flex-direction:column;gap:var(--pf-t--global--spacer--md)}
+.msg{max-width:70%;padding:var(--pf-t--global--spacer--md);border-radius:8px}
+.msg.user{align-self:flex-end;background:var(--pf-t--global--color--brand--default);color:#fff}
+.msg.bot{align-self:flex-start;background:var(--pf-t--global--background--color--secondary--default)}
+.thumb{width:180px;height:120px;border-radius:6px;background:linear-gradient(135deg,#6ea8d8,#2b9a66 60%,#f0ab00);display:flex;align-items:flex-end;color:#fff;font-size:12px;padding:6px;margin-bottom:8px}
+.audio-chip{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.wave{height:24px;width:160px;background:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 6px);opacity:.6}
+</style></head><body>
+<script src="uxd-scenario-runtime.js"></script>
+<script src="shell.js"></script>
+<script>
+var S = window.UxdScenario.get();
+var MODELS = {
+  'text-only':   {name:'granite-3.3-8b-instruct', mods:[]},
+  'vision-only': {name:'qwen2.5-vl-7b-instruct', mods:['image']},
+  'full':        {name:'gemma3-12b-it', mods:['image','audio']}
+};
+var key = {'text-only':'text-only','vision-only':'vision-only','upload-error':'vision-only'}[S] || 'full';
+var model = MODELS[key];
+var hasImage = S==='default', hasAudio = S==='audio-answered' || S==='asr-failure';
+var asrAssets = S==='audio-no-asr' ? [] : ['whisper-small (ASR)','whisper-large-v3 (ASR)'];
+var imgOn = model.mods.indexOf('image')>-1, audOn = model.mods.indexOf('audio')>-1;
+var limitReached = hasImage || hasAudio;
+
+function alertHtml(v,t,b,id){return '<div class="pf-v6-c-alert pf-m-inline pf-m-'+v+'" aria-label="'+t+'" '+(id?'data-ouia-component-id="'+id+'"':'')+'><div class="pf-v6-c-alert__icon"></div><p class="pf-v6-c-alert__title"><span class="pf-v6-screen-reader">'+v+' alert:</span>'+t+'</p>'+(b?'<div class="pf-v6-c-alert__description">'+b+'</div>':'')+'</div>';}
+
+UxdShell.mount('index.html', function(main){
+  var chat = '';
+  if (S==='default') chat =
+    '<div class="msg user"><div class="thumb" role="img" aria-label="Uploaded image: street-scene.jpg">street-scene.jpg</div>What objects do you see in this image?</div>'+
+    '<div class="msg bot">The image shows a street scene with a cyclist, two parked cars, a bus stop sign and several pedestrians crossing at a zebra crossing.</div>';
+  if (S==='audio-answered') chat =
+    '<div class="msg user"><div class="audio-chip"><span class="wave" aria-hidden="true"></span><span>standup-recording.wav &middot; 0:42</span></div>'+
+    '<div class="pf-v6-u-font-size-sm"><em>Transcribed by whisper-small:</em> "Yesterday we finished the BFF upload endpoint and started on the file TTL cleanup."</div>Summarize this recording.</div>'+
+    '<div class="msg bot">Summary: the upload endpoint is done and work has begun on TTL-based cleanup of stored files.</div>';
+  if (S==='asr-failure') chat =
+    '<div class="msg user"><div class="audio-chip"><span class="wave" aria-hidden="true"></span><span>standup-recording.wav &middot; 0:42</span></div>Summarize this recording.</div>'+
+    alertHtml('danger','Transcription failed','whisper-small could not be reached. Your prompt was not sent to the model. Check the endpoint in AI asset endpoints or choose another transcription model.','asr-error');
+  if (!chat) chat = '<div class="pf-v6-c-empty-state"><div class="pf-v6-c-empty-state__content"><h2 class="pf-v6-c-title pf-m-lg">Start a conversation</h2><div class="pf-v6-c-empty-state__body">Type a prompt'+(imgOn?', attach an image':'')+(audOn?' or upload audio':'')+' to begin.</div></div></div>';
+
+  var banners = '';
+  if (S==='audio-no-asr') banners += alertHtml('warning','No transcription model registered','Audio submission is blocked. <a href="ai-assets.html">Register a transcription model as an AI asset</a> and mark it as an ASR endpoint.','no-asr-alert');
+  if (S==='upload-error') banners += alertHtml('danger','big-scan.png was not uploaded','File is 14.2 MB. The maximum size is 10 MB. No upload was sent.','file-error');
+  if (limitReached) banners += '<div hidden data-ouia-component-id="limit-alert-tpl"></div>';
+
+  var audioPanel = audOn ? '<div class="pf-v6-c-form__group"><label class="pf-v6-c-form__label" for="asr"><span class="pf-v6-c-form__label-text">Transcription model</span></label>'+
+    '<select class="pf-v6-c-form-control" id="asr" data-ouia-component-id="asr-select"'+(asrAssets.length?'':' disabled')+'>'+
+    (asrAssets.length? asrAssets.map(function(a){return '<option>'+a+'</option>';}).join('') : '<option>None registered</option>')+'</select></div>' : '';
+
+  main.innerHTML =
+  '<section class="pf-v6-c-page__main-section"><h1 class="pf-v6-c-title pf-m-2xl">Playground</h1></section>'+
+  '<section class="pf-v6-c-page__main-section"><div class="pf-v6-l-grid pf-m-gutter"><div class="pf-v6-l-grid__item pf-m-8-col">'+
+  '<div class="pf-v6-c-card"><div class="pf-v6-c-card__header"><div class="pf-v6-c-card__title">Model: '+
+  '<select class="pf-v6-c-form-control" id="model" aria-label="Model" data-ouia-component-id="model-select" style="width:auto;display:inline-block">'+
+  Object.keys(MODELS).map(function(k){return '<option value="'+k+'"'+(k===key?' selected':'')+'>'+MODELS[k].name+' ['+(MODELS[k].mods.join(', ')||'text')+']</option>';}).join('')+
+  '</select></div></div><div class="pf-v6-c-card__body"><div class="chat" role="log" aria-label="Chat transcript">'+chat+'</div></div>'+
+  '<div class="pf-v6-c-card__footer">'+banners+
+  '<div class="pf-v6-l-flex pf-m-align-items-flex-end pf-m-space-items-sm" style="margin-top:8px">'+
+  '<textarea class="pf-v6-c-form-control" aria-label="Prompt" rows="2" placeholder="Send a message" style="flex:1"'+(S==='audio-no-asr'?'':'')+'></textarea>'+
+  (imgOn?'<button class="pf-v6-c-button pf-m-secondary" data-ouia-component-id="attach-image" aria-label="Attach image (JPG, PNG, max 10 MB)">Attach image</button>':'')+
+  (audOn?'<button class="pf-v6-c-button pf-m-secondary" data-ouia-component-id="attach-audio" aria-label="Upload audio (WAV, MP3, max 10 MB)"'+(S==='audio-no-asr'?' aria-disabled="true"':'')+'>Upload audio</button>':'')+
+  '<button class="pf-v6-c-button pf-m-primary" data-ouia-component-id="send"'+(S==='audio-no-asr'?' disabled':'')+'>Send</button></div>'+
+  '<div id="limit-slot"></div>'+
+  '<p class="pf-v6-u-font-size-sm pf-v6-u-color-200" style="margin-top:8px">'+(imgOn||audOn?'JPG, PNG'+(audOn?', WAV, MP3':'')+' &middot; max 10 MB &middot; one image or audio file per conversation':'This model accepts text only.')+'</p>'+
+  '</div></div></div>'+
+  '<div class="pf-v6-l-grid__item pf-m-4-col"><div class="pf-v6-c-card"><div class="pf-v6-c-card__title">Input types</div><div class="pf-v6-c-card__body"><form class="pf-v6-c-form">'+
+  '<div class="pf-v6-c-form__group"><span class="pf-v6-c-label pf-m-blue">Text</span> '+(imgOn?'<span class="pf-v6-c-label pf-m-green">Image</span> ':'')+(audOn?'<span class="pf-v6-c-label pf-m-purple">Audio</span>':'')+'</div>'+
+  audioPanel+'</form></div></div></div></div></section>';
+
+  document.getElementById('model').addEventListener('change', function(e){
+    var m = {'text-only':'text-only','vision-only':'vision-only','full':'default'}[e.target.value];
+    window.UxdScenario.set(m);
+  });
+  var att = document.querySelector('[data-ouia-component-id="attach-image"]');
+  if (att && limitReached) att.addEventListener('click', function(){
+    document.getElementById('limit-slot').innerHTML = alertHtml('warning','One file per conversation','This conversation already contains an image or audio file. Start a new conversation to attach another.','limit-alert');
+  });
+});
+</script><script data-uxd-prototype-bar="config">window.__UXD_PROTOTYPE__={"id":"RHAISTRAT-1527","title":"Multimodal Support in Gen AI Studio Playground","jiraBaseUrl":"https://issues.example.com/browse/","sources":[{"kind":"rfe","key":"RHAISTRAT-1527","label":"RFE","url":"https://redhat.atlassian.net/browse/RHAISTRAT-1527"}],"views":{"prototype":null,"eval":"/evals/RHAISTRAT-1527/"},"scenarios":[{"route":"/index.html","id":"default","name":"Image answered","default":true},{"route":"/index.html","id":"text-only","name":"Text-only model"},{"route":"/index.html","id":"vision-only","name":"Vision-only model, empty chat"},{"route":"/index.html","id":"audio-no-asr","name":"Audio, no ASR asset"},{"route":"/index.html","id":"audio-answered","name":"Audio answered"},{"route":"/index.html","id":"asr-failure","name":"Transcription failed"},{"route":"/index.html","id":"upload-error","name":"File rejected"},{"route":"/ai-assets.html","id":"default","name":"Table with ASR endpoint","default":true},{"route":"/ai-assets.html","id":"no-asr","name":"No ASR endpoints"},{"route":"/ai-assets.html","id":"empty","name":"No endpoints"},{"route":"/ai-assets.html","id":"load-error","name":"Load error"}]};</script>
+<link rel="stylesheet" href="uxd-prototype-bar/prototype-bar.css" data-uxd-prototype-bar="install" />
+<script src="uxd-prototype-bar/serialize-page.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/export-pf-spec.browser.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/uxd-scenario-runtime.js" data-uxd-prototype-bar="install"></script>
+<script src="uxd-prototype-bar/prototype-bar-standalone.js" data-uxd-prototype-bar="install"></script>
+</body></html>

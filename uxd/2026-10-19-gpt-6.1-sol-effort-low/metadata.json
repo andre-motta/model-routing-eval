@@ -1,0 +1,53 @@
+{
+  "prototype_id": "RHAISTRAT-1527",
+  "title": "Multimodal Support in Gen AI Studio Playground",
+  "source": {
+    "type": "jira",
+    "reference": "RHAISTRAT-1527",
+    "rfe_count": 1,
+    "local_artifact": "rfe-snapshot.md"
+  },
+  "source_rfes": [
+    "RHAISTRAT-1527"
+  ],
+  "sources": [
+    {
+      "kind": "rfe",
+      "key": "RHAISTRAT-1527",
+      "label": "RFE",
+      "url": "https://redhat.atlassian.net/browse/RHAISTRAT-1527"
+    }
+  ],
+  "build_mode": "standalone-html",
+  "decision_mode": "skip",
+  "status": "draft",
+  "iteration": 0,
+  "workspace_path": ".artifacts/RHAISTRAT-1527/prototype",
+  "screens": [
+    "Playground",
+    "AIAssetEndpoints"
+  ],
+  "journeys_path": ".artifacts/RHAISTRAT-1527/journeys.json",
+  "scenarios_path": ".artifacts/RHAISTRAT-1527/scenarios.json",
+  "prototype_bar": true,
+  "exports": {
+    "count": 0
+  },
+  "assumptions": [
+    "The detailed strategy and final Staff Engineer clarifications take precedence over the broad business request.",
+    "10 MB is a proposed prototype limit, pending PM confirmation.",
+    "All uploads, inference, endpoint registration and processing are simulated locally; no backend is implemented.",
+    "Sample model names and endpoint URLs illustrate capabilities, not validated model availability.",
+    "ASR capability is represented as an editable checkbox; its final data model is pending UX agreement.",
+    "Persona catalog is unavailable; app-developer and platform-engineer are descriptive role IDs."
+  ],
+  "created_at": "2026-10-19T13:51:28.387555+00:00",
+  "updated_at": null,
+  "refinement_history": [],
+  "limitations": [
+    "Browser tool returned: Browser is not available: iab.",
+    "Local HTTP server failed with PermissionError: [Errno 1] Operation not permitted. No bypass was attempted.",
+    "Source-level reachability and JavaScript syntax checks passed; browser rendering and end-to-end interactions remain unverified."
+  ],
+  "reachability_check_path": ".artifacts/RHAISTRAT-1527/reachability-check.json"
+}
