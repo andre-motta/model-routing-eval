@@ -2,7 +2,7 @@
  "n_runs": 404,
  "n_tasks": 24,
  "configs": [
-  "glm-5-3@medium",
+  "glm-5-3@max",
   "gpt-5.6-terra@medium",
   "gpt-6-astra@medium",
   "gpt-6-luna@low",
@@ -18,7 +18,7 @@
  "by_tier_config": [
   {
    "tier": 1,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 1.0,
    "mean_cost": 0.0,
    "mean_wall": 87.16666666666667,
@@ -90,7 +90,7 @@
   },
   {
    "tier": 2,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 1.0,
    "mean_cost": 0.0,
    "mean_wall": 139.86666666666667,
@@ -162,7 +162,7 @@
   },
   {
    "tier": 3,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 1.0,
    "mean_cost": 0.0,
    "mean_wall": 227.325,
@@ -234,7 +234,7 @@
   },
   {
    "tier": 4,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 1.0,
    "mean_cost": 0.0,
    "mean_wall": 341.725,
@@ -322,7 +322,7 @@
   },
   {
    "tier": 5,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 1.0,
    "mean_cost": 0.0,
    "mean_wall": 157.75,
@@ -410,7 +410,7 @@
   },
   {
    "tier": 6,
-   "config": "glm-5-3@medium",
+   "config": "glm-5-3@max",
    "pass_rate": 0.875,
    "mean_cost": 0.0,
    "mean_wall": 484.225,
@@ -517,7 +517,7 @@
   {
    "task": "r01t_fromager_distinfo_ticket",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.8794466
@@ -525,7 +525,7 @@
   {
    "task": "r02_fromager_age_filter",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.5255002000000001
@@ -533,7 +533,7 @@
   {
    "task": "r02t_fromager_age_filter_ticket",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.7191836
@@ -541,7 +541,7 @@
   {
    "task": "r03_fromager_dep_chain",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 1.0309682
@@ -549,7 +549,7 @@
   {
    "task": "r03t_fromager_dep_chain_ticket",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 1.6002685
@@ -557,7 +557,7 @@
   {
    "task": "r04_fromager_age_fallback",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 1.5036647999999997
@@ -565,7 +565,7 @@
   {
    "task": "r05_fromager_version_prebuilt",
    "tier": 6,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 2.0501126
@@ -573,7 +573,7 @@
   {
    "task": "t01_rename_symbol",
    "tier": 1,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2144456
@@ -581,7 +581,7 @@
   {
    "task": "t02_ini_to_toml",
    "tier": 1,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2318592
@@ -589,7 +589,7 @@
   {
    "task": "t03_add_type_hints",
    "tier": 1,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2340218
@@ -597,7 +597,7 @@
   {
    "task": "t04_lru_cache",
    "tier": 2,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2943686
@@ -605,7 +605,7 @@
   {
    "task": "t05_cli_json_flag",
    "tier": 2,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.27841
@@ -613,7 +613,7 @@
   {
    "task": "t06_log_parser",
    "tier": 2,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.3760088
@@ -621,7 +621,7 @@
   {
    "task": "t07_mutable_default",
    "tier": 3,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.29879220000000006
@@ -629,7 +629,7 @@
   {
    "task": "t08_timezone_bug",
    "tier": 3,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2890092
@@ -637,7 +637,7 @@
   {
    "task": "t09_thread_safety",
    "tier": 3,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2058748
@@ -645,7 +645,7 @@
   {
    "task": "t10_plugin_registry",
    "tier": 4,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.3915366
@@ -653,7 +653,7 @@
   {
    "task": "t11_async_migration",
    "tier": 4,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.2525024
@@ -661,7 +661,7 @@
   {
    "task": "t12_needle_bug",
    "tier": 5,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.4274388
@@ -669,7 +669,7 @@
   {
    "task": "t13_unicode_dedupe",
    "tier": 3,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.30159600000000003
@@ -677,7 +677,7 @@
   {
    "task": "t14_dep_resolver",
    "tier": 4,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 2.6650646
@@ -685,7 +685,7 @@
   {
    "task": "t15_perf_regression",
    "tier": 5,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.5430188
@@ -693,7 +693,7 @@
   {
    "task": "t16_json_patch",
    "tier": 4,
-   "cheapest": "glm-5-3@medium",
+   "cheapest": "glm-5-3@max",
    "cheapest_cost": 0.0,
    "priciest": "opus-5-5@medium",
    "priciest_cost": 0.49464059999999993
@@ -723,6 +723,7 @@
    "tok_out": 19615,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -741,6 +742,7 @@
    "tok_out": 5019,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -759,6 +761,7 @@
    "tok_out": 5366,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -777,6 +780,7 @@
    "tok_out": 9290,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -795,6 +799,7 @@
    "tok_out": 11444,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -813,6 +818,7 @@
    "tok_out": 13868,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -831,6 +837,7 @@
    "tok_out": 21034,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -849,6 +856,7 @@
    "tok_out": 42693,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -867,6 +875,7 @@
    "tok_out": 2743,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -885,6 +894,7 @@
    "tok_out": 2184,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -903,6 +913,7 @@
    "tok_out": 2328,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -921,6 +932,7 @@
    "tok_out": 4765,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -939,6 +951,7 @@
    "tok_out": 3149,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -957,6 +970,7 @@
    "tok_out": 5048,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -975,6 +989,7 @@
    "tok_out": 2753,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -993,6 +1008,7 @@
    "tok_out": 3954,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1011,6 +1027,7 @@
    "tok_out": 4794,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1029,6 +1046,7 @@
    "tok_out": 7195,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1047,6 +1065,7 @@
    "tok_out": 4672,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1065,6 +1084,7 @@
    "tok_out": 4376,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1083,6 +1103,7 @@
    "tok_out": 3757,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1101,6 +1122,7 @@
    "tok_out": 12055,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1119,6 +1141,7 @@
    "tok_out": 3799,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1137,6 +1160,7 @@
    "tok_out": 11577,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1155,6 +1179,7 @@
    "tok_out": 22113,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "hidden tests failed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1173,6 +1198,7 @@
    "tok_out": 7275,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -1191,6 +1217,7 @@
    "tok_out": 5373,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1209,6 +1236,7 @@
    "tok_out": 8765,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -1227,6 +1255,7 @@
    "tok_out": 11611,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1245,6 +1274,7 @@
    "tok_out": 13375,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -1263,6 +1293,7 @@
    "tok_out": 18878,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1281,6 +1312,7 @@
    "tok_out": 44079,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1299,6 +1331,7 @@
    "tok_out": 2792,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1317,6 +1350,7 @@
    "tok_out": 3343,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1335,6 +1369,7 @@
    "tok_out": 2124,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1353,6 +1388,7 @@
    "tok_out": 4707,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1371,6 +1407,7 @@
    "tok_out": 3446,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1389,6 +1426,7 @@
    "tok_out": 5304,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1407,6 +1445,7 @@
    "tok_out": 2328,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1425,6 +1464,7 @@
    "tok_out": 4089,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1443,6 +1483,7 @@
    "tok_out": 4272,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1461,6 +1502,7 @@
    "tok_out": 7241,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1479,6 +1521,7 @@
    "tok_out": 5209,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1497,6 +1540,7 @@
    "tok_out": 3173,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1515,6 +1559,7 @@
    "tok_out": 5030,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1533,6 +1578,7 @@
    "tok_out": 11094,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1551,6 +1597,7 @@
    "tok_out": 4737,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1569,6 +1616,7 @@
    "tok_out": 9613,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -1587,6 +1635,7 @@
    "tok_out": 33989,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1605,6 +1654,7 @@
    "tok_out": 9182,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1623,6 +1673,7 @@
    "tok_out": 9715,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1641,6 +1692,7 @@
    "tok_out": 13285,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1659,6 +1711,7 @@
    "tok_out": 13275,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1677,6 +1730,7 @@
    "tok_out": 17058,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1695,6 +1749,7 @@
    "tok_out": 37698,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1713,6 +1768,7 @@
    "tok_out": 44182,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1731,6 +1787,7 @@
    "tok_out": 4420,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1749,6 +1806,7 @@
    "tok_out": 3168,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1767,6 +1825,7 @@
    "tok_out": 4370,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1785,6 +1844,7 @@
    "tok_out": 8360,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1803,6 +1863,7 @@
    "tok_out": 5035,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1821,6 +1882,7 @@
    "tok_out": 9346,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1839,6 +1901,7 @@
    "tok_out": 2949,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1857,6 +1920,7 @@
    "tok_out": 6591,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1875,6 +1939,7 @@
    "tok_out": 5711,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1893,6 +1958,7 @@
    "tok_out": 8508,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1911,6 +1977,7 @@
    "tok_out": 8860,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1929,6 +1996,7 @@
    "tok_out": 4510,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1947,6 +2015,7 @@
    "tok_out": 5863,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1965,6 +2034,7 @@
    "tok_out": 21546,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -1983,6 +2053,7 @@
    "tok_out": 5399,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2001,6 +2072,7 @@
    "tok_out": 17251,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2019,6 +2091,7 @@
    "tok_out": 24958,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2037,6 +2110,7 @@
    "tok_out": 12355,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2055,6 +2129,7 @@
    "tok_out": 8417,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2073,6 +2148,7 @@
    "tok_out": 8496,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2091,6 +2167,7 @@
    "tok_out": 16463,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2109,6 +2186,7 @@
    "tok_out": 35117,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2127,6 +2205,7 @@
    "tok_out": 30626,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2145,6 +2224,7 @@
    "tok_out": 55211,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "hidden tests failed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2163,6 +2243,7 @@
    "tok_out": 3301,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2181,6 +2262,7 @@
    "tok_out": 4029,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2199,6 +2281,7 @@
    "tok_out": 4672,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2217,6 +2300,7 @@
    "tok_out": 7116,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2235,6 +2319,7 @@
    "tok_out": 5581,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2253,6 +2338,7 @@
    "tok_out": 9614,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2271,6 +2357,7 @@
    "tok_out": 2552,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2289,6 +2376,7 @@
    "tok_out": 6616,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2307,6 +2395,7 @@
    "tok_out": 6823,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2325,6 +2414,7 @@
    "tok_out": 10790,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2343,6 +2433,7 @@
    "tok_out": 6341,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2361,6 +2452,7 @@
    "tok_out": 4033,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2379,6 +2471,7 @@
    "tok_out": 8389,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2397,6 +2490,7 @@
    "tok_out": 62653,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2415,6 +2509,7 @@
    "tok_out": 7200,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2433,6 +2528,7 @@
    "tok_out": 14123,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -2451,6 +2547,7 @@
    "tok_out": 4537,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2469,6 +2566,7 @@
    "tok_out": 2625,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2487,6 +2585,7 @@
    "tok_out": 2809,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2505,6 +2604,7 @@
    "tok_out": 2512,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2523,6 +2623,7 @@
    "tok_out": 5620,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2541,6 +2642,7 @@
    "tok_out": 8176,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2559,6 +2661,7 @@
    "tok_out": 5645,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2577,6 +2680,7 @@
    "tok_out": 12311,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2595,6 +2699,7 @@
    "tok_out": 394,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2613,6 +2718,7 @@
    "tok_out": 942,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2631,6 +2737,7 @@
    "tok_out": 1060,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2649,6 +2756,7 @@
    "tok_out": 2677,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2667,6 +2775,7 @@
    "tok_out": 878,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2685,6 +2794,7 @@
    "tok_out": 2222,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2703,6 +2813,7 @@
    "tok_out": 803,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2721,6 +2832,7 @@
    "tok_out": 1606,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2739,6 +2851,7 @@
    "tok_out": 1942,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2757,6 +2870,7 @@
    "tok_out": 2131,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2775,6 +2889,7 @@
    "tok_out": 2411,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2793,6 +2908,7 @@
    "tok_out": 2234,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2811,6 +2927,7 @@
    "tok_out": 1207,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2829,6 +2946,7 @@
    "tok_out": 3670,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2847,6 +2965,7 @@
    "tok_out": 1118,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2865,6 +2984,7 @@
    "tok_out": 4841,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests failed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2883,6 +3003,7 @@
    "tok_out": 5094,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2901,6 +3022,7 @@
    "tok_out": 3045,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2919,6 +3041,7 @@
    "tok_out": 2395,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2937,6 +3060,7 @@
    "tok_out": 3005,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2955,6 +3079,7 @@
    "tok_out": 4956,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2973,6 +3098,7 @@
    "tok_out": 4843,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@low"
   },
   {
@@ -2991,6 +3117,7 @@
    "tok_out": 4810,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3009,6 +3136,7 @@
    "tok_out": 12689,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3027,6 +3155,7 @@
    "tok_out": 356,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3045,6 +3174,7 @@
    "tok_out": 895,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3063,6 +3193,7 @@
    "tok_out": 1072,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3081,6 +3212,7 @@
    "tok_out": 2541,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3099,6 +3231,7 @@
    "tok_out": 921,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3117,6 +3250,7 @@
    "tok_out": 2290,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3135,6 +3269,7 @@
    "tok_out": 660,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3153,6 +3288,7 @@
    "tok_out": 1660,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3171,6 +3307,7 @@
    "tok_out": 2072,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3189,6 +3326,7 @@
    "tok_out": 2111,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3207,6 +3345,7 @@
    "tok_out": 2372,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3225,6 +3364,7 @@
    "tok_out": 1300,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3243,6 +3383,7 @@
    "tok_out": 1566,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3261,6 +3402,7 @@
    "tok_out": 3925,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3279,6 +3421,7 @@
    "tok_out": 2393,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3297,6 +3440,7 @@
    "tok_out": 4365,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -3315,6 +3459,7 @@
    "tok_out": 4552,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3333,6 +3478,7 @@
    "tok_out": 1618,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3351,6 +3497,7 @@
    "tok_out": 2493,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3369,6 +3516,7 @@
    "tok_out": 2877,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3387,6 +3535,7 @@
    "tok_out": 5493,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3405,6 +3554,7 @@
    "tok_out": 5886,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3423,6 +3573,7 @@
    "tok_out": 6615,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3441,6 +3592,7 @@
    "tok_out": 12867,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3459,6 +3611,7 @@
    "tok_out": 433,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3477,6 +3630,7 @@
    "tok_out": 1024,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3495,6 +3649,7 @@
    "tok_out": 1102,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3513,6 +3668,7 @@
    "tok_out": 3507,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3531,6 +3687,7 @@
    "tok_out": 1587,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3549,6 +3706,7 @@
    "tok_out": 3357,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3567,6 +3725,7 @@
    "tok_out": 861,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3585,6 +3744,7 @@
    "tok_out": 1897,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3603,6 +3763,7 @@
    "tok_out": 2131,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3621,6 +3782,7 @@
    "tok_out": 2378,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3639,6 +3801,7 @@
    "tok_out": 2833,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3657,6 +3820,7 @@
    "tok_out": 1349,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3675,6 +3839,7 @@
    "tok_out": 1325,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3693,6 +3858,7 @@
    "tok_out": 7055,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3711,6 +3877,7 @@
    "tok_out": 1764,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3729,6 +3896,7 @@
    "tok_out": 9088,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3747,6 +3915,7 @@
    "tok_out": 5354,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3765,6 +3934,7 @@
    "tok_out": 3861,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3783,6 +3953,7 @@
    "tok_out": 2848,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3801,6 +3972,7 @@
    "tok_out": 2689,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3819,6 +3991,7 @@
    "tok_out": 5001,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3837,6 +4010,7 @@
    "tok_out": 7850,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3855,6 +4029,7 @@
    "tok_out": 6764,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3873,6 +4048,7 @@
    "tok_out": 14349,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3891,6 +4067,7 @@
    "tok_out": 596,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3909,6 +4086,7 @@
    "tok_out": 1134,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3927,6 +4105,7 @@
    "tok_out": 975,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3945,6 +4124,7 @@
    "tok_out": 2728,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3963,6 +4143,7 @@
    "tok_out": 1089,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3981,6 +4162,7 @@
    "tok_out": 2624,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -3999,6 +4181,7 @@
    "tok_out": 1056,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4017,6 +4200,7 @@
    "tok_out": 1825,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4035,6 +4219,7 @@
    "tok_out": 2255,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4053,6 +4238,7 @@
    "tok_out": 2118,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4071,6 +4257,7 @@
    "tok_out": 2741,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4089,6 +4276,7 @@
    "tok_out": 1757,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4107,6 +4295,7 @@
    "tok_out": 1522,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4125,6 +4314,7 @@
    "tok_out": 4494,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4143,6 +4333,7 @@
    "tok_out": 1418,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4161,6 +4352,7 @@
    "tok_out": 7351,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -4179,6 +4371,7 @@
    "tok_out": 4983,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4197,6 +4390,7 @@
    "tok_out": 2103,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4215,6 +4409,7 @@
    "tok_out": 1545,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4233,6 +4428,7 @@
    "tok_out": 1439,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4251,6 +4447,7 @@
    "tok_out": 3185,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4269,6 +4466,7 @@
    "tok_out": 3431,
    "tok_reason": 0,
    "quality": 2.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4287,6 +4485,7 @@
    "tok_out": 4422,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4305,6 +4504,7 @@
    "tok_out": 7848,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4323,6 +4523,7 @@
    "tok_out": 841,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4341,6 +4542,7 @@
    "tok_out": 1005,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4359,6 +4561,7 @@
    "tok_out": 835,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4377,6 +4580,7 @@
    "tok_out": 3127,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4395,6 +4599,7 @@
    "tok_out": 1389,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4413,6 +4618,7 @@
    "tok_out": 2061,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4431,6 +4637,7 @@
    "tok_out": 926,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4449,6 +4656,7 @@
    "tok_out": 1298,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4467,6 +4675,7 @@
    "tok_out": 1646,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4485,6 +4694,7 @@
    "tok_out": 1852,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests failed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4503,6 +4713,7 @@
    "tok_out": 2979,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4521,6 +4732,7 @@
    "tok_out": 1134,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4539,6 +4751,7 @@
    "tok_out": 1241,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4557,6 +4770,7 @@
    "tok_out": 3336,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4575,6 +4789,7 @@
    "tok_out": 1956,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4593,6 +4808,7 @@
    "tok_out": 4192,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4611,6 +4827,7 @@
    "tok_out": 2927,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4629,6 +4846,7 @@
    "tok_out": 5028,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4647,6 +4865,7 @@
    "tok_out": 2023,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4665,6 +4884,7 @@
    "tok_out": 1547,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4683,6 +4903,7 @@
    "tok_out": 4339,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4701,6 +4922,7 @@
    "tok_out": 4632,
    "tok_reason": 0,
    "quality": 1.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4719,6 +4941,7 @@
    "tok_out": 4383,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4737,6 +4960,7 @@
    "tok_out": 9542,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4755,6 +4979,7 @@
    "tok_out": 1061,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4773,6 +4998,7 @@
    "tok_out": 1221,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4791,6 +5017,7 @@
    "tok_out": 1163,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4809,6 +5036,7 @@
    "tok_out": 2739,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4827,6 +5055,7 @@
    "tok_out": 1539,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4845,6 +5074,7 @@
    "tok_out": 1741,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4863,6 +5093,7 @@
    "tok_out": 1266,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4881,6 +5112,7 @@
    "tok_out": 1623,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4899,6 +5131,7 @@
    "tok_out": 1769,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4917,6 +5150,7 @@
    "tok_out": 1847,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4935,6 +5169,7 @@
    "tok_out": 2767,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4953,6 +5188,7 @@
    "tok_out": 1435,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4971,6 +5207,7 @@
    "tok_out": 1380,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -4989,6 +5226,7 @@
    "tok_out": 3040,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -5007,6 +5245,7 @@
    "tok_out": 380,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests failed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -5025,6 +5264,7 @@
    "tok_out": 8607,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -5043,6 +5283,7 @@
    "tok_out": 16470,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5061,6 +5302,7 @@
    "tok_out": 8204,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5079,6 +5321,7 @@
    "tok_out": 8330,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5097,6 +5340,7 @@
    "tok_out": 8801,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5115,6 +5359,7 @@
    "tok_out": 15061,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5133,6 +5378,7 @@
    "tok_out": 32066,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5151,6 +5397,7 @@
    "tok_out": 24101,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5169,6 +5416,7 @@
    "tok_out": 47981,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5187,6 +5435,7 @@
    "tok_out": 2784,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5205,6 +5454,7 @@
    "tok_out": 5181,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5223,6 +5473,7 @@
    "tok_out": 5614,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5241,6 +5492,7 @@
    "tok_out": 8422,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5259,6 +5511,7 @@
    "tok_out": 3194,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5277,6 +5530,7 @@
    "tok_out": 8294,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5295,6 +5549,7 @@
    "tok_out": 4220,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5313,6 +5568,7 @@
    "tok_out": 7609,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5331,6 +5587,7 @@
    "tok_out": 8772,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5349,6 +5606,7 @@
    "tok_out": 8538,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5367,6 +5625,7 @@
    "tok_out": 7099,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5385,6 +5644,7 @@
    "tok_out": 3571,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5403,6 +5663,7 @@
    "tok_out": 6745,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5421,6 +5682,7 @@
    "tok_out": 16109,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5439,6 +5701,7 @@
    "tok_out": 7581,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5457,6 +5720,7 @@
    "tok_out": 16293,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5475,6 +5739,7 @@
    "tok_out": 20815,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5493,6 +5758,7 @@
    "tok_out": 7588,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5511,6 +5777,7 @@
    "tok_out": 6483,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5529,6 +5796,7 @@
    "tok_out": 6824,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5547,6 +5815,7 @@
    "tok_out": 13419,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5565,6 +5834,7 @@
    "tok_out": 15346,
    "tok_reason": 0,
    "quality": 2.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-luna@xhigh"
   },
   {
@@ -5583,6 +5853,7 @@
    "tok_out": 3145,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5601,6 +5872,7 @@
    "tok_out": 1164,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5619,6 +5891,7 @@
    "tok_out": 1819,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5637,6 +5910,7 @@
    "tok_out": 1891,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5655,6 +5929,7 @@
    "tok_out": 2230,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5673,6 +5948,7 @@
    "tok_out": 2144,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5691,6 +5967,7 @@
    "tok_out": 3396,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5709,6 +5986,7 @@
    "tok_out": 5680,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5727,6 +6005,7 @@
    "tok_out": 774,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5745,6 +6024,7 @@
    "tok_out": 1192,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5763,6 +6043,7 @@
    "tok_out": 714,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5781,6 +6062,7 @@
    "tok_out": 2415,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5799,6 +6081,7 @@
    "tok_out": 1474,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5817,6 +6100,7 @@
    "tok_out": 2393,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5835,6 +6119,7 @@
    "tok_out": 1281,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5853,6 +6138,7 @@
    "tok_out": 1371,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5871,6 +6157,7 @@
    "tok_out": 1572,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5889,6 +6176,7 @@
    "tok_out": 3473,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5907,6 +6195,7 @@
    "tok_out": 2505,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5925,6 +6214,7 @@
    "tok_out": 1224,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5943,6 +6233,7 @@
    "tok_out": 1644,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5961,6 +6252,7 @@
    "tok_out": 3144,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5979,6 +6271,7 @@
    "tok_out": 1467,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -5997,6 +6290,7 @@
    "tok_out": 4268,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6015,6 +6309,7 @@
    "tok_out": 3385,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6033,6 +6328,7 @@
    "tok_out": 1667,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6051,6 +6347,7 @@
    "tok_out": 1775,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6069,6 +6366,7 @@
    "tok_out": 1523,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6087,6 +6385,7 @@
    "tok_out": 2599,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6105,6 +6404,7 @@
    "tok_out": 1715,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6123,6 +6423,7 @@
    "tok_out": 4938,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6141,6 +6442,7 @@
    "tok_out": 6636,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6159,6 +6461,7 @@
    "tok_out": 888,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6177,6 +6480,7 @@
    "tok_out": 1253,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6195,6 +6499,7 @@
    "tok_out": 846,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6213,6 +6518,7 @@
    "tok_out": 2459,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6231,6 +6537,7 @@
    "tok_out": 1589,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6249,6 +6556,7 @@
    "tok_out": 2404,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6267,6 +6575,7 @@
    "tok_out": 1315,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6285,6 +6594,7 @@
    "tok_out": 1383,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6303,6 +6613,7 @@
    "tok_out": 1127,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6321,6 +6632,7 @@
    "tok_out": 3232,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6339,6 +6651,7 @@
    "tok_out": 2714,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6357,6 +6670,7 @@
    "tok_out": 1846,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6375,6 +6689,7 @@
    "tok_out": 1818,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6393,6 +6708,7 @@
    "tok_out": 3310,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6411,6 +6727,7 @@
    "tok_out": 1564,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6429,6 +6746,7 @@
    "tok_out": 3125,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -6447,6 +6765,7 @@
    "tok_out": 10529,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6465,6 +6784,7 @@
    "tok_out": 4924,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6483,6 +6803,7 @@
    "tok_out": 6766,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6501,6 +6822,7 @@
    "tok_out": 6459,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6519,6 +6841,7 @@
    "tok_out": 10055,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6537,6 +6860,7 @@
    "tok_out": 11688,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6555,6 +6879,7 @@
    "tok_out": 13447,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6.1-sol@xhigh"
   },
   {
@@ -6573,6 +6898,7 @@
    "tok_out": 8514,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6591,6 +6917,7 @@
    "tok_out": 7488,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -6609,6 +6936,7 @@
    "tok_out": 3990,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6627,6 +6955,7 @@
    "tok_out": 4891,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -6645,6 +6974,7 @@
    "tok_out": 9913,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6663,6 +6993,7 @@
    "tok_out": 12562,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -6681,6 +7012,7 @@
    "tok_out": 11742,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6699,6 +7031,7 @@
    "tok_out": 19552,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6717,6 +7050,7 @@
    "tok_out": 789,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6735,6 +7069,7 @@
    "tok_out": 1232,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6753,6 +7088,7 @@
    "tok_out": 1696,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6771,6 +7107,7 @@
    "tok_out": 4330,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6789,6 +7126,7 @@
    "tok_out": 1524,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6807,6 +7145,7 @@
    "tok_out": 4729,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6825,6 +7164,7 @@
    "tok_out": 1825,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6843,6 +7183,7 @@
    "tok_out": 2825,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6861,6 +7202,7 @@
    "tok_out": 2813,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6879,6 +7221,7 @@
    "tok_out": 3955,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6897,6 +7240,7 @@
    "tok_out": 3878,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6915,6 +7259,7 @@
    "tok_out": 3348,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6933,6 +7278,7 @@
    "tok_out": 3137,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6951,6 +7297,7 @@
    "tok_out": 40786,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6969,6 +7316,7 @@
    "tok_out": 3836,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -6987,439 +7335,8 @@
    "tok_out": 8686,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "opus-5-5@medium"
-  },
-  {
-   "task": "r01_fromager_distinfo",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": false,
-   "cost": 0.0,
-   "wall": 600.0,
-   "turns": 1,
-   "tok_in": 348034,
-   "tok_cached": 2141184,
-   "tok_out": 15713,
-   "tok_reason": 0,
-   "quality": 3.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r01t_fromager_distinfo_ticket",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 247.7,
-   "turns": 1,
-   "tok_in": 83991,
-   "tok_cached": 909312,
-   "tok_out": 5921,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r02_fromager_age_filter",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 221.1,
-   "turns": 1,
-   "tok_in": 112710,
-   "tok_cached": 854016,
-   "tok_out": 5163,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r02t_fromager_age_filter_ticket",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 364.8,
-   "turns": 1,
-   "tok_in": 97780,
-   "tok_cached": 1734656,
-   "tok_out": 8469,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r03_fromager_dep_chain",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 492.4,
-   "turns": 1,
-   "tok_in": 210643,
-   "tok_cached": 1624064,
-   "tok_out": 8860,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r03t_fromager_dep_chain_ticket",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 717.0,
-   "turns": 1,
-   "tok_in": 333821,
-   "tok_cached": 5660160,
-   "tok_out": 18927,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r04_fromager_age_fallback",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 409.8,
-   "turns": 1,
-   "tok_in": 109548,
-   "tok_cached": 2670592,
-   "tok_out": 10657,
-   "tok_reason": 0,
-   "quality": 5.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "r05_fromager_version_prebuilt",
-   "tier": 6,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 821.0,
-   "turns": 1,
-   "tok_in": 626220,
-   "tok_cached": 6179328,
-   "tok_out": 24581,
-   "tok_reason": 0,
-   "quality": 4.0,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t01_rename_symbol",
-   "tier": 1,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 87.1,
-   "turns": 1,
-   "tok_in": 24828,
-   "tok_cached": 504320,
-   "tok_out": 2684,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t02_ini_to_toml",
-   "tier": 1,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 94.2,
-   "turns": 1,
-   "tok_in": 17933,
-   "tok_cached": 410624,
-   "tok_out": 3462,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t03_add_type_hints",
-   "tier": 1,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 80.2,
-   "turns": 1,
-   "tok_in": 21549,
-   "tok_cached": 351744,
-   "tok_out": 2907,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t04_lru_cache",
-   "tier": 2,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 158.8,
-   "turns": 1,
-   "tok_in": 43214,
-   "tok_cached": 459264,
-   "tok_out": 6415,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t05_cli_json_flag",
-   "tier": 2,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 103.5,
-   "turns": 1,
-   "tok_in": 20593,
-   "tok_cached": 521216,
-   "tok_out": 3265,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t06_log_parser",
-   "tier": 2,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 157.3,
-   "turns": 1,
-   "tok_in": 26070,
-   "tok_cached": 531968,
-   "tok_out": 5882,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t07_mutable_default",
-   "tier": 3,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 135.3,
-   "turns": 1,
-   "tok_in": 37614,
-   "tok_cached": 513024,
-   "tok_out": 4251,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t08_timezone_bug",
-   "tier": 3,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 316.9,
-   "turns": 1,
-   "tok_in": 96639,
-   "tok_cached": 1018368,
-   "tok_out": 21858,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t09_thread_safety",
-   "tier": 3,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 241.2,
-   "turns": 1,
-   "tok_in": 86780,
-   "tok_cached": 592896,
-   "tok_out": 8853,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t10_plugin_registry",
-   "tier": 4,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 212.2,
-   "turns": 1,
-   "tok_in": 42989,
-   "tok_cached": 526848,
-   "tok_out": 9796,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t11_async_migration",
-   "tier": 4,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 152.4,
-   "turns": 1,
-   "tok_in": 101103,
-   "tok_cached": 530432,
-   "tok_out": 5692,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t12_needle_bug",
-   "tier": 5,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 144.9,
-   "turns": 1,
-   "tok_in": 51145,
-   "tok_cached": 758272,
-   "tok_out": 5319,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t13_unicode_dedupe",
-   "tier": 3,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 215.9,
-   "turns": 1,
-   "tok_in": 27217,
-   "tok_cached": 660992,
-   "tok_out": 9377,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t14_dep_resolver",
-   "tier": 4,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 600.4,
-   "turns": 1,
-   "tok_in": 213527,
-   "tok_cached": 1128448,
-   "tok_out": 28367,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t15_perf_regression",
-   "tier": 5,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 170.6,
-   "turns": 1,
-   "tok_in": 84622,
-   "tok_cached": 473600,
-   "tok_out": 5134,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
-  },
-  {
-   "task": "t16_json_patch",
-   "tier": 4,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 401.9,
-   "turns": 1,
-   "tok_in": 112831,
-   "tok_cached": 1058304,
-   "tok_out": 19084,
-   "tok_reason": 0,
-   "quality": NaN,
-   "config": "glm-5-3@medium"
   },
   {
    "task": "r01_fromager_distinfo",
@@ -7437,6 +7354,7 @@
    "tok_out": 10396,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7455,6 +7373,7 @@
    "tok_out": 3799,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7473,6 +7392,7 @@
    "tok_out": 3594,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7491,6 +7411,7 @@
    "tok_out": 3848,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7509,6 +7430,7 @@
    "tok_out": 7319,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7527,6 +7449,7 @@
    "tok_out": 7494,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7545,6 +7468,7 @@
    "tok_out": 7066,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7563,6 +7487,7 @@
    "tok_out": 13330,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "hidden tests failed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7581,6 +7506,7 @@
    "tok_out": 8023,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7599,6 +7525,7 @@
    "tok_out": 3949,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7617,6 +7544,7 @@
    "tok_out": 9735,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-5.6-terra@medium"
   },
   {
@@ -7635,6 +7563,7 @@
    "tok_out": 4028,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7653,6 +7582,7 @@
    "tok_out": 1376,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7671,6 +7601,7 @@
    "tok_out": 2210,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7689,6 +7620,7 @@
    "tok_out": 2025,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7707,6 +7639,7 @@
    "tok_out": 3132,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7725,6 +7658,7 @@
    "tok_out": 2912,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7743,6 +7677,7 @@
    "tok_out": 6042,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7761,6 +7696,7 @@
    "tok_out": 8547,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7779,6 +7715,7 @@
    "tok_out": 5900,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7797,6 +7734,7 @@
    "tok_out": 1643,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7815,6 +7753,7 @@
    "tok_out": 4413,
    "tok_reason": 0,
    "quality": NaN,
+   "verify_tail": "hidden tests passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -7833,6 +7772,7 @@
    "tok_out": 5742,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -7851,6 +7791,7 @@
    "tok_out": 6107,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -7869,6 +7810,7 @@
    "tok_out": 16284,
    "tok_reason": 0,
    "quality": 3.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "haiku-5-5@low"
   },
   {
@@ -7887,6 +7829,7 @@
    "tok_out": 6616,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -7905,6 +7848,7 @@
    "tok_out": 4416,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -7923,6 +7867,7 @@
    "tok_out": 11611,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "opus-5-5@medium"
   },
   {
@@ -7941,6 +7886,7 @@
    "tok_out": 3339,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -7959,6 +7905,7 @@
    "tok_out": 2660,
    "tok_reason": 0,
    "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -7977,7 +7924,464 @@
    "tok_out": 6870,
    "tok_reason": 0,
    "quality": 4.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
    "config": "sonnet-5-5@medium"
+  },
+  {
+   "task": "r01_fromager_distinfo",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": false,
+   "cost": 0.0,
+   "wall": 600.0,
+   "turns": 1,
+   "tok_in": 348034,
+   "tok_cached": 2141184,
+   "tok_out": 15713,
+   "tok_reason": 0,
+   "quality": 3.0,
+   "verify_tail": "hidden tests failed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r01t_fromager_distinfo_ticket",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 247.7,
+   "turns": 1,
+   "tok_in": 83991,
+   "tok_cached": 909312,
+   "tok_out": 5921,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r02_fromager_age_filter",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 221.1,
+   "turns": 1,
+   "tok_in": 112710,
+   "tok_cached": 854016,
+   "tok_out": 5163,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r02t_fromager_age_filter_ticket",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 364.8,
+   "turns": 1,
+   "tok_in": 97780,
+   "tok_cached": 1734656,
+   "tok_out": 8469,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r03_fromager_dep_chain",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 492.4,
+   "turns": 1,
+   "tok_in": 210643,
+   "tok_cached": 1624064,
+   "tok_out": 8860,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r03t_fromager_dep_chain_ticket",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 717.0,
+   "turns": 1,
+   "tok_in": 333821,
+   "tok_cached": 5660160,
+   "tok_out": 18927,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r04_fromager_age_fallback",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 409.8,
+   "turns": 1,
+   "tok_in": 109548,
+   "tok_cached": 2670592,
+   "tok_out": 10657,
+   "tok_reason": 0,
+   "quality": 5.0,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "r05_fromager_version_prebuilt",
+   "tier": 6,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 821.0,
+   "turns": 1,
+   "tok_in": 626220,
+   "tok_cached": 6179328,
+   "tok_out": 24581,
+   "tok_reason": 0,
+   "quality": 4.0,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t01_rename_symbol",
+   "tier": 1,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 87.1,
+   "turns": 1,
+   "tok_in": 24828,
+   "tok_cached": 504320,
+   "tok_out": 2684,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t02_ini_to_toml",
+   "tier": 1,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 94.2,
+   "turns": 1,
+   "tok_in": 17933,
+   "tok_cached": 410624,
+   "tok_out": 3462,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t03_add_type_hints",
+   "tier": 1,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 80.2,
+   "turns": 1,
+   "tok_in": 21549,
+   "tok_cached": 351744,
+   "tok_out": 2907,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t04_lru_cache",
+   "tier": 2,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 158.8,
+   "turns": 1,
+   "tok_in": 43214,
+   "tok_cached": 459264,
+   "tok_out": 6415,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t05_cli_json_flag",
+   "tier": 2,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 103.5,
+   "turns": 1,
+   "tok_in": 20593,
+   "tok_cached": 521216,
+   "tok_out": 3265,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t06_log_parser",
+   "tier": 2,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 157.3,
+   "turns": 1,
+   "tok_in": 26070,
+   "tok_cached": 531968,
+   "tok_out": 5882,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t07_mutable_default",
+   "tier": 3,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 135.3,
+   "turns": 1,
+   "tok_in": 37614,
+   "tok_cached": 513024,
+   "tok_out": 4251,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t08_timezone_bug",
+   "tier": 3,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 316.9,
+   "turns": 1,
+   "tok_in": 96639,
+   "tok_cached": 1018368,
+   "tok_out": 21858,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t09_thread_safety",
+   "tier": 3,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 241.2,
+   "turns": 1,
+   "tok_in": 86780,
+   "tok_cached": 592896,
+   "tok_out": 8853,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t10_plugin_registry",
+   "tier": 4,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 212.2,
+   "turns": 1,
+   "tok_in": 42989,
+   "tok_cached": 526848,
+   "tok_out": 9796,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t11_async_migration",
+   "tier": 4,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 152.4,
+   "turns": 1,
+   "tok_in": 101103,
+   "tok_cached": 530432,
+   "tok_out": 5692,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t12_needle_bug",
+   "tier": 5,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 144.9,
+   "turns": 1,
+   "tok_in": 51145,
+   "tok_cached": 758272,
+   "tok_out": 5319,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t13_unicode_dedupe",
+   "tier": 3,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 215.9,
+   "turns": 1,
+   "tok_in": 27217,
+   "tok_cached": 660992,
+   "tok_out": 9377,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t14_dep_resolver",
+   "tier": 4,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 600.4,
+   "turns": 1,
+   "tok_in": 213527,
+   "tok_cached": 1128448,
+   "tok_out": 28367,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t15_perf_regression",
+   "tier": 5,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 170.6,
+   "turns": 1,
+   "tok_in": 84622,
+   "tok_cached": 473600,
+   "tok_out": 5134,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "t16_json_patch",
+   "tier": 4,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 401.9,
+   "turns": 1,
+   "tok_in": 112831,
+   "tok_cached": 1058304,
+   "tok_out": 19084,
+   "tok_reason": 0,
+   "quality": NaN,
+   "verify_tail": "hidden tests passed",
+   "config": "glm-5-3@max"
   }
  ]
 }

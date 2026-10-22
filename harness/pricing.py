@@ -17,6 +17,7 @@ PRICES = {
     "gpt-5.6-luna":    dict(input=0.20,  cached=0.02, cache_write=0.25,  output=1.20),
     # GLM 5.3 via the Red Hat EnMaaS gateway: free (does not draw on the API budget). 252K context, no prompt cache.
     "rits/zai-org/glm-5-3": dict(input=0.0, cached=0.0, cache_write=0.0, output=0.0),
+    "rits/deepseek-ai/DeepSeek-V4.1-Flash-1017": dict(input=0.0, cached=0.0, cache_write=0.0, output=0.0),  # EnMaaS, 1M context
     # Anthropic list prices per claude-api skill table cached 2026-10-06. Claude Code reports cost
     # itself (total_cost_usd); these rows are only used when a record has tokens but no cost.
     "claude-fable-5-1":  dict(input=10.00, cached=1.00, cache_write=12.50, output=50.00),
@@ -29,7 +30,7 @@ PRICES = {
 }
 
 ALIASES = {"astra": "gpt-6-astra", "sol": "gpt-6.1-sol", "luna": "gpt-6-luna", "terra": "gpt-5.6-terra",
-           "glm": "rits/zai-org/glm-5-3", "fable": "claude-fable-5-1", "opus": "claude-opus-5-5", "sonnet": "claude-sonnet-5-5", "haiku": "claude-haiku-5-5"}
+           "glm": "rits/zai-org/glm-5-3", "deepseek": "rits/deepseek-ai/DeepSeek-V4.1-Flash-1017", "fable": "claude-fable-5-1", "opus": "claude-opus-5-5", "sonnet": "claude-sonnet-5-5", "haiku": "claude-haiku-5-5"}
 
 
 def resolve(model: str) -> str:

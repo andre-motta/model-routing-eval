@@ -53,6 +53,9 @@ def main():
         per_judge = S.get("per_case", {})
         model, agent = R.get("model"), R.get("agent", "claude-code")
         effort = (R.get("eval_params") or {}).get("effort") or "default"
+        if "glm-5-3" in model and effort != "default":
+            # GLM 5.3 on EnMaaS ran at max reasoning (confirmed 2026-10-22); record what ran.
+            effort = "max"
         rep = 0
         m = re.search(r"-r(\d+)$", run.name)
         if m:

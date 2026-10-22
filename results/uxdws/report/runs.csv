@@ -11,8 +11,6 @@ u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,low,0,True,1.1953982999999
 u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,low,1,True,1.0136526000000001,253.0,17,34,1783346,19335,0,,3,all checks passed,sonnet-5-5@low
 u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,medium,0,True,1.4420787000000002,521.2,29,58,3282267,38198,0,,3,all checks passed,sonnet-5-5@medium
 u02_uxd_prototype_workspace,,claude,claude-sonnet-5-5,medium,1,True,3.3776894700000017,720.4,63,126,14102441,71823,0,,3,all checks passed,sonnet-5-5@medium
-u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,medium,0,False,0.0,1255.2,1,351463,10355200,37051,0,,3,"failed: scenarios:cover-journey-routes, workspace-analysis:valid",glm-5-3@medium
-u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,medium,1,True,0.0,2060.7,1,263042,21659136,58889,0,,3,all checks passed,glm-5-3@medium
 u02_uxd_prototype_workspace,,codex,gpt-6-astra,low,0,True,8.333206,405.2,1,92018,2763648,12874,0,,3,all checks passed,gpt-6-astra@low
 u02_uxd_prototype_workspace,,codex,gpt-6-astra,medium,0,True,8.503296,431.5,1,106103,2579968,16284,0,,3,all checks passed,gpt-6-astra@medium
 u02_uxd_prototype_workspace,,codex,gpt-6-luna,low,0,True,0.43060428,1874.8,1,185130,17412864,60428,0,,3,all checks passed,gpt-6-luna@low
@@ -26,3 +24,5 @@ u02_uxd_prototype_workspace,,codex,gpt-6-astra,low,1,True,6.79136,380.3,1,98608,
 u02_uxd_prototype_workspace,,codex,gpt-6-astra,medium,1,True,10.694885,528.3,1,110434,3584640,17559,0,,3,all checks passed,gpt-6-astra@medium
 u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,low,1,True,1.3326622,518.5,1,94557,3552896,16257,0,,3,all checks passed,gpt-6.1-sol@low
 u02_uxd_prototype_workspace,,codex,gpt-6.1-sol,medium,1,True,1.5050375999999999,627.2,1,117777,3349248,24272,0,,3,all checks passed,gpt-6.1-sol@medium
+u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,max,0,False,0.0,1255.2,1,351463,10355200,37051,0,,3,"failed: scenarios:cover-journey-routes, workspace-analysis:valid",glm-5-3@max
+u02_uxd_prototype_workspace,,codex,rits/zai-org/glm-5-3,max,1,True,0.0,2060.7,1,263042,21659136,58889,0,,3,all checks passed,glm-5-3@max

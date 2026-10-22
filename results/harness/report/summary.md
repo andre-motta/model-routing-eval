@@ -8,7 +8,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 100% | $0.000 | 87 | 3 |
+| glm-5-3@max | 100% | $0.000 | 87 | 3 |
 | gpt-6-luna@low | 100% | $0.002 | 35 | 6 |
 | gpt-6-luna@xhigh | 100% | $0.004 | 99 | 3 |
 | haiku-5-5@low | 100% | $0.009 | 15 | 6 |
@@ -22,7 +22,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 100% | $0.000 | 140 | 3 |
+| glm-5-3@max | 100% | $0.000 | 140 | 3 |
 | gpt-6-luna@low | 100% | $0.003 | 58 | 6 |
 | gpt-6-luna@xhigh | 100% | $0.006 | 138 | 3 |
 | haiku-5-5@low | 100% | $0.010 | 22 | 6 |
@@ -36,7 +36,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 100% | $0.000 | 227 | 4 |
+| glm-5-3@max | 100% | $0.000 | 227 | 4 |
 | gpt-6-luna@low | 100% | $0.002 | 44 | 8 |
 | gpt-6-luna@xhigh | 100% | $0.006 | 142 | 4 |
 | haiku-5-5@low | 100% | $0.010 | 23 | 8 |
@@ -50,7 +50,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 100% | $0.000 | 342 | 4 |
+| glm-5-3@max | 100% | $0.000 | 342 | 4 |
 | gpt-6-luna@low | 88% | $0.005 | 88 | 8 |
 | gpt-6-luna@xhigh | 100% | $0.010 | 237 | 4 |
 | haiku-5-5@low | 100% | $0.014 | 38 | 8 |
@@ -66,7 +66,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 100% | $0.000 | 158 | 2 |
+| glm-5-3@max | 100% | $0.000 | 158 | 2 |
 | gpt-6-luna@low | 75% | $0.002 | 38 | 4 |
 | gpt-6-luna@xhigh | 100% | $0.005 | 117 | 2 |
 | haiku-5-5@low | 100% | $0.015 | 28 | 4 |
@@ -82,7 +82,7 @@
 
 | config | pass rate | mean cost | mean wall s | n |
 |---|---|---|---|---|
-| glm-5-3@medium | 88% | $0.000 | 484 | 8 |
+| glm-5-3@max | 88% | $0.000 | 484 | 8 |
 | gpt-6-luna@low | 81% | $0.010 | 128 | 16 |
 | gpt-6-luna@xhigh | 79% | $0.021 | 346 | 14 |
 | gpt-6.1-sol@low | 94% | $0.059 | 96 | 16 |
@@ -100,29 +100,29 @@
 | task | tier | cheapest passing config | cost | most expensive passing | cost | saving |
 |---|---|---|---|---|---|---|
 | r01_fromager_distinfo | 6 | gpt-6-luna@low | $0.007 | opus-5-5@medium | $1.048 | 99% |
-| r01t_fromager_distinfo_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.879 | 100% |
-| r02_fromager_age_filter | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.526 | 100% |
-| r02t_fromager_age_filter_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.719 | 100% |
-| r03_fromager_dep_chain | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.031 | 100% |
-| r03t_fromager_dep_chain_ticket | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.600 | 100% |
-| r04_fromager_age_fallback | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $1.504 | 100% |
-| r05_fromager_version_prebuilt | 6 | glm-5-3@medium | $0.000 | opus-5-5@medium | $2.050 | 100% |
-| t01_rename_symbol | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.214 | 100% |
-| t02_ini_to_toml | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.232 | 100% |
-| t03_add_type_hints | 1 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.234 | 100% |
-| t04_lru_cache | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.294 | 100% |
-| t05_cli_json_flag | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.278 | 100% |
-| t06_log_parser | 2 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.376 | 100% |
-| t07_mutable_default | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.299 | 100% |
-| t08_timezone_bug | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.289 | 100% |
-| t09_thread_safety | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.206 | 100% |
-| t10_plugin_registry | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.392 | 100% |
-| t11_async_migration | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.253 | 100% |
-| t12_needle_bug | 5 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.427 | 100% |
-| t13_unicode_dedupe | 3 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.302 | 100% |
-| t14_dep_resolver | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $2.665 | 100% |
-| t15_perf_regression | 5 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.543 | 100% |
-| t16_json_patch | 4 | glm-5-3@medium | $0.000 | opus-5-5@medium | $0.495 | 100% |
+| r01t_fromager_distinfo_ticket | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.879 | 100% |
+| r02_fromager_age_filter | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.526 | 100% |
+| r02t_fromager_age_filter_ticket | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.719 | 100% |
+| r03_fromager_dep_chain | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $1.031 | 100% |
+| r03t_fromager_dep_chain_ticket | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $1.600 | 100% |
+| r04_fromager_age_fallback | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $1.504 | 100% |
+| r05_fromager_version_prebuilt | 6 | glm-5-3@max | $0.000 | opus-5-5@medium | $2.050 | 100% |
+| t01_rename_symbol | 1 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.214 | 100% |
+| t02_ini_to_toml | 1 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.232 | 100% |
+| t03_add_type_hints | 1 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.234 | 100% |
+| t04_lru_cache | 2 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.294 | 100% |
+| t05_cli_json_flag | 2 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.278 | 100% |
+| t06_log_parser | 2 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.376 | 100% |
+| t07_mutable_default | 3 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.299 | 100% |
+| t08_timezone_bug | 3 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.289 | 100% |
+| t09_thread_safety | 3 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.206 | 100% |
+| t10_plugin_registry | 4 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.392 | 100% |
+| t11_async_migration | 4 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.253 | 100% |
+| t12_needle_bug | 5 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.427 | 100% |
+| t13_unicode_dedupe | 3 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.302 | 100% |
+| t14_dep_resolver | 4 | glm-5-3@max | $0.000 | opus-5-5@medium | $2.665 | 100% |
+| t15_perf_regression | 5 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.543 | 100% |
+| t16_json_patch | 4 | glm-5-3@max | $0.000 | opus-5-5@medium | $0.495 | 100% |
 
 ## Routing scenario
 

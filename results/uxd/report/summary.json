@@ -2,7 +2,7 @@
  "n_runs": 27,
  "n_tasks": 1,
  "configs": [
-  "glm-5-3@medium",
+  "glm-5-3@max",
   "gpt-6-astra@low",
   "gpt-6-astra@medium",
   "gpt-6-luna@low",
@@ -42,6 +42,7 @@
    "tok_out": 19959,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -60,6 +61,7 @@
    "tok_out": 59729,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -78,6 +80,7 @@
    "tok_out": 24125,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "opus-5-5@low"
   },
   {
@@ -96,6 +99,7 @@
    "tok_out": 56307,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -114,6 +118,7 @@
    "tok_out": 14662,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -132,25 +137,8 @@
    "tok_out": 19473,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "sonnet-5-5@medium"
-  },
-  {
-   "task": "u01_uxd_prototype_create",
-   "tier": null,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 0,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 584.4,
-   "turns": 1,
-   "tok_in": 281339,
-   "tok_cached": 3120640,
-   "tok_out": 27562,
-   "tok_reason": 0,
-   "quality": 3,
-   "config": "glm-5-3@medium"
   },
   {
    "task": "u01_uxd_prototype_create",
@@ -168,6 +156,7 @@
    "tok_out": 12345,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-astra@low"
   },
   {
@@ -186,6 +175,7 @@
    "tok_out": 12984,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -204,6 +194,7 @@
    "tok_out": 14792,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-luna@medium"
   },
   {
@@ -222,6 +213,7 @@
    "tok_out": 11523,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -240,6 +232,7 @@
    "tok_out": 21699,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -258,6 +251,7 @@
    "tok_out": 25108,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "haiku-5-5@low"
   },
   {
@@ -276,6 +270,7 @@
    "tok_out": 48400,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "haiku-5-5@medium"
   },
   {
@@ -294,6 +289,7 @@
    "tok_out": 19274,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "opus-5-5@low"
   },
   {
@@ -312,6 +308,7 @@
    "tok_out": 75115,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "opus-5-5@medium"
   },
   {
@@ -330,6 +327,7 @@
    "tok_out": 16811,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "sonnet-5-5@low"
   },
   {
@@ -348,6 +346,7 @@
    "tok_out": 26497,
    "tok_reason": 0,
    "quality": 4,
+   "verify_tail": "all structural checks passed",
    "config": "sonnet-5-5@medium"
   },
   {
@@ -366,6 +365,7 @@
    "tok_out": 14942,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -384,6 +384,7 @@
    "tok_out": 23731,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-luna@low"
   },
   {
@@ -402,6 +403,7 @@
    "tok_out": 15838,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-luna@medium"
   },
   {
@@ -420,6 +422,7 @@
    "tok_out": 8438,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6.1-sol@low"
   },
   {
@@ -438,25 +441,8 @@
    "tok_out": 16673,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6.1-sol@medium"
-  },
-  {
-   "task": "u01_uxd_prototype_create",
-   "tier": null,
-   "backend": "codex",
-   "model": "rits/zai-org/glm-5-3",
-   "effort": "medium",
-   "rep": 1,
-   "passed": true,
-   "cost": 0.0,
-   "wall": 657.6,
-   "turns": 1,
-   "tok_in": 141941,
-   "tok_cached": 3729920,
-   "tok_out": 32614,
-   "tok_reason": 0,
-   "quality": 3,
-   "config": "glm-5-3@medium"
   },
   {
    "task": "u01_uxd_prototype_create",
@@ -474,6 +460,7 @@
    "tok_out": 8024,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-astra@low"
   },
   {
@@ -492,6 +479,7 @@
    "tok_out": 9299,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6-astra@medium"
   },
   {
@@ -510,7 +498,46 @@
    "tok_out": 22494,
    "tok_reason": 0,
    "quality": 3,
+   "verify_tail": "all structural checks passed",
    "config": "gpt-6.1-sol@medium"
+  },
+  {
+   "task": "u01_uxd_prototype_create",
+   "tier": null,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 0,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 584.4,
+   "turns": 1,
+   "tok_in": 281339,
+   "tok_cached": 3120640,
+   "tok_out": 27562,
+   "tok_reason": 0,
+   "quality": 3,
+   "verify_tail": "all structural checks passed",
+   "config": "glm-5-3@max"
+  },
+  {
+   "task": "u01_uxd_prototype_create",
+   "tier": null,
+   "backend": "codex",
+   "model": "rits/zai-org/glm-5-3",
+   "effort": "max",
+   "rep": 1,
+   "passed": true,
+   "cost": 0.0,
+   "wall": 657.6,
+   "turns": 1,
+   "tok_in": 141941,
+   "tok_cached": 3729920,
+   "tok_out": 32614,
+   "tok_reason": 0,
+   "quality": 3,
+   "verify_tail": "all structural checks passed",
+   "config": "glm-5-3@max"
   }
  ]
 }

@@ -3,7 +3,7 @@
  "tier": 4,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
- "effort": "medium",
+ "effort": "max",
  "rep": 0,
  "passed": true,
  "quality": null,

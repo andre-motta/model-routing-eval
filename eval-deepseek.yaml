@@ -1,0 +1,27 @@
+# DeepSeek V4.1 Flash through the EnMaaS gateway (free, 1M context), driven by Codex CLI.
+# Run: ./run_eval.sh rits/deepseek-ai/DeepSeek-V4.1-Flash-1017 medium eval-deepseek.yaml
+extends: ./eval.yaml
+runner:
+  type: codex
+  effort: medium
+  settings:
+    model_provider: enmaas
+    model_providers.enmaas.name: EnMaaS
+    model_providers.enmaas.base_url: https://api.enmaas.devshift.net/v1
+    model_providers.enmaas.env_key: ENMAAS_KEY
+    model_providers.enmaas.wire_api: responses
+    model_context_window: 1048576
+  env:
+    ENMAAS_KEY: $ENMAAS_KEY
+models:
+  skill: rits/deepseek-ai/DeepSeek-V4.1-Flash-1017
+matrix:
+  factors:
+    model: !replace
+      - rits/deepseek-ai/DeepSeek-V4.1-Flash-1017
+    effort: !replace
+      - medium
+judges:
+  # A runner:/ judge inside a Codex profile would run Opus through Codex. Skip during the run; ./rescore.sh re-judges.
+  - name: solution_quality
+    if: "False"

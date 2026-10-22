@@ -37,7 +37,7 @@ SKILL_URL = "https://github.com/rh-uxd/ai-helpers/tree/main/plugins/uxd-prototyp
 
 
 def model_key(model: str) -> str:
-    m = model.rsplit("/", 1)[-1]
+    m = model.rsplit("/", 1)[-1]  # rits/zai-org/glm-5-3 -> glm-5-3, rits/deepseek-ai/DeepSeek-... -> DeepSeek-...
     return m[len("claude-"):] if m.startswith("claude-") else m
 
 
@@ -276,7 +276,7 @@ HTML, not the render, and did not catch that.</p>
 <h2>Runs</h2>
 <table><thead><tr><th>model @ effort</th><th>agent</th><th class="num">judge</th><th>checks</th><th class="num">scenarios</th><th class="num">cost</th><th class="num">wall</th><th class="num">turns</th></tr></thead>
 <tbody>{''.join(rows)}</tbody></table>
-<p class="note">Cost is list price from token usage; EnMaaS runs are free. Scenarios counts the non-default <code>?scenario=</code> states the run declared in scenarios.json.</p>
+<p class="note">Cost is list price from token usage; EnMaaS runs are free. GLM 5.3 ran at max reasoning. Scenarios counts the non-default <code>?scenario=</code> states the run declared in scenarios.json.</p>
 <h2>What it built</h2>
 <div class="hdr" id="hdr"></div>
 <p><b>Judge:</b> <span id="rat"></span></p>

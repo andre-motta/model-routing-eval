@@ -37,12 +37,12 @@ TIER_DEFS = {
     7: ("Skill pipeline", "Run a team's multi-step skill end to end, headless, from a real RFE: the UXD uxd-prototype-create skill on RHAISTRAT-1527 (Multimodal Playground). A structural checker verifies every promised artifact and the ?scenario= wiring; an LLM judge scores MVP coverage against the RFE.",
         "journeys.json, scenarios.json, PatternFly 6 standalone prototype, Prototype Bar install"),
 }
-PRETTY = {"glm-5-3": "GLM 5.3", "gpt-6-luna": "Luna", "gpt-6.1-sol": "Sol 6.1", "gpt-5.6-terra": "Terra 5.6",
+PRETTY = {"glm-5-3": "GLM 5.3", "DeepSeek-V4.1-Flash-1017": "DeepSeek V4.1 Flash", "gpt-6-luna": "Luna", "gpt-6.1-sol": "Sol 6.1", "gpt-5.6-terra": "Terra 5.6",
           "gpt-6-astra": "Astra", "haiku-5-5": "Haiku 5.5", "sonnet-5-5": "Sonnet 5.5", "opus-5-5": "Opus 5.5", "fable-5-1": "Fable 5.1"}
 # Price tier of each model. Colour follows the tier (an entity attribute), never the rank.
-TIER_OF = {"glm-5-3": "free", "gpt-6-luna": "floor", "haiku-5-5": "floor", "gpt-6.1-sol": "middle", "sonnet-5-5": "middle",
+TIER_OF = {"glm-5-3": "free", "DeepSeek-V4.1-Flash-1017": "free", "gpt-6-luna": "floor", "haiku-5-5": "floor", "gpt-6.1-sol": "middle", "sonnet-5-5": "middle",
            "gpt-5.6-terra": "middle", "opus-5-5": "flagship", "gpt-6-astra": "flagship", "fable-5-1": "flagship"}
-TIER_LABEL = {"floor": "Floor tier ($0.10 per 1M input)", "middle": "Middle tier ($2)", "flagship": "Flagship tier ($4 to $10)", "free": "Free (GLM via EnMaaS)"}
+TIER_LABEL = {"floor": "Floor tier ($0.10 per 1M input)", "middle": "Middle tier ($2)", "flagship": "Flagship tier ($4 to $10)", "free": "Free (GLM, DeepSeek via EnMaaS)"}
 
 CSS = """
 :root{color-scheme:light;--surface:#fcfcfb;--surface-2:#f0efec;--grid:#e3e2de;--ink:#0b0b0b;--ink-2:#52514e;--ink-3:#8a8984;
@@ -367,7 +367,10 @@ for real-repository tasks Claude Opus 5.5 also scores the diff against the merge
 <a href="https://github.com/andre-motta/model-routing-eval">github.com/andre-motta/model-routing-eval</a>.</p>
 {tiles_html}
 <p class="note">Costs are list prices, October 2026, from token usage. Claude Code reports its own cost; Codex runs are priced from the repository rate
-table; GLM 5.3 via the EnMaaS gateway is free. Configurations are model@effort. Colour follows the price tier.</p>
+table; GLM 5.3 via the EnMaaS gateway is free. Configurations are model@effort. Colour follows the price tier.
+GLM 5.3 ran at max reasoning.
+The gateway caches prompt prefixes: 92% of the input tokens in the GLM runs were cache reads, and a repeated 2.5K-token prefix measured on
+2026-10-22 came back 81% cached on GLM 5.3 and 98% on DeepSeek V4.1 Flash.</p>
 
 <h2>Task tiers</h2>
 <p class="note">Every configuration ran the same tasks. Tiers group them by what the agent has to do, not by size of the diff.</p>

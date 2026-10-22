@@ -1,5 +1,6 @@
 # GLM 5.3 via EnMaaS for the workspace-mode suite.
 #   ./run_eval.sh rits/zai-org/glm-5-3 medium eval-uxdws-glm.yaml
+# GLM 5.3 runs at max reasoning on the gateway; import_runs.py records max.
 extends: ./eval-uxdws.yaml
 runner:
   type: codex

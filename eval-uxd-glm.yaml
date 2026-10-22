@@ -1,5 +1,6 @@
 # GLM 5.3 through the EnMaaS gateway for the tier 7 skill-pipeline suite, driven by Codex CLI.
 #   ./run_eval.sh rits/zai-org/glm-5-3 medium eval-uxd-glm.yaml
+# GLM 5.3 runs at max reasoning on the gateway; import_runs.py records max.
 extends: ./eval-uxd.yaml
 runner:
   type: codex

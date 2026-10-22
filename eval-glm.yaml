@@ -1,4 +1,5 @@
-# GLM 5.3 through the EnMaaS gateway (free, 252K context, no prompt cache), driven by Codex CLI.
+# GLM 5.3 through the EnMaaS gateway (free, 1M context since 2026-10-21, prompt prefix cache on), driven by Codex CLI.
+# GLM 5.3 runs at max reasoning on the gateway; import_runs.py records the runs as max.
 # Same as `codex --profile enmaas`, spelled out as -c overrides because the harness runner takes
 # settings, not a profile name. The gateway key is read from $ENMAAS_KEY in the caller's environment.
 # Run: ./run_eval.sh rits/zai-org/glm-5-3 medium eval-glm.yaml
@@ -12,6 +13,7 @@ runner:
     model_providers.enmaas.base_url: https://api.enmaas.devshift.net/v1
     model_providers.enmaas.env_key: ENMAAS_KEY
     model_providers.enmaas.wire_api: responses
+    model_context_window: 1048576
   env:
     ENMAAS_KEY: $ENMAAS_KEY
 models:
