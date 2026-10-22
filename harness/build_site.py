@@ -19,6 +19,12 @@ from harness.run import ROOT  # noqa: E402
 RUNS = ROOT / "eval" / "runs" / "model-routing-eval"
 ANOVA = ROOT / "eval" / "anova"
 RESULTS = ROOT / "results" / "harness"
+RENAMED_RUNS = {"glm-5-3-medium": "glm-5-3-max"}
+
+
+def redirect(target: str) -> str:
+    return (f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url={target}">'
+            f'<link rel="canonical" href="{target}"><title>Moved</title></head><body><p>Moved to <a href="{target}">{target}</a>.</p></body></html>')
 
 TIER_NAMES = {1: "Mechanical", 2: "Bounded impl.", 3: "Debugging", 4: "Architecture", 5: "Long context", 6: "Real repo", 7: "Skill pipeline"}
 TIER_DEFS = {
@@ -398,6 +404,9 @@ The gateway caches prompt prefixes: 92% of the input tokens in the GLM runs were
 <p class="note">Built by <code>harness/build_site.py</code>. Hover or focus any mark for details; every value is also in the tables.</p>
 <script>{JS}</script></body></html>"""
     (out / "index.html").write_text(page)
+    # Old URLs of runs renamed after publication (GLM ran at max, not medium)
+    for old, new in RENAMED_RUNS.items():
+        (out / "runs" / f"{old}.html").write_text(redirect(f"{new}.html"))
     (out / ".nojekyll").write_text("")
     print(f"site: {out} ({len(run_rows)} run reports, {len(compares)} compare reports)")
 

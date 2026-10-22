@@ -1,5 +1,5 @@
 {
- "task": "t14_dep_resolver",
+ "task": "t11_async_migration",
  "tier": 4,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 600.4,
+ "run_id": "glm-5-3-max",
+ "wall_s": 152.4,
  "tokens": {
-  "input": 213527,
-  "cached": 1128448,
+  "input": 101103,
+  "cached": 530432,
   "cache_write": 0,
-  "output": 28367,
+  "output": 5692,
   "reasoning": 0
  },
  "turns": 1,

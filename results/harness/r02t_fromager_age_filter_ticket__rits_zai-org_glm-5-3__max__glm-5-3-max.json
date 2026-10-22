@@ -8,7 +8,7 @@
  "passed": true,
  "quality": 5,
  "verify_tail": "Skipped: condition 'not annotations.get('ticket_only')' is false",
- "run_id": "glm-5-3-medium",
+ "run_id": "glm-5-3-max",
  "wall_s": 364.8,
  "tokens": {
   "input": 97780,

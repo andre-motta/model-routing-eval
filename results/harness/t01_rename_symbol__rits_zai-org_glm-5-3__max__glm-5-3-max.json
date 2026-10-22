@@ -1,5 +1,5 @@
 {
- "task": "t02_ini_to_toml",
+ "task": "t01_rename_symbol",
  "tier": 1,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 94.2,
+ "run_id": "glm-5-3-max",
+ "wall_s": 87.1,
  "tokens": {
-  "input": 17933,
-  "cached": 410624,
+  "input": 24828,
+  "cached": 504320,
   "cache_write": 0,
-  "output": 3462,
+  "output": 2684,
   "reasoning": 0
  },
  "turns": 1,

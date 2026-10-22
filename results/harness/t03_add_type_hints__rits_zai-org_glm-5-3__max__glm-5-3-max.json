@@ -1,6 +1,6 @@
 {
- "task": "t13_unicode_dedupe",
- "tier": 3,
+ "task": "t03_add_type_hints",
+ "tier": 1,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
  "effort": "max",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 215.9,
+ "run_id": "glm-5-3-max",
+ "wall_s": 80.2,
  "tokens": {
-  "input": 27217,
-  "cached": 660992,
+  "input": 21549,
+  "cached": 351744,
   "cache_write": 0,
-  "output": 9377,
+  "output": 2907,
   "reasoning": 0
  },
  "turns": 1,

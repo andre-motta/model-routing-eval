@@ -8,7 +8,7 @@
  "passed": false,
  "quality": 3,
  "verify_tail": "failed: scenarios:cover-journey-routes, workspace-analysis:valid",
- "run_id": "2026-10-19-glm-5-3-effort-medium",
+ "run_id": "2026-10-19-glm-5-3-effort-max",
  "wall_s": 1255.2,
  "tokens": {
   "input": 351463,

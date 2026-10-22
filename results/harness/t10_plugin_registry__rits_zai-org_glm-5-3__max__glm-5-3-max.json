@@ -1,6 +1,6 @@
 {
- "task": "t07_mutable_default",
- "tier": 3,
+ "task": "t10_plugin_registry",
+ "tier": 4,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
  "effort": "max",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 135.3,
+ "run_id": "glm-5-3-max",
+ "wall_s": 212.2,
  "tokens": {
-  "input": 37614,
-  "cached": 513024,
+  "input": 42989,
+  "cached": 526848,
   "cache_write": 0,
-  "output": 4251,
+  "output": 9796,
   "reasoning": 0
  },
  "turns": 1,

@@ -289,6 +289,12 @@ HTML, not the render, and did not catch that.</p>
 <p class="note">Built by <code>harness/build_uxd.py</code>. Screenshots are headless Chrome at 1280 px.</p>
 <script>{JS}</script><script>{js}</script>{ws_js}</body></html>"""
     (out / "index.html").write_text(html)
+    # Old prototype URLs of runs renamed after publication (GLM ran at max, not medium)
+    for old_id, new_id in {"2026-10-19-glm-5-3-effort-medium": "2026-10-19-glm-5-3-effort-max",
+                           "2026-10-19-glm-5-3-effort-medium-r1": "2026-10-19-glm-5-3-effort-max-r1"}.items():
+        d = out / old_id; d.mkdir(parents=True, exist_ok=True)
+        (d / "index.html").write_text(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=../{new_id}/">'
+                                      f'<title>Moved</title></head><body><p>Moved to <a href="../{new_id}/">{new_id}</a>.</p></body></html>')
 
 
 def ws_section(runs_ws):

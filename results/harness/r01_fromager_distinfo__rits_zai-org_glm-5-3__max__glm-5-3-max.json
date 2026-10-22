@@ -8,7 +8,7 @@
  "passed": false,
  "quality": 3,
  "verify_tail": "hidden tests failed",
- "run_id": "glm-5-3-medium",
+ "run_id": "glm-5-3-max",
  "wall_s": 600.0,
  "tokens": {
   "input": 348034,

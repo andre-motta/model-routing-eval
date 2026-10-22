@@ -1,6 +1,6 @@
 {
- "task": "t16_json_patch",
- "tier": 4,
+ "task": "t07_mutable_default",
+ "tier": 3,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
  "effort": "max",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 401.9,
+ "run_id": "glm-5-3-max",
+ "wall_s": 135.3,
  "tokens": {
-  "input": 112831,
-  "cached": 1058304,
+  "input": 37614,
+  "cached": 513024,
   "cache_write": 0,
-  "output": 19084,
+  "output": 4251,
   "reasoning": 0
  },
  "turns": 1,

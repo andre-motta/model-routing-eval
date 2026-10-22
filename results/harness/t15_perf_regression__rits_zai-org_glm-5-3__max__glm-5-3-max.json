@@ -1,6 +1,6 @@
 {
- "task": "t08_timezone_bug",
- "tier": 3,
+ "task": "t15_perf_regression",
+ "tier": 5,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
  "effort": "max",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 316.9,
+ "run_id": "glm-5-3-max",
+ "wall_s": 170.6,
  "tokens": {
-  "input": 96639,
-  "cached": 1018368,
+  "input": 84622,
+  "cached": 473600,
   "cache_write": 0,
-  "output": 21858,
+  "output": 5134,
   "reasoning": 0
  },
  "turns": 1,

@@ -1,6 +1,6 @@
 {
- "task": "t01_rename_symbol",
- "tier": 1,
+ "task": "t12_needle_bug",
+ "tier": 5,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
  "effort": "max",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 87.1,
+ "run_id": "glm-5-3-max",
+ "wall_s": 144.9,
  "tokens": {
-  "input": 24828,
-  "cached": 504320,
+  "input": 51145,
+  "cached": 758272,
   "cache_write": 0,
-  "output": 2684,
+  "output": 5319,
   "reasoning": 0
  },
  "turns": 1,

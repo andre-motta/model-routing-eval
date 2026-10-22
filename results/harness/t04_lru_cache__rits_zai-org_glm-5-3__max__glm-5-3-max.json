@@ -1,5 +1,5 @@
 {
- "task": "t06_log_parser",
+ "task": "t04_lru_cache",
  "tier": 2,
  "backend": "codex",
  "model": "rits/zai-org/glm-5-3",
@@ -8,13 +8,13 @@
  "passed": true,
  "quality": null,
  "verify_tail": "hidden tests passed",
- "run_id": "glm-5-3-medium",
- "wall_s": 157.3,
+ "run_id": "glm-5-3-max",
+ "wall_s": 158.8,
  "tokens": {
-  "input": 26070,
-  "cached": 531968,
+  "input": 43214,
+  "cached": 459264,
   "cache_write": 0,
-  "output": 5882,
+  "output": 6415,
   "reasoning": 0
  },
  "turns": 1,

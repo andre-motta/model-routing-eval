@@ -8,7 +8,7 @@
  "passed": true,
  "quality": 3,
  "verify_tail": "all structural checks passed",
- "run_id": "2026-10-19-glm-5-3-effort-medium",
+ "run_id": "2026-10-19-glm-5-3-effort-max",
  "wall_s": 584.4,
  "tokens": {
   "input": 281339,
